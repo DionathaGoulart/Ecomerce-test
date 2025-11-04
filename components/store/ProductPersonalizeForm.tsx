@@ -173,7 +173,7 @@ export default function ProductPersonalizeForm({
           Descrição da personalização <span className="text-gray-400 font-normal">(opcional)</span>
         </Label>
         <p className="text-sm text-gray-500 mb-3 leading-relaxed">
-          Descreva como você quer que a imagem seja aplicada no produto. Ex: "Colocar no centro da caneca", "Fundo branco, imagem no topo", etc.
+          Descreva como você quer que a imagem seja aplicada no produto. Ex: &ldquo;Colocar no centro da caneca&rdquo;, &ldquo;Fundo branco, imagem no topo&rdquo;, etc.
         </p>
         <Input
           id="personalization-description"
