@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       const product = productMap.get(item.productId)!
       
       // Construir objeto de personalização se houver imagem ou descrição
-      let personalization = null
+      let personalization: { imageUrl?: string; description?: string } | null = null
       if (item.personalizationImageUrl || item.personalizationDescription) {
         personalization = {}
         if (item.personalizationImageUrl) {
