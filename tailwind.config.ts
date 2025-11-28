@@ -11,6 +11,14 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        'header-bg': '#212121',
+        'header-border': '#3D3D3D',
+        'cart-button': '#E9EF33',
+        'body-bg': '#121212',
+      },
+      spacing: {
+        'header-top': '45px',
+        'header-sides': '390px',
       },
     },
   },
