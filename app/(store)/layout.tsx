@@ -14,14 +14,14 @@ export default function StoreLayout({
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/', label: 'Home' },
+    { href: '/#home', label: 'Home' },
     { href: '/beneficios', label: 'Benefícios' },
     { href: '/como-funciona', label: 'Como Funciona' },
     { href: '/store', label: 'Catálogo' },
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#121212]">
+    <div className="flex min-h-screen flex-col bg-[#0A0A0A]">
       {/* Header fixo */}
       <header className="fixed top-[45px] left-0 right-0 z-40 px-96">
         <div className="rounded-2xl border border-[#3D3D3D] bg-[#212121] px-6 py-4">
@@ -34,10 +34,33 @@ export default function StoreLayout({
             {/* Nav no meio */}
             <nav className="flex items-center gap-4">
               {navItems.map((item) => {
+                const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                  if (item.href === '/#home') {
+                    e.preventDefault()
+                    
+                    // Aguarda um frame para garantir que o DOM está pronto
+                    requestAnimationFrame(() => {
+                      const homeSection = document.getElementById('home')
+                      if (homeSection) {
+                        // Calcula a posição considerando o header fixo
+                        const headerOffset = 120
+                        const elementPosition = homeSection.offsetTop
+                        const offsetPosition = elementPosition - headerOffset
+
+                        window.scrollTo({
+                          top: Math.max(0, offsetPosition),
+                          behavior: 'smooth'
+                        })
+                      }
+                    })
+                  }
+                }
+                
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={handleClick}
                     className="group flex items-center gap-1.5 px-5 py-3.5 text-xs font-medium text-white transition-opacity hover:opacity-80"
                   >
                     <span>{item.label}</span>
