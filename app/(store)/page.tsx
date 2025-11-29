@@ -19,47 +19,66 @@ export default function Home() {
     video.pause()
 
     let rafId: number | null = null
+    let isRunning = true
+    let lastScrollTop = window.scrollY
 
     const updateVideoFrame = () => {
+      if (!isRunning) return
+      
+      // Pausa o loop durante animação programática (controlada pelo layout.tsx)
+      if ((video as any).__isProgrammaticScroll) {
+        rafId = requestAnimationFrame(updateVideoFrame)
+        return
+      }
+      
       const scrollTop = window.scrollY
       const containerHeight = container.offsetHeight
       const videoDuration = video.duration || 0
       
-      if (videoDuration > 0 && containerHeight > 0) {
+      // Só atualiza se o scroll mudou ou se o vídeo está pronto
+      if (videoDuration > 0 && containerHeight > 0 && video.readyState >= 2) {
         // Calcula o progresso do scroll (0 a 1)
         const scrollProgress = Math.max(0, Math.min(1, scrollTop / containerHeight))
         
         // Calcula o tempo do vídeo baseado no progresso do scroll
         const targetTime = scrollProgress * videoDuration
-        video.currentTime = Math.min(targetTime, videoDuration)
+        
+        // Atualiza o vídeo diretamente - sem debounce para capturar todos os frames
+        if (Math.abs(video.currentTime - targetTime) > 0.001) {
+          video.currentTime = Math.min(targetTime, videoDuration)
+        }
       }
       
-      rafId = null
-    }
-
-    const handleScroll = () => {
-      // Usa requestAnimationFrame para atualizações suaves
-      if (!rafId) {
+      // Continua o loop para garantir que todos os frames sejam capturados
+      if (isRunning) {
         rafId = requestAnimationFrame(updateVideoFrame)
+      } else {
+        rafId = null
       }
     }
 
     // Carrega os metadados do vídeo para obter a duração
     const handleLoadedMetadata = () => {
       video.currentTime = 0
-      // Executa uma vez no início para sincronizar
-      updateVideoFrame()
+      // Inicia o loop contínuo
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateVideoFrame)
+      }
     }
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata)
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    // Inicia o loop imediatamente se o vídeo já estiver carregado
+    if (video.readyState >= 2) {
+      rafId = requestAnimationFrame(updateVideoFrame)
+    }
 
     return () => {
+      isRunning = false
       if (rafId) {
         cancelAnimationFrame(rafId)
       }
       video.removeEventListener('loadedmetadata', handleLoadedMetadata)
-      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
