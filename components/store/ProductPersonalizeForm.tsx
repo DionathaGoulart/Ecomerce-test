@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -158,10 +159,13 @@ export default function ProductPersonalizeForm({
           {imageUrl && !uploadError && (
             <div className="mt-4">
               <p className="text-sm text-gray-500 mb-3">Preview da imagem:</p>
-              <img
+              <Image
                 src={imageUrl}
                 alt="Preview"
+                width={128}
+                height={128}
                 className="h-32 w-32 rounded-xl object-cover border border-gray-200 shadow-sm"
+                unoptimized
               />
             </div>
           )}

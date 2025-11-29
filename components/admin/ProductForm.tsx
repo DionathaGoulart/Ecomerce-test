@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { productSchema, type ProductInput } from '@/lib/validations/product'
@@ -191,10 +192,13 @@ export default function ProductForm({ product }: ProductFormProps) {
         )}
         {imageUrl && (
           <div className="mt-4">
-            <img
+            <Image
               src={imageUrl}
               alt="Preview"
+              width={128}
+              height={128}
               className="h-32 w-32 rounded-md object-cover"
+              unoptimized
             />
           </div>
         )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
 interface ImageModalProps {
@@ -82,12 +83,17 @@ export default function ImageModal({ imageUrl, onClose, alt = 'Imagem' }: ImageM
         </button>
 
         {/* Imagem */}
-        <img
-          src={imageUrl}
-          alt={alt}
-          className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-2xl"
-          style={{ maxHeight: '85vh' }}
-        />
+        <div className="relative max-h-[85vh] max-w-full">
+          <Image
+            src={imageUrl}
+            alt={alt}
+            width={1200}
+            height={800}
+            className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-2xl"
+            style={{ maxHeight: '85vh', width: 'auto', height: 'auto' }}
+            unoptimized
+          />
+        </div>
 
         {/* Botão download */}
         <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">

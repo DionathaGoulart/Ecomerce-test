@@ -270,10 +270,13 @@ export default function CartCheckoutForm() {
                     {item.personalizationImageUrl && (
                       <div>
                         <p className="text-xs font-medium text-gray-700">Imagem de personalização:</p>
-                        <img
+                        <Image
                           src={item.personalizationImageUrl}
                           alt="Personalização"
+                          width={64}
+                          height={64}
                           className="mt-2 h-16 w-16 rounded-xl object-cover border border-gray-200"
+                          unoptimized
                         />
                       </div>
                     )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import ImageModal from './ImageModal'
 
 interface PersonalizationImageProps {
@@ -23,10 +24,7 @@ export default function PersonalizationImage({
     <>
       <div className="relative group cursor-pointer inline-block">
         <div className="relative overflow-hidden rounded-md border border-gray-300 mt-2">
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="h-32 w-32 rounded object-cover transition-transform duration-300 group-hover:scale-105 block"
+          <div
             onClick={handleImageClick}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -37,7 +35,17 @@ export default function PersonalizationImage({
             tabIndex={0}
             role="button"
             aria-label="Clique para ampliar imagem"
-          />
+            className="cursor-pointer"
+          >
+            <Image
+              src={imageUrl}
+              alt={alt}
+              width={128}
+              height={128}
+              className="h-32 w-32 rounded object-cover transition-transform duration-300 group-hover:scale-105 block"
+              unoptimized
+            />
+          </div>
           {/* Overlay no hover - mesmo tamanho da imagem */}
           <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded transition-all duration-300 pointer-events-none">
             <svg
