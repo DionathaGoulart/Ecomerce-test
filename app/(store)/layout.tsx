@@ -15,7 +15,7 @@ export default function StoreLayout({
 
   const navItems = [
     { href: '/#home', label: 'Home' },
-    { href: '/beneficios', label: 'Benefícios' },
+    { href: '/#beneficios', label: 'Benefícios' },
     { href: '/como-funciona', label: 'Como Funciona' },
     { href: '/store', label: 'Catálogo' },
   ]
@@ -35,32 +35,75 @@ export default function StoreLayout({
             <nav className="flex items-center gap-4">
               {navItems.map((item) => {
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (item.href === '/#home') {
+                  if (item.href === '/#home' || item.href === '/#beneficios') {
                     e.preventDefault()
+                    e.stopPropagation()
                     
-                    // Aguarda um frame para garantir que o DOM está pronto
-                    requestAnimationFrame(() => {
-                      const homeSection = document.getElementById('home')
-                      if (homeSection) {
-                        // Calcula a posição considerando o header fixo
-                        const headerOffset = 120
-                        const elementPosition = homeSection.offsetTop
-                        const offsetPosition = elementPosition - headerOffset
-
-                        window.scrollTo({
-                          top: Math.max(0, offsetPosition),
-                          behavior: 'smooth'
-                        })
+                    const sectionId = item.href.replace('/#', '')
+                    const section = document.getElementById(sectionId)
+                    
+                    if (section) {
+                      // Para benefícios, precisa rolar mais para baixo
+                      const extraOffset = sectionId === 'beneficios' ? 580 : 0
+                      const headerOffset = 120
+                      
+                      // Calcula a posição usando offsetTop
+                      const elementPosition = section.offsetTop
+                      const targetPosition = elementPosition - headerOffset + extraOffset
+                      
+                      // Animação manual de scroll suave
+                      const startPosition = window.pageYOffset
+                      const distance = targetPosition - startPosition
+                      const duration = 800 // 800ms
+                      let start: number | null = null
+                      
+                      const easeInOutCubic = (t: number): number => {
+                        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
                       }
-                    })
+                      
+                      const animateScroll = (currentTime: number) => {
+                        if (start === null) start = currentTime
+                        const timeElapsed = currentTime - start
+                        const progress = Math.min(timeElapsed / duration, 1)
+                        
+                        const ease = easeInOutCubic(progress)
+                        window.scrollTo(0, startPosition + distance * ease)
+                        
+                        if (progress < 1) {
+                          requestAnimationFrame(animateScroll)
+                        }
+                      }
+                      
+                      requestAnimationFrame(animateScroll)
+                    }
                   }
+                }
+                
+                // Para âncoras, usa <a> ao invés de Link para garantir scroll suave
+                if (item.href.startsWith('/#')) {
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      onClick={handleClick}
+                      className="group flex items-center gap-1.5 px-5 py-3.5 text-xs font-medium text-white transition-opacity hover:opacity-80"
+                    >
+                      <span>{item.label}</span>
+                      <Image
+                        src="/icons/right.svg"
+                        alt=""
+                        width={10}
+                        height={10}
+                        className="h-2.5 w-2.5 transition-transform duration-300 group-hover:rotate-90"
+                      />
+                    </a>
+                  )
                 }
                 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={handleClick}
                     className="group flex items-center gap-1.5 px-5 py-3.5 text-xs font-medium text-white transition-opacity hover:opacity-80"
                   >
                     <span>{item.label}</span>
