@@ -239,8 +239,8 @@ export default function Home() {
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-screen z-0">
-        <div className="w-full h-full px-48">
-          <div className="w-full h-full translate-y-24 scale-90">
+        <div className="w-full h-full px-4 sm:px-8 md:px-16 lg:px-24 xl:px-48">
+          <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 scale-95 sm:scale-90">
             <video
               ref={videoRef}
               className="w-full h-full object-cover rounded-2xl"
@@ -260,31 +260,31 @@ export default function Home() {
       <div ref={containerRef} className="relative min-h-screen z-10">
         {/* Seção Home */}
         <section id="home" className="min-h-screen flex">
-          <div className="w-full mt-48">
+          <div className="w-full mt-16 sm:mt-24 md:mt-32 lg:mt-48">
             <div className="max-w-2xl">
               {/* Título */}
-              <h1 className="text-[96px] font-semibold text-white mb-12 leading-none inline-block">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-semibold text-white mb-6 sm:mb-8 md:mb-12 leading-none inline-block">
                 Soluções<br />em Madeira
               </h1>
 
               {/* Texto */}
-              <p className="text-base text-white mb-16 leading-relaxed max-w-[35rem]">
+              <p className="text-sm sm:text-base text-white mb-8 sm:mb-12 md:mb-16 leading-relaxed max-w-[35rem]">
                 Materializamos a sua marca em peças exclusivas de MDF e Pinus desde embalagens premium até projetos complexos. Sem pedido mínimo.
               </p>
 
               {/* Botões */}
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                 {/* Botão Ver Catálogo (estilo carrinho) */}
                 <Link
                   href="/store"
-                  className="flex items-center gap-[10px] rounded-[16px] bg-[#E9EF33] px-5 py-[18px] text-base font-medium text-[#121212] transition-opacity hover:opacity-90"
+                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-[#E9EF33] px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#121212] transition-opacity hover:opacity-90"
                 >
                   <Image
                     src="/icons/eye.svg"
                     alt=""
                     width={20}
                     height={20}
-                    className="h-5 w-5"
+                    className="h-4 w-4 sm:h-5 sm:w-5"
                   />
                   <span>Ver catálogo</span>
                 </Link>
@@ -299,14 +299,14 @@ export default function Home() {
                       element.scrollIntoView({ behavior: 'smooth' })
                     }
                   }}
-                  className="flex items-center gap-[10px] rounded-[16px] border border-[#E9EF33] bg-transparent px-5 py-[18px] text-base font-medium text-[#E9EF33] transition-opacity hover:opacity-80"
+                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-[#E9EF33] bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#E9EF33] transition-opacity hover:opacity-80"
                 >
                   <Image
                     src="/icons/project.svg"
                     alt=""
                     width={20}
                     height={20}
-                    className="h-5 w-5"
+                    className="h-4 w-4 sm:h-5 sm:w-5"
                   />
                   <span>Orçar projeto</span>
                 </a>
@@ -314,9 +314,9 @@ export default function Home() {
             </div>
 
             {/* Seção Clientes */}
-            <div className="mt-16 w-full">
-              <div className="max-w-2xl mb-4">
-                <p className="text-base text-white">Conheça nossos clientes:</p>
+            <div className="mt-8 sm:mt-12 md:mt-16 w-full">
+              <div className="max-w-2xl mb-3 sm:mb-4">
+                <p className="text-sm sm:text-base text-white">Conheça nossos clientes:</p>
               </div>
               
               {/* Carousel */}
@@ -330,15 +330,7 @@ export default function Home() {
                       key={`first-${idx}`}
                       src={`/carousel/${img}`}
                       alt=""
-                      className="flex-shrink-0"
-                      style={{ 
-                        maxWidth: '80px', 
-                        maxHeight: '60px', 
-                        width: 'auto', 
-                        height: 'auto', 
-                        objectFit: 'contain',
-                        marginRight: '40px' 
-                      }}
+                      className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
                     />
                   ))}
                   {/* Segunda sequência (duplicada para loop) */}
@@ -347,15 +339,7 @@ export default function Home() {
                       key={`second-${idx}`}
                       src={`/carousel/${img}`}
                       alt=""
-                      className="flex-shrink-0"
-                      style={{ 
-                        maxWidth: '80px', 
-                        maxHeight: '60px', 
-                        width: 'auto', 
-                        height: 'auto', 
-                        objectFit: 'contain',
-                        marginRight: '40px' 
-                      }}
+                      className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
                     />
                   ))}
                 </div>
@@ -365,13 +349,13 @@ export default function Home() {
         </section>
 
         {/* Nova Seção de Cards */}
-        <section id="beneficios" ref={cardsSectionRef} className="w-full  py-96 relative">
-          <div className="flex justify-between items-start w-full py-32">
+        <section id="beneficios" ref={cardsSectionRef} className="w-full py-16 sm:py-24 md:py-48 lg:py-96 relative">
+          <div className="flex flex-col lg:flex-row justify-between items-start w-full py-8 sm:py-12 md:py-16 lg:py-32 gap-8 lg:gap-0">
             {/* Coluna Esquerda - 3 cards */}
-            <div className="flex flex-col gap-16 items-start">
+            <div className="flex flex-col gap-8 sm:gap-12 md:gap-16 items-start w-full lg:w-auto">
               {/* Card 1 */}
-              <div className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
+              <div className="relative w-full lg:w-auto">
+                <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
                       <Image
@@ -382,15 +366,15 @@ export default function Home() {
                         className="w-4 h-4"
                       />
                     </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Produtos<br />Validados</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
+                    <h3 className="text-xl sm:text-2xl md:text-[32px] font-semibold text-white leading-tight">Produtos<br />Validados</h3>
+                    <p className="text-[10px] sm:text-[11px] md:text-[12px] text-white/80 leading-tight">
                       Itens testados para garantir durabilidade e funcionalidade.
                     </p>
                   </div>
                 </div>
                 {/* Linha decorativa - começa na borda direita do card */}
                 <svg 
-                  className="absolute top-1/2 left-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
                   width="300" 
                   height="200" 
                   viewBox="0 0 300 200"
@@ -448,7 +432,7 @@ export default function Home() {
                 </div>
                 {/* Linha decorativa horizontal */}
                 <svg 
-                  className="absolute top-1/2 left-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
                   width="310" 
                   height="200" 
                   viewBox="0 0 310 200"
@@ -496,7 +480,7 @@ export default function Home() {
                 </div>
                 {/* Linha decorativa - começa na borda direita do card */}
                 <svg 
-                  className="absolute top-1/2 left-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
                   width="300" 
                   height="200" 
                   viewBox="0 0 300 200"
@@ -535,7 +519,7 @@ export default function Home() {
             </div>
 
             {/* Coluna Direita - 3 cards */}
-            <div className="flex flex-col gap-16 items-end">
+            <div className="flex flex-col gap-8 sm:gap-12 md:gap-16 items-start lg:items-end w-full lg:w-auto">
               {/* Card 4 */}
               <div className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
@@ -557,7 +541,7 @@ export default function Home() {
                 </div>
                 {/* Linha decorativa - começa na borda esquerda do card */}
                 <svg 
-                  className="absolute top-1/2 right-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
                   width="330" 
                   height="420" 
                   viewBox="0 0 330 420"
@@ -615,7 +599,7 @@ export default function Home() {
                 </div>
                 {/* Linha decorativa - começa na borda esquerda do card */}
                 <svg 
-                  className="absolute top-1/2 right-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
                   width="220" 
                   height="200" 
                   viewBox="0 0 220 200"
@@ -673,7 +657,7 @@ export default function Home() {
                 </div>
                 {/* Linha decorativa horizontal - começa na esquerda do card */}
                 <svg 
-                  className="absolute top-1/2 right-full pointer-events-none"
+                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
                   width="300" 
                   height="200" 
                   viewBox="0 0 300 200"
