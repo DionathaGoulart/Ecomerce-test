@@ -67,9 +67,8 @@ export function smoothScrollTo(
       document.body.scrollTop = newScrollPosition
       window.scrollTo(0, newScrollPosition)
       
-      // O Spline será atualizado automaticamente pelo componente
-      // que monitora continuamente a posição do scroll via requestAnimationFrame
-      // Não precisa forçar atualização aqui
+      // Dispara evento de scroll para garantir que o Spline detecte (Event configurado 0-2500px)
+      window.dispatchEvent(new Event('scroll', { bubbles: true }))
       
       // Chama callback de progresso se fornecido
       if (onProgress) {
@@ -84,7 +83,9 @@ export function smoothScrollTo(
         document.body.scrollTop = targetPosition
         window.scrollTo(0, targetPosition)
         
-        // O Spline será atualizado automaticamente
+        // Dispara evento de scroll final para garantir que o Spline detecte
+        window.dispatchEvent(new Event('scroll', { bubbles: true }))
+        
         isScrolling = false
         resolve()
       }

@@ -1,209 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { smoothScrollTo, setupSplineScrollSync } from '@/lib/utils/smoothScroll'
-
-// Componente Spline otimizado que carrega apenas no cliente
-function SplineBackground() {
-  const [Spline, setSpline] = useState<any>(null)
-  const splineRef = useRef<any>(null)
-
-  useEffect(() => {
-    // Carrega o Spline apenas no cliente usando o componente padrão (não /next)
-    // O componente padrão tem melhor suporte para callbacks
-    import('@splinetool/react-spline').then((mod) => {
-      setSpline(() => mod.default)
-    })
-  }, [])
-
-  // Atualiza Spline baseado na posição atual do scroll (altura da tela)
-  // Não depende de eventos, apenas monitora continuamente a posição
-  useEffect(() => {
-    let rafId: number | null = null
-    
-    const updateSplineBasedOnPosition = () => {
-      // Lê a posição atual do scroll (altura da tela)
-      const currentScrollY = window.scrollY || document.documentElement.scrollTop
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      
-      // Calcula o progresso (0 = topo, 1 = final)
-      const scrollProgress = maxScroll > 0 ? Math.max(0, Math.min(1, currentScrollY / maxScroll)) : 0
-      
-      // Atualiza o Spline diretamente baseado na posição atual
-      if (splineRef.current && splineRef.current.application) {
-        try {
-          const app = splineRef.current.application
-          
-          // Método 1: Procura variável global de scroll
-          if (app.findVariableByName) {
-            const scrollVar = app.findVariableByName('scroll')
-            if (scrollVar) {
-              scrollVar.value = scrollProgress
-            }
-            
-            // Tenta outros nomes comuns
-            const scrollYVar = app.findVariableByName('scrollY')
-            const scrollProgressVar = app.findVariableByName('scrollProgress')
-            if (scrollYVar) {
-              scrollYVar.value = currentScrollY
-            }
-            if (scrollProgressVar) {
-              scrollProgressVar.value = scrollProgress
-            }
-          }
-          
-          // Método 2: Procura em todos os objetos da cena
-          if (app.objects) {
-            for (const obj of app.objects) {
-              if (obj.variables) {
-                // Procura qualquer variável relacionada a scroll
-                const scrollVar = obj.variables.find((v: any) => 
-                  v.name === 'scroll' || 
-                  v.name === 'scrollY' || 
-                  v.name === 'scrollProgress' ||
-                  v.name?.toLowerCase().includes('scroll')
-                )
-                if (scrollVar) {
-                  // Atualiza com o progresso (0 a 1)
-                  scrollVar.value = scrollProgress
-                }
-              }
-            }
-          }
-        } catch (e) {
-          // Ignora erros silenciosamente
-        }
-      }
-      
-      // Continua monitorando em cada frame
-      rafId = requestAnimationFrame(updateSplineBasedOnPosition)
-    }
-    
-    // Inicia o loop contínuo de atualização
-    // Isso garante que o Spline sempre reflete a posição atual, independente de como o scroll aconteceu
-    rafId = requestAnimationFrame(updateSplineBasedOnPosition)
-
-    return () => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId)
-      }
-    }
-  }, [])
-
-  if (!Spline) {
-    return null
-  }
-
-  return (
-    <Spline
-      scene="https://prod.spline.design/lzqdiUivvSwKYvU9/scene.splinecode"
-      className="w-full h-full"
-      onLoad={(spline: any) => {
-        // Armazena a instância do Spline para acesso direto
-        splineRef.current = spline
-        // Expõe globalmente para acesso em smoothScroll
-        ;(window as any).__splineInstance = spline
-        
-        console.log('✅ Spline carregado!', spline)
-        
-        // DEBUG: Lista todas as variáveis disponíveis
-        try {
-          if (spline.application) {
-            const app = spline.application
-            console.log('📋 Application:', app)
-            
-            // Lista todas as variáveis globais
-            if (app.variables) {
-              console.log('📊 Variáveis globais:', Object.keys(app.variables))
-            }
-            
-            // Lista objetos e suas variáveis
-            if (app.objects) {
-              console.log('🎯 Total de objetos:', app.objects.length)
-              app.objects.forEach((obj: any, index: number) => {
-                if (obj.variables && obj.variables.length > 0) {
-                  console.log(`📦 Objeto ${index} (${obj.name || 'sem nome'}):`, 
-                    obj.variables.map((v: any) => v.name))
-                }
-              })
-            }
-            
-            // Tenta encontrar variável de scroll
-            if (app.findVariableByName) {
-              const scrollVar = app.findVariableByName('scroll')
-              const scrollYVar = app.findVariableByName('scrollY')
-              const scrollProgressVar = app.findVariableByName('scrollProgress')
-              console.log('🔍 Variáveis de scroll encontradas:', {
-                scroll: scrollVar ? 'SIM' : 'NÃO',
-                scrollY: scrollYVar ? 'SIM' : 'NÃO',
-                scrollProgress: scrollProgressVar ? 'SIM' : 'NÃO'
-              })
-            }
-          }
-        } catch (e) {
-          console.error('❌ Erro ao inspecionar Spline:', e)
-        }
-        
-        // Força uma atualização inicial
-        setTimeout(() => {
-          const scrollY = window.scrollY || document.documentElement.scrollTop
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-          const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0
-          
-          try {
-            if (spline.application) {
-              const app = spline.application
-              if (app.findVariableByName) {
-                const scrollVar = app.findVariableByName('scroll')
-                if (scrollVar) {
-                  scrollVar.value = scrollProgress
-                  console.log('✅ Atualização inicial:', scrollProgress)
-                }
-              }
-            }
-          } catch (e) {
-            console.error('❌ Erro na atualização inicial:', e)
-          }
-        }, 100)
-      }}
-    />
-  )
-}
+import Spline from '@splinetool/react-spline/next'
+import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardsSectionRef = useRef<HTMLElement>(null)
-
-  // Pré-carrega o recurso do Spline assim que a página carrega
-  useEffect(() => {
-    // Pré-conecta ao domínio do Spline
-    const link = document.createElement('link')
-    link.rel = 'dns-prefetch'
-    link.href = 'https://prod.spline.design'
-    document.head.appendChild(link)
-
-    // Pré-conecta ao domínio do Spline
-    const preconnect = document.createElement('link')
-    preconnect.rel = 'preconnect'
-    preconnect.href = 'https://prod.spline.design'
-    preconnect.crossOrigin = 'anonymous'
-    document.head.appendChild(preconnect)
-
-    // Pré-baixa o arquivo do Spline
-    const prefetch = document.createElement('link')
-    prefetch.rel = 'prefetch'
-    prefetch.href = 'https://prod.spline.design/lzqdiUivvSwKYvU9/scene.splinecode'
-    document.head.appendChild(prefetch)
-
-    // Configura sincronização de scroll com Spline
-    const cleanup = setupSplineScrollSync()
-
-    return () => {
-      cleanup()
-    }
-  }, [])
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // Inicializa as linhas como invisíveis
   useEffect(() => {
@@ -227,6 +33,128 @@ export default function Home() {
 
     // Aguarda um pouco para garantir que o DOM está renderizado
     setTimeout(initializeLines, 100)
+  }, [])
+
+  // Mantém os cards sempre visíveis e anima linhas quando todos estão visíveis
+  useEffect(() => {
+    const cardsSection = cardsSectionRef.current
+    if (!cardsSection) return
+
+    // Garante que todos os cards estão sempre visíveis
+    cardRefs.current.forEach((card) => {
+      if (card) {
+        card.style.opacity = '1'
+        card.style.transform = 'translateY(0)'
+      }
+    })
+
+    // Verifica se todos os 6 cards estão visíveis na tela
+    const allRelativeDivs = Array.from(cardsSection.querySelectorAll('div.relative'))
+    const finalContainers = allRelativeDivs.slice(0, 6)
+
+    if (finalContainers.length !== 6) return
+
+    let visibleCards = new Set<number>()
+    let linesAnimated = false
+
+    const animateLines = () => {
+      if (linesAnimated) return
+      
+      const svgs = cardsSection.querySelectorAll('svg')
+      
+      svgs.forEach((svg, svgIndex) => {
+        const svgLines = svg.querySelectorAll('line')
+        const svgCircle = svg.querySelector('circle')
+        
+        if (svgLines.length === 0) return
+        
+        // Identifica linha horizontal e vertical
+        let horizontalLine: SVGLineElement | null = null
+        let verticalLine: SVGLineElement | null = null
+        
+        svgLines.forEach((line) => {
+          const lineEl = line as SVGLineElement
+          const x1 = parseFloat(lineEl.getAttribute('x1') || '0')
+          const y1 = parseFloat(lineEl.getAttribute('y1') || '0')
+          const x2 = parseFloat(lineEl.getAttribute('x2') || '0')
+          const y2 = parseFloat(lineEl.getAttribute('y2') || '0')
+          
+          if (Math.abs(y1 - y2) < 0.1) {
+            horizontalLine = lineEl
+          } else if (Math.abs(x1 - x2) < 0.1) {
+            verticalLine = lineEl
+          }
+        })
+        
+        // Anima linha horizontal primeiro
+        if (horizontalLine) {
+          const hLine = horizontalLine as SVGLineElement
+          const hLength = hLine.getTotalLength()
+          hLine.style.strokeDasharray = `${hLength}`
+          hLine.style.strokeDashoffset = `${hLength}`
+          hLine.style.transition = 'stroke-dashoffset 0.8s ease-in-out'
+          
+          setTimeout(() => {
+            hLine.style.strokeDashoffset = '0'
+          }, 50 + (svgIndex * 100)) // Delay escalonado por SVG (mais rápido)
+        }
+        
+        // Anima linha vertical depois
+        if (verticalLine) {
+          const vLine = verticalLine as SVGLineElement
+          const vLength = vLine.getTotalLength()
+          vLine.style.strokeDasharray = `${vLength}`
+          vLine.style.strokeDashoffset = `${vLength}`
+          vLine.style.transition = 'stroke-dashoffset 0.8s ease-in-out'
+          
+          setTimeout(() => {
+            vLine.style.strokeDashoffset = '0'
+          }, 900 + (svgIndex * 100)) // Após a horizontal terminar (mais rápido)
+        }
+        
+        // Mostra a bolinha por último
+        if (svgCircle) {
+          const circleEl = svgCircle as SVGCircleElement
+          circleEl.style.opacity = '0'
+          circleEl.style.transition = 'opacity 0.3s ease-in-out'
+          
+          setTimeout(() => {
+            circleEl.style.opacity = '0.5'
+          }, 1800 + (svgIndex * 100)) // Após ambas as linhas terminarem (mais rápido)
+        }
+      })
+      
+      linesAnimated = true
+    }
+
+    const observers: IntersectionObserver[] = []
+
+    finalContainers.forEach((card, index) => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
+              visibleCards.add(index)
+            } else {
+              visibleCards.delete(index)
+            }
+            
+            // Se todos os 6 cards estão visíveis, anima as linhas
+            if (visibleCards.size === 6) {
+              animateLines()
+            }
+          })
+        },
+        { threshold: 0.8 } // 80% visível
+      )
+
+      observer.observe(card)
+      observers.push(observer)
+    })
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect())
+    }
   }, [])
 
   // Verifica se todos os cards estão 100% visíveis e controla a visibilidade das linhas
@@ -363,9 +291,9 @@ export default function Home() {
     <>
       <div className="fixed top-0 left-0 w-full h-screen z-0">
         <div className="w-full h-full px-4 sm:px-8 md:px-16 lg:px-24 xl:px-48">
-          <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 scale-110 sm:scale-125">
+          <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 scale-150 sm:scale-175 md:scale-200">
             <div className="w-full h-full rounded-2xl overflow-hidden">
-              <SplineBackground />
+              <Spline scene="https://prod.spline.design/lzqdiUivvSwKYvU9/scene.splinecode" />
             </div>
             {/* Overlay escuro para melhorar legibilidade */}
             <div className="absolute inset-0 bg-black/40 rounded-2xl" />
@@ -409,7 +337,7 @@ export default function Home() {
                 {/* Botão Orçar Projeto (estilo minha conta) */}
                 <a
                   href="#beneficios"
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.preventDefault()
                     const element = document.getElementById('beneficios')
                     if (element) {
@@ -420,8 +348,14 @@ export default function Home() {
                       const elementPosition = element.offsetTop
                       const targetPosition = elementPosition - headerOffset + extraOffset
                       
-                      // Usa a função otimizada para scroll suave que garante sincronização com Spline
-                      await smoothScrollTo(targetPosition, 1000)
+                      // Usa smoothScrollTo que dispara eventos de scroll
+                      // O Spline detecta automaticamente via seu Event configurado (0 a 2500px)
+                      smoothScrollTo(targetPosition, 1000).then(() => {
+                        // Garante que eventos de scroll sejam disparados para o Spline detectar
+                        setTimeout(() => {
+                          window.dispatchEvent(new Event('scroll', { bubbles: true }))
+                        }, 50)
+                      })
                     }
                   }}
                   className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-[#E9EF33] bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#E9EF33] transition-opacity hover:opacity-80"
@@ -479,13 +413,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Nova Seção de Cards */}
-        <section id="beneficios" ref={cardsSectionRef} className="w-full py-16 sm:py-24 md:py-48 lg:py-96 relative">
-          <div className="flex flex-col lg:flex-row justify-between items-start w-full py-8 sm:py-12 md:py-16 lg:py-32 gap-8 lg:gap-0">
+        {/* Container para manter a seção fixa durante 9 rolagens */}
+        <div className="relative" style={{ height: '900vh' }}>
+          {/* Nova Seção de Cards - fica sticky durante 9 rolagens */}
+          <section id="beneficios" ref={cardsSectionRef} className="w-full py-52 sticky top-0">
+          <div className="flex flex-col lg:flex-row justify-between items-start w-full gap-8 lg:gap-0">
             {/* Coluna Esquerda - 3 cards */}
-            <div className="flex flex-col gap-8 sm:gap-12 md:gap-16 items-start w-full lg:w-auto">
+            <div className="flex flex-col gap-6 sm:gap-10 md:gap-12 items-start w-full lg:w-auto">
               {/* Card 1 */}
-              <div className="relative w-full lg:w-auto">
+              <div ref={(el) => { cardRefs.current[0] = el }} className="relative w-full lg:w-auto">
                 <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -515,7 +451,7 @@ export default function Home() {
                   <line 
                     x1="0" 
                     y1="100" 
-                    x2="200" 
+                    x2="160" 
                     y2="100" 
                     stroke="white" 
                     strokeWidth="1" 
@@ -523,9 +459,9 @@ export default function Home() {
                   />
                   {/* Linha vertical para baixo */}
                   <line 
-                    x1="200" 
+                    x1="160" 
                     y1="100" 
-                    x2="200" 
+                    x2="160" 
                     y2="190" 
                     stroke="white" 
                     strokeWidth="1" 
@@ -533,7 +469,7 @@ export default function Home() {
                   />
                   {/* Bolinha no final */}
                   <circle 
-                    cx="200" 
+                    cx="160" 
                     cy="190" 
                     r="4" 
                     fill="white" 
@@ -543,7 +479,7 @@ export default function Home() {
               </div>
 
               {/* Card 2 */}
-              <div className="relative">
+              <div ref={(el) => { cardRefs.current[1] = el }} className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -591,7 +527,7 @@ export default function Home() {
               </div>
 
               {/* Card 3 */}
-              <div className="relative">
+              <div ref={(el) => { cardRefs.current[2] = el }} className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -650,9 +586,9 @@ export default function Home() {
             </div>
 
             {/* Coluna Direita - 3 cards */}
-            <div className="flex flex-col gap-8 sm:gap-12 md:gap-16 items-start lg:items-end w-full lg:w-auto">
+            <div className="flex flex-col gap-6 sm:gap-10 md:gap-12 items-start lg:items-end w-full lg:w-auto">
               {/* Card 4 */}
-              <div className="relative">
+              <div ref={(el) => { cardRefs.current[3] = el }} className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -682,7 +618,7 @@ export default function Home() {
                   <line 
                     x1="330" 
                     y1="210" 
-                    x2="50" 
+                    x2="30" 
                     y2="210" 
                     stroke="white" 
                     strokeWidth="1" 
@@ -690,18 +626,18 @@ export default function Home() {
                   />
                   {/* Linha vertical para baixo */}
                   <line 
-                    x1="50" 
+                    x1="30" 
                     y1="210" 
-                    x2="50" 
-                    y2="410" 
+                    x2="30" 
+                    y2="370" 
                     stroke="white" 
                     strokeWidth="1" 
                     opacity="0.3"
                   />
                   {/* Bolinha no final */}
                   <circle 
-                    cx="50" 
-                    cy="410" 
+                    cx="30" 
+                    cy="370" 
                     r="4" 
                     fill="white" 
                     opacity="0.5"
@@ -710,7 +646,7 @@ export default function Home() {
               </div>
 
               {/* Card 5 */}
-              <div className="relative">
+              <div ref={(el) => { cardRefs.current[4] = el }} className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -740,7 +676,7 @@ export default function Home() {
                   <line 
                     x1="220" 
                     y1="100" 
-                    x2="130" 
+                    x2="110" 
                     y2="100" 
                     stroke="white" 
                     strokeWidth="1" 
@@ -748,9 +684,9 @@ export default function Home() {
                   />
                   {/* Linha vertical para cima */}
                   <line 
-                    x1="130" 
+                    x1="110" 
                     y1="100" 
-                    x2="130" 
+                    x2="110" 
                     y2="30" 
                     stroke="white" 
                     strokeWidth="1" 
@@ -758,7 +694,7 @@ export default function Home() {
                   />
                   {/* Bolinha no final */}
                   <circle 
-                    cx="130" 
+                    cx="110" 
                     cy="30" 
                     r="4" 
                     fill="white" 
@@ -768,7 +704,7 @@ export default function Home() {
               </div>
 
               {/* Card 6 */}
-              <div className="relative">
+              <div ref={(el) => { cardRefs.current[5] = el }} className="relative">
                 <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
                   <div className="flex flex-col gap-2">
                     <div className="w-4 h-4 flex items-center justify-center">
@@ -817,6 +753,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </div>
 
         {/* Espaço para scroll */}
         <div className="h-[200vh]" />
