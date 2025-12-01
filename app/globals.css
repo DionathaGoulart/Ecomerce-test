@@ -10,7 +10,9 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior removido para evitar conflito com scroll programático
+     O scroll suave é controlado via JavaScript para garantir sincronização com Spline */
+  scroll-behavior: auto;
 }
 
 body {

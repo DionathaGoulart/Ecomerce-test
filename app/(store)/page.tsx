@@ -1,84 +1,207 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { smoothScrollTo, setupSplineScrollSync } from '@/lib/utils/smoothScroll'
 
-export default function Home() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const cardsSectionRef = useRef<HTMLElement>(null)
+// Componente Spline otimizado que carrega apenas no cliente
+function SplineBackground() {
+  const [Spline, setSpline] = useState<any>(null)
+  const splineRef = useRef<any>(null)
 
   useEffect(() => {
-    const video = videoRef.current
-    const container = containerRef.current
+    // Carrega o Spline apenas no cliente usando o componente padrão (não /next)
+    // O componente padrão tem melhor suporte para callbacks
+    import('@splinetool/react-spline').then((mod) => {
+      setSpline(() => mod.default)
+    })
+  }, [])
 
-    if (!video || !container) return
-
-    // Pausa o vídeo inicialmente
-    video.pause()
-
+  // Atualiza Spline baseado na posição atual do scroll (altura da tela)
+  // Não depende de eventos, apenas monitora continuamente a posição
+  useEffect(() => {
     let rafId: number | null = null
-    let isRunning = true
-    let lastScrollTop = window.scrollY
-
-    const updateVideoFrame = () => {
-      if (!isRunning) return
+    
+    const updateSplineBasedOnPosition = () => {
+      // Lê a posição atual do scroll (altura da tela)
+      const currentScrollY = window.scrollY || document.documentElement.scrollTop
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
       
-      // Pausa o loop durante animação programática (controlada pelo layout.tsx)
-      if ((video as any).__isProgrammaticScroll) {
-        rafId = requestAnimationFrame(updateVideoFrame)
-        return
-      }
+      // Calcula o progresso (0 = topo, 1 = final)
+      const scrollProgress = maxScroll > 0 ? Math.max(0, Math.min(1, currentScrollY / maxScroll)) : 0
       
-      const scrollTop = window.scrollY
-      const containerHeight = container.offsetHeight
-      const videoDuration = video.duration || 0
-      
-      // Só atualiza se o scroll mudou ou se o vídeo está pronto
-      if (videoDuration > 0 && containerHeight > 0 && video.readyState >= 2) {
-        // Calcula o progresso do scroll (0 a 1)
-        const scrollProgress = Math.max(0, Math.min(1, scrollTop / containerHeight))
-        
-        // Calcula o tempo do vídeo baseado no progresso do scroll
-        const targetTime = scrollProgress * videoDuration
-        
-        // Atualiza o vídeo diretamente - sem debounce para capturar todos os frames
-        if (Math.abs(video.currentTime - targetTime) > 0.001) {
-          video.currentTime = Math.min(targetTime, videoDuration)
+      // Atualiza o Spline diretamente baseado na posição atual
+      if (splineRef.current && splineRef.current.application) {
+        try {
+          const app = splineRef.current.application
+          
+          // Método 1: Procura variável global de scroll
+          if (app.findVariableByName) {
+            const scrollVar = app.findVariableByName('scroll')
+            if (scrollVar) {
+              scrollVar.value = scrollProgress
+            }
+            
+            // Tenta outros nomes comuns
+            const scrollYVar = app.findVariableByName('scrollY')
+            const scrollProgressVar = app.findVariableByName('scrollProgress')
+            if (scrollYVar) {
+              scrollYVar.value = currentScrollY
+            }
+            if (scrollProgressVar) {
+              scrollProgressVar.value = scrollProgress
+            }
+          }
+          
+          // Método 2: Procura em todos os objetos da cena
+          if (app.objects) {
+            for (const obj of app.objects) {
+              if (obj.variables) {
+                // Procura qualquer variável relacionada a scroll
+                const scrollVar = obj.variables.find((v: any) => 
+                  v.name === 'scroll' || 
+                  v.name === 'scrollY' || 
+                  v.name === 'scrollProgress' ||
+                  v.name?.toLowerCase().includes('scroll')
+                )
+                if (scrollVar) {
+                  // Atualiza com o progresso (0 a 1)
+                  scrollVar.value = scrollProgress
+                }
+              }
+            }
+          }
+        } catch (e) {
+          // Ignora erros silenciosamente
         }
       }
       
-      // Continua o loop para garantir que todos os frames sejam capturados
-      if (isRunning) {
-        rafId = requestAnimationFrame(updateVideoFrame)
-      } else {
-        rafId = null
-      }
+      // Continua monitorando em cada frame
+      rafId = requestAnimationFrame(updateSplineBasedOnPosition)
     }
-
-    // Carrega os metadados do vídeo para obter a duração
-    const handleLoadedMetadata = () => {
-      video.currentTime = 0
-      // Inicia o loop contínuo
-      if (!rafId) {
-        rafId = requestAnimationFrame(updateVideoFrame)
-      }
-    }
-
-    video.addEventListener('loadedmetadata', handleLoadedMetadata)
     
-    // Inicia o loop imediatamente se o vídeo já estiver carregado
-    if (video.readyState >= 2) {
-      rafId = requestAnimationFrame(updateVideoFrame)
-    }
+    // Inicia o loop contínuo de atualização
+    // Isso garante que o Spline sempre reflete a posição atual, independente de como o scroll aconteceu
+    rafId = requestAnimationFrame(updateSplineBasedOnPosition)
 
     return () => {
-      isRunning = false
-      if (rafId) {
+      if (rafId !== null) {
         cancelAnimationFrame(rafId)
       }
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+    }
+  }, [])
+
+  if (!Spline) {
+    return null
+  }
+
+  return (
+    <Spline
+      scene="https://prod.spline.design/lzqdiUivvSwKYvU9/scene.splinecode"
+      className="w-full h-full"
+      onLoad={(spline: any) => {
+        // Armazena a instância do Spline para acesso direto
+        splineRef.current = spline
+        // Expõe globalmente para acesso em smoothScroll
+        ;(window as any).__splineInstance = spline
+        
+        console.log('✅ Spline carregado!', spline)
+        
+        // DEBUG: Lista todas as variáveis disponíveis
+        try {
+          if (spline.application) {
+            const app = spline.application
+            console.log('📋 Application:', app)
+            
+            // Lista todas as variáveis globais
+            if (app.variables) {
+              console.log('📊 Variáveis globais:', Object.keys(app.variables))
+            }
+            
+            // Lista objetos e suas variáveis
+            if (app.objects) {
+              console.log('🎯 Total de objetos:', app.objects.length)
+              app.objects.forEach((obj: any, index: number) => {
+                if (obj.variables && obj.variables.length > 0) {
+                  console.log(`📦 Objeto ${index} (${obj.name || 'sem nome'}):`, 
+                    obj.variables.map((v: any) => v.name))
+                }
+              })
+            }
+            
+            // Tenta encontrar variável de scroll
+            if (app.findVariableByName) {
+              const scrollVar = app.findVariableByName('scroll')
+              const scrollYVar = app.findVariableByName('scrollY')
+              const scrollProgressVar = app.findVariableByName('scrollProgress')
+              console.log('🔍 Variáveis de scroll encontradas:', {
+                scroll: scrollVar ? 'SIM' : 'NÃO',
+                scrollY: scrollYVar ? 'SIM' : 'NÃO',
+                scrollProgress: scrollProgressVar ? 'SIM' : 'NÃO'
+              })
+            }
+          }
+        } catch (e) {
+          console.error('❌ Erro ao inspecionar Spline:', e)
+        }
+        
+        // Força uma atualização inicial
+        setTimeout(() => {
+          const scrollY = window.scrollY || document.documentElement.scrollTop
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+          const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0
+          
+          try {
+            if (spline.application) {
+              const app = spline.application
+              if (app.findVariableByName) {
+                const scrollVar = app.findVariableByName('scroll')
+                if (scrollVar) {
+                  scrollVar.value = scrollProgress
+                  console.log('✅ Atualização inicial:', scrollProgress)
+                }
+              }
+            }
+          } catch (e) {
+            console.error('❌ Erro na atualização inicial:', e)
+          }
+        }, 100)
+      }}
+    />
+  )
+}
+
+export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cardsSectionRef = useRef<HTMLElement>(null)
+
+  // Pré-carrega o recurso do Spline assim que a página carrega
+  useEffect(() => {
+    // Pré-conecta ao domínio do Spline
+    const link = document.createElement('link')
+    link.rel = 'dns-prefetch'
+    link.href = 'https://prod.spline.design'
+    document.head.appendChild(link)
+
+    // Pré-conecta ao domínio do Spline
+    const preconnect = document.createElement('link')
+    preconnect.rel = 'preconnect'
+    preconnect.href = 'https://prod.spline.design'
+    preconnect.crossOrigin = 'anonymous'
+    document.head.appendChild(preconnect)
+
+    // Pré-baixa o arquivo do Spline
+    const prefetch = document.createElement('link')
+    prefetch.rel = 'prefetch'
+    prefetch.href = 'https://prod.spline.design/lzqdiUivvSwKYvU9/scene.splinecode'
+    document.head.appendChild(prefetch)
+
+    // Configura sincronização de scroll com Spline
+    const cleanup = setupSplineScrollSync()
+
+    return () => {
+      cleanup()
     }
   }, [])
 
@@ -240,16 +363,10 @@ export default function Home() {
     <>
       <div className="fixed top-0 left-0 w-full h-screen z-0">
         <div className="w-full h-full px-4 sm:px-8 md:px-16 lg:px-24 xl:px-48">
-          <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 scale-95 sm:scale-90">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover rounded-2xl"
-              playsInline
-              muted
-              preload="metadata"
-            >
-              <source src="/bg.mp4" type="video/mp4" />
-            </video>
+          <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 scale-110 sm:scale-125">
+            <div className="w-full h-full rounded-2xl overflow-hidden">
+              <SplineBackground />
+            </div>
             {/* Overlay escuro para melhorar legibilidade */}
             <div className="absolute inset-0 bg-black/40 rounded-2xl" />
           </div>
@@ -292,11 +409,19 @@ export default function Home() {
                 {/* Botão Orçar Projeto (estilo minha conta) */}
                 <a
                   href="#beneficios"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault()
                     const element = document.getElementById('beneficios')
                     if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' })
+                      const isMobile = window.innerWidth < 768
+                      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                      const extraOffset = isMobile ? 200 : isTablet ? 400 : 580
+                      const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
+                      const elementPosition = element.offsetTop
+                      const targetPosition = elementPosition - headerOffset + extraOffset
+                      
+                      // Usa a função otimizada para scroll suave que garante sincronização com Spline
+                      await smoothScrollTo(targetPosition, 1000)
                     }
                   }}
                   className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-[#E9EF33] bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#E9EF33] transition-opacity hover:opacity-80"

@@ -7,6 +7,8 @@ import Image from 'next/image'
 import Logo from '@/components/store/Logo'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
 
+import { smoothScrollTo } from '@/lib/utils/smoothScroll'
+
 export default function StoreLayout({
   children,
 }: {
@@ -67,71 +69,8 @@ export default function StoreLayout({
                       const elementPosition = section.offsetTop
                       const targetPosition = elementPosition - headerOffset + extraOffset
                       
-                      // Animação manual de scroll suave
-                      const startPosition = window.pageYOffset
-                      const distance = targetPosition - startPosition
-                      const duration = 800 // 800ms - scroll mais rápido para maior fluidez
-                      let start: number | null = null
-                      
-                      // Busca o vídeo e container para atualizar diretamente
-                      const video = document.querySelector('video') as HTMLVideoElement | null
-                      const container = document.querySelector('div.relative.min-h-screen') as HTMLElement | null
-                      
-                      // Sinaliza que estamos em animação programática (para o loop do vídeo)
-                      if (video) {
-                        (video as any).__isProgrammaticScroll = true
-                      }
-                      
-                      // Easing linear puro para movimento constante e fluido
-                      const linearEase = (t: number): number => t
-                      
-                      // Calcula valores iniciais do vídeo
-                      let videoStartTime = 0
-                      let videoEndTime = 0
-                      if (video && container && video.readyState >= 2) {
-                        const containerHeight = container.offsetHeight
-                        const videoDuration = video.duration || 0
-                        if (videoDuration > 0 && containerHeight > 0) {
-                          const startProgress = Math.max(0, Math.min(1, startPosition / containerHeight))
-                          const endProgress = Math.max(0, Math.min(1, targetPosition / containerHeight))
-                          videoStartTime = startProgress * videoDuration
-                          videoEndTime = endProgress * videoDuration
-                        }
-                      }
-                      
-                      const animateScroll = (currentTime: number) => {
-                        if (start === null) start = currentTime
-                        const timeElapsed = currentTime - start
-                        const progress = Math.min(timeElapsed / duration, 1)
-                        
-                        // Easing linear para movimento constante
-                        const ease = linearEase(progress)
-                        const newScrollPosition = startPosition + distance * ease
-                        
-                        // Atualiza scroll
-                        window.scrollTo(0, newScrollPosition)
-                        
-                        // Atualiza vídeo de forma linear e sincronizada
-                        if (video && container && video.readyState >= 2) {
-                          const videoDuration = video.duration || 0
-                          if (videoDuration > 0) {
-                            // Interpola linearmente entre o tempo inicial e final do vídeo
-                            const videoTime = videoStartTime + (videoEndTime - videoStartTime) * ease
-                            video.currentTime = Math.max(0, Math.min(videoTime, videoDuration))
-                          }
-                        }
-                        
-                        if (progress < 1) {
-                          requestAnimationFrame(animateScroll)
-                        } else {
-                          // Reabilita o loop do vídeo ao finalizar
-                          if (video) {
-                            (video as any).__isProgrammaticScroll = false
-                          }
-                        }
-                      }
-                      
-                      requestAnimationFrame(animateScroll)
+                      // Usa a função otimizada para scroll suave que garante sincronização com Spline
+                      smoothScrollTo(targetPosition, 1000)
                     }
                   }
                 }
@@ -213,11 +152,16 @@ export default function StoreLayout({
                   const section = document.getElementById(sectionId)
                   if (section) {
                     const isMobile = window.innerWidth < 768
-                    const extraOffset = sectionId === 'beneficios' ? (isMobile ? 200 : 400) : 0
-                    const headerOffset = isMobile ? 80 : 100
+                    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                    const extraOffset = sectionId === 'beneficios' 
+                      ? (isMobile ? 200 : isTablet ? 400 : 580) 
+                      : 0
+                    const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
                     const elementPosition = section.offsetTop
                     const targetPosition = elementPosition - headerOffset + extraOffset
-                    window.scrollTo({ top: targetPosition, behavior: 'smooth' })
+                    
+                    // Usa a função otimizada para scroll suave que garante sincronização com Spline
+                    smoothScrollTo(targetPosition, 1000)
                   }
                 }
               }
