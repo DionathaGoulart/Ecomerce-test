@@ -6,6 +6,110 @@ import Image from 'next/image'
 import Spline from '@splinetool/react-spline/next'
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 
+interface LineConfig {
+  svgWidth: number
+  svgHeight: number
+  viewBox: string
+  position: 'left' | 'right' // left-full ou right-full
+  horizontalLine?: {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  }
+  verticalLine?: {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  }
+  circle?: {
+    cx: number
+    cy: number
+  }
+}
+
+interface BenefitCardProps {
+  index: number
+  icon: string
+  title: string
+  description: string
+  lineConfig: LineConfig
+  cardRef: (el: HTMLDivElement | null) => void
+  className?: string
+}
+
+function BenefitCard({ index, icon, title, description, lineConfig, cardRef, className = '' }: BenefitCardProps) {
+  return (
+    <div ref={cardRef} className={`relative ${className}`}>
+      <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px]">
+        <div className="flex flex-col gap-2">
+          <div className="w-4 h-4 flex items-center justify-center">
+            <Image
+              src={icon}
+              alt=""
+              width={16}
+              height={16}
+              className="w-4 h-4"
+            />
+          </div>
+          <h3 className="text-xl sm:text-2xl md:text-[32px] font-semibold text-white leading-tight">
+            {title.split('\n').map((line, i) => (
+              <span key={i}>
+                {line}
+                {i < title.split('\n').length - 1 && <br />}
+              </span>
+            ))}
+          </h3>
+          <p className="text-[10px] sm:text-[11px] md:text-[12px] text-white/80 leading-tight">
+            {description}
+          </p>
+        </div>
+      </div>
+      {/* Linha decorativa */}
+      <svg 
+        className={`hidden lg:block absolute top-1/2 ${lineConfig.position === 'left' ? 'left-full' : 'right-full'} pointer-events-none`}
+        width={lineConfig.svgWidth}
+        height={lineConfig.svgHeight}
+        viewBox={lineConfig.viewBox}
+        style={{ transform: 'translateY(-50%)' }}
+      >
+        {lineConfig.horizontalLine && (
+          <line 
+            x1={lineConfig.horizontalLine.x1}
+            y1={lineConfig.horizontalLine.y1}
+            x2={lineConfig.horizontalLine.x2}
+            y2={lineConfig.horizontalLine.y2}
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.3"
+          />
+        )}
+        {lineConfig.verticalLine && (
+          <line 
+            x1={lineConfig.verticalLine.x1}
+            y1={lineConfig.verticalLine.y1}
+            x2={lineConfig.verticalLine.x2}
+            y2={lineConfig.verticalLine.y2}
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.3"
+          />
+        )}
+        {lineConfig.circle && (
+          <circle 
+            cx={lineConfig.circle.cx}
+            cy={lineConfig.circle.cy}
+            r="4"
+            fill="white"
+            opacity="0.5"
+          />
+        )}
+      </svg>
+    </div>
+  )
+}
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardsSectionRef = useRef<HTMLElement>(null)
@@ -287,6 +391,93 @@ export default function Home() {
     }
   }, [])
 
+  // Dados dos cards
+  const cardsData = [
+    {
+      icon: '/icons/project.svg',
+      title: 'Produtos\nValidados',
+      description: 'Itens testados para garantir durabilidade e funcionalidade.',
+      lineConfig: {
+        svgWidth: 300,
+        svgHeight: 200,
+        viewBox: '0 0 300 200',
+        position: 'left' as const,
+        horizontalLine: { x1: 0, y1: 100, x2: 160, y2: 100 },
+        verticalLine: { x1: 160, y1: 100, x2: 160, y2: 190 },
+        circle: { cx: 160, cy: 190 }
+      },
+      className: 'w-full lg:w-auto'
+    },
+    {
+      icon: '/icons/eye.svg',
+      title: 'Sem pedido\nMínimo',
+      description: 'Viabilizamos desde uma peça exclusiva até grandes lotes.',
+      lineConfig: {
+        svgWidth: 310,
+        svgHeight: 200,
+        viewBox: '0 0 310 200',
+        position: 'left' as const,
+        horizontalLine: { x1: 0, y1: 100, x2: 260, y2: 100 },
+        circle: { cx: 260, cy: 100 }
+      }
+    },
+    {
+      icon: '/icons/project.svg',
+      title: 'Processo\nSimplificado',
+      description: 'Você escolhe o produto, nós colocamos sua marca ou arte.',
+      lineConfig: {
+        svgWidth: 300,
+        svgHeight: 200,
+        viewBox: '0 0 300 200',
+        position: 'left' as const,
+        horizontalLine: { x1: 0, y1: 100, x2: 240, y2: 100 },
+        verticalLine: { x1: 240, y1: 100, x2: 240, y2: 35 },
+        circle: { cx: 240, cy: 35 }
+      }
+    },
+    {
+      icon: '/icons/eye.svg',
+      title: 'Material\nIncluso',
+      description: 'O preço do catálogo já contempla a peça, o corte e a gravação.',
+      lineConfig: {
+        svgWidth: 330,
+        svgHeight: 420,
+        viewBox: '0 0 330 420',
+        position: 'right' as const,
+        horizontalLine: { x1: 330, y1: 210, x2: 30, y2: 210 },
+        verticalLine: { x1: 30, y1: 210, x2: 30, y2: 370 },
+        circle: { cx: 30, cy: 370 }
+      }
+    },
+    {
+      icon: '/icons/project.svg',
+      title: 'Revisão\nProfissional',
+      description: 'Verificamos sua arte antes da produção para garantir o resultado.',
+      lineConfig: {
+        svgWidth: 220,
+        svgHeight: 200,
+        viewBox: '0 0 220 200',
+        position: 'right' as const,
+        horizontalLine: { x1: 220, y1: 100, x2: 110, y2: 100 },
+        verticalLine: { x1: 110, y1: 100, x2: 110, y2: 30 },
+        circle: { cx: 110, cy: 30 }
+      }
+    },
+    {
+      icon: '/icons/eye.svg',
+      title: 'Acabamento\nPremium',
+      description: 'Cortes limpos e gravações nítidas em Pinus ou MDF.',
+      lineConfig: {
+        svgWidth: 300,
+        svgHeight: 200,
+        viewBox: '0 0 300 200',
+        position: 'right' as const,
+        horizontalLine: { x1: 300, y1: 100, x2: 60, y2: 100 },
+        circle: { cx: 60, cy: 100 }
+      }
+    }
+  ]
+
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-screen z-0">
@@ -341,20 +532,20 @@ export default function Home() {
                     e.preventDefault()
                     const element = document.getElementById('beneficios')
                     if (element) {
-                      const isMobile = window.innerWidth < 768
-                      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                      const extraOffset = isMobile ? 200 : isTablet ? 400 : 580
-                      const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                      const elementPosition = element.offsetTop
-                      const targetPosition = elementPosition - headerOffset + extraOffset
+                      // Pega a posição exata da seção usando getBoundingClientRect
+                      const rect = element.getBoundingClientRect()
+                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                      const elementTop = rect.top + scrollTop
+                      
+                      // Scroll até a seção, uma rolagem a mais para baixo
+                      const targetPosition = elementTop + 100
                       
                       // Usa smoothScrollTo que dispara eventos de scroll
-                      // O Spline detecta automaticamente via seu Event configurado (0 a 2500px)
                       smoothScrollTo(targetPosition, 1000).then(() => {
-                        // Garante que eventos de scroll sejam disparados para o Spline detectar
-                        setTimeout(() => {
-                          window.dispatchEvent(new Event('scroll', { bubbles: true }))
-                        }, 50)
+                      // Garante que eventos de scroll sejam disparados para o Spline detectar
+                      setTimeout(() => {
+                        window.dispatchEvent(new Event('scroll', { bubbles: true }))
+                      }, 50)
                       })
                     }
                   }}
@@ -413,343 +604,66 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Container para manter a seção fixa durante 9 rolagens */}
-        <div className="relative" style={{ height: '900vh' }}>
-          {/* Nova Seção de Cards - fica sticky durante 9 rolagens */}
+        {/* Container para manter a seção fixa durante 2 rolagens */}
+        <div className="relative" style={{ height: '220vh' }}>
+          {/* Nova Seção de Cards - fica sticky durante 2 rolagens */}
           <section id="beneficios" ref={cardsSectionRef} className="w-full py-52 sticky top-0">
           <div className="flex flex-col lg:flex-row justify-between items-start w-full gap-8 lg:gap-0">
             {/* Coluna Esquerda - 3 cards */}
             <div className="flex flex-col gap-6 sm:gap-10 md:gap-12 items-start w-full lg:w-auto">
-              {/* Card 1 */}
-              <div ref={(el) => { cardRefs.current[0] = el }} className="relative w-full lg:w-auto">
-                <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/project.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl md:text-[32px] font-semibold text-white leading-tight">Produtos<br />Validados</h3>
-                    <p className="text-[10px] sm:text-[11px] md:text-[12px] text-white/80 leading-tight">
-                      Itens testados para garantir durabilidade e funcionalidade.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa - começa na borda direita do card */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
-                  width="300" 
-                  height="200" 
-                  viewBox="0 0 300 200"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para direita - começa do meio */}
-                  <line 
-                    x1="0" 
-                    y1="100" 
-                    x2="160" 
-                    y2="100" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Linha vertical para baixo */}
-                  <line 
-                    x1="160" 
-                    y1="100" 
-                    x2="160" 
-                    y2="190" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="160" 
-                    cy="190" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
-
-              {/* Card 2 */}
-              <div ref={(el) => { cardRefs.current[1] = el }} className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/eye.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Sem pedido<br />Mínimo</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
-                      Viabilizamos desde uma peça exclusiva até grandes lotes.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa horizontal */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
-                  width="310" 
-                  height="200" 
-                  viewBox="0 0 310 200"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para direita - começa do meio */}
-                  <line 
-                    x1="0" 
-                    y1="100" 
-                    x2="260" 
-                    y2="100" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="260" 
-                    cy="100" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
-
-              {/* Card 3 */}
-              <div ref={(el) => { cardRefs.current[2] = el }} className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/project.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Processo<br />Simplificado</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
-                      Você escolhe o produto, nós colocamos sua marca ou arte.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa - começa na borda direita do card */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 left-full pointer-events-none"
-                  width="300" 
-                  height="200" 
-                  viewBox="0 0 300 200"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para direita - começa do meio */}
-                  <line 
-                    x1="0" 
-                    y1="100" 
-                    x2="240" 
-                    y2="100" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Linha vertical para cima */}
-                  <line 
-                    x1="240" 
-                    y1="100" 
-                    x2="240" 
-                    y2="35" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="240" 
-                    cy="35" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
+              <BenefitCard
+                index={0}
+                icon={cardsData[0].icon}
+                title={cardsData[0].title}
+                description={cardsData[0].description}
+                lineConfig={cardsData[0].lineConfig}
+                cardRef={(el) => { cardRefs.current[0] = el }}
+                className={cardsData[0].className}
+              />
+              <BenefitCard
+                index={1}
+                icon={cardsData[1].icon}
+                title={cardsData[1].title}
+                description={cardsData[1].description}
+                lineConfig={cardsData[1].lineConfig}
+                cardRef={(el) => { cardRefs.current[1] = el }}
+              />
+              <BenefitCard
+                index={2}
+                icon={cardsData[2].icon}
+                title={cardsData[2].title}
+                description={cardsData[2].description}
+                lineConfig={cardsData[2].lineConfig}
+                cardRef={(el) => { cardRefs.current[2] = el }}
+              />
             </div>
 
             {/* Coluna Direita - 3 cards */}
             <div className="flex flex-col gap-6 sm:gap-10 md:gap-12 items-start lg:items-end w-full lg:w-auto">
-              {/* Card 4 */}
-              <div ref={(el) => { cardRefs.current[3] = el }} className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/eye.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Material<br />Incluso</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
-                      O preço do catálogo já contempla a peça, o corte e a gravação.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa - começa na borda esquerda do card */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
-                  width="330" 
-                  height="420" 
-                  viewBox="0 0 330 420"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para esquerda - começa do meio */}
-                  <line 
-                    x1="330" 
-                    y1="210" 
-                    x2="30" 
-                    y2="210" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Linha vertical para baixo */}
-                  <line 
-                    x1="30" 
-                    y1="210" 
-                    x2="30" 
-                    y2="370" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="30" 
-                    cy="370" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
-
-              {/* Card 5 */}
-              <div ref={(el) => { cardRefs.current[4] = el }} className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/project.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Revisão<br />Profissional</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
-                      Verificamos sua arte antes da produção para garantir o resultado.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa - começa na borda esquerda do card */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
-                  width="220" 
-                  height="200" 
-                  viewBox="0 0 220 200"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para esquerda - começa do meio */}
-                  <line 
-                    x1="220" 
-                    y1="100" 
-                    x2="110" 
-                    y2="100" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Linha vertical para cima */}
-                  <line 
-                    x1="110" 
-                    y1="100" 
-                    x2="110" 
-                    y2="30" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="110" 
-                    cy="30" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
-
-              {/* Card 6 */}
-              <div ref={(el) => { cardRefs.current[5] = el }} className="relative">
-                <div className="p-8 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 w-[273px]">
-                  <div className="flex flex-col gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <Image
-                        src="/icons/eye.svg"
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                    </div>
-                    <h3 className="text-[32px] font-semibold text-white leading-tight">Acabamento<br />Premium</h3>
-                    <p className="text-[12px] text-white/80 leading-tight">
-                      Cortes limpos e gravações nítidas em Pinus ou MDF.
-                    </p>
-                  </div>
-                </div>
-                {/* Linha decorativa horizontal - começa na esquerda do card */}
-                <svg 
-                  className="hidden lg:block absolute top-1/2 right-full pointer-events-none"
-                  width="300" 
-                  height="200" 
-                  viewBox="0 0 300 200"
-                  style={{ transform: 'translateY(-50%)' }}
-                >
-                  {/* Linha horizontal para esquerda - começa do meio */}
-                  <line 
-                    x1="300" 
-                    y1="100" 
-                    x2="60" 
-                    y2="100" 
-                    stroke="white" 
-                    strokeWidth="1" 
-                    opacity="0.3"
-                  />
-                  {/* Bolinha no final */}
-                  <circle 
-                    cx="60" 
-                    cy="100" 
-                    r="4" 
-                    fill="white" 
-                    opacity="0.5"
-                  />
-                </svg>
-              </div>
+              <BenefitCard
+                index={3}
+                icon={cardsData[3].icon}
+                title={cardsData[3].title}
+                description={cardsData[3].description}
+                lineConfig={cardsData[3].lineConfig}
+                cardRef={(el) => { cardRefs.current[3] = el }}
+              />
+              <BenefitCard
+                index={4}
+                icon={cardsData[4].icon}
+                title={cardsData[4].title}
+                description={cardsData[4].description}
+                lineConfig={cardsData[4].lineConfig}
+                cardRef={(el) => { cardRefs.current[4] = el }}
+              />
+              <BenefitCard
+                index={5}
+                icon={cardsData[5].icon}
+                title={cardsData[5].title}
+                description={cardsData[5].description}
+                lineConfig={cardsData[5].lineConfig}
+                cardRef={(el) => { cardRefs.current[5] = el }}
+              />
             </div>
           </div>
         </section>

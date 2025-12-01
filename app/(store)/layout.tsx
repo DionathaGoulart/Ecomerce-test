@@ -25,7 +25,7 @@ export default function StoreLayout({
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#0A0A0A]">
+    <div className="flex min-h-screen flex-col bg-[#121212]">
       {/* Header fixo */}
       <header className="fixed top-2 sm:top-[45px] left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
         <div className="rounded-xl sm:rounded-2xl border border-[#3D3D3D] bg-[#212121] px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
@@ -56,21 +56,27 @@ export default function StoreLayout({
                     const section = document.getElementById(sectionId)
                     
                     if (section) {
-                      // Para benefícios, precisa rolar mais para baixo
-                      // Offset responsivo baseado na largura da tela
-                      const isMobile = window.innerWidth < 768
-                      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                      const extraOffset = sectionId === 'beneficios' 
-                        ? (isMobile ? 200 : isTablet ? 400 : 580) 
-                        : 0
-                      const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                      
-                      // Calcula a posição usando offsetTop
-                      const elementPosition = section.offsetTop
-                      const targetPosition = elementPosition - headerOffset + extraOffset
-                      
-                      // Usa a função otimizada para scroll suave que garante sincronização com Spline
-                      smoothScrollTo(targetPosition, 1000)
+                      if (sectionId === 'beneficios') {
+                        // Para benefícios, a seção está dentro de um container sticky
+                        // Pega a posição exata usando getBoundingClientRect
+                        const rect = section.getBoundingClientRect()
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                        const elementTop = rect.top + scrollTop
+                        
+                        // Scroll até a seção, uma rolagem a mais para baixo
+                        const targetPosition = elementTop + 100
+                        
+                        smoothScrollTo(targetPosition, 1000)
+                      } else {
+                        // Para home, usa o método padrão
+                        const isMobile = window.innerWidth < 768
+                        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                        const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
+                        const elementPosition = section.offsetTop
+                        const targetPosition = elementPosition - headerOffset
+                        
+                        smoothScrollTo(targetPosition, 1000)
+                      }
                     }
                   }
                 }
@@ -151,17 +157,27 @@ export default function StoreLayout({
                   const sectionId = item.href.replace('/#', '')
                   const section = document.getElementById(sectionId)
                   if (section) {
-                    const isMobile = window.innerWidth < 768
-                    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                    const extraOffset = sectionId === 'beneficios' 
-                      ? (isMobile ? 200 : isTablet ? 400 : 580) 
-                      : 0
-                    const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                    const elementPosition = section.offsetTop
-                    const targetPosition = elementPosition - headerOffset + extraOffset
-                    
-                    // Usa a função otimizada para scroll suave que garante sincronização com Spline
-                    smoothScrollTo(targetPosition, 1000)
+                    if (sectionId === 'beneficios') {
+                      // Para benefícios, a seção está dentro de um container sticky
+                      // Pega a posição exata usando getBoundingClientRect
+                      const rect = section.getBoundingClientRect()
+                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                      const elementTop = rect.top + scrollTop
+                      
+                      // Scroll até a seção, descontando apenas um pequeno offset
+                      const targetPosition = elementTop - 100
+                      
+                      smoothScrollTo(targetPosition, 1000)
+                    } else {
+                      // Para home, usa o método padrão
+                      const isMobile = window.innerWidth < 768
+                      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                      const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
+                      const elementPosition = section.offsetTop
+                      const targetPosition = elementPosition - headerOffset
+                      
+                      smoothScrollTo(targetPosition, 1000)
+                    }
                   }
                 }
               }
