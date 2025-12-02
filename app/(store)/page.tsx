@@ -570,12 +570,11 @@ export default function Home() {
               </div>
               
               {/* Carousel */}
-              <div className="relative max-w-xl overflow-hidden bg-transparent">
-                
+              <div className="carousel-fade relative max-w-xl overflow-hidden bg-transparent">
                 {/* Container do carousel */}
-                <div className="flex animate-scroll" style={{ width: 'max-content' }}>
+                <div className="flex animate-scroll" style={{ width: 'max-content', transform: 'translateZ(0)' }}>
                   {/* Primeira sequência */}
-                  {['brahma.png', 'casamadeira.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
+                  {['aguaviva.png', 'brahma.png', 'casamadeira.png', 'consertec.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
                     <Image
                       key={`first-${idx}`}
                       src={`/carousel/${img}`}
@@ -583,11 +582,12 @@ export default function Home() {
                       width={80}
                       height={60}
                       className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+                      style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
                       unoptimized
                     />
                   ))}
                   {/* Segunda sequência (duplicada para loop) */}
-                  {['brahma.png', 'casamadeira.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
+                  {['aguaviva.png', 'brahma.png', 'casamadeira.png', 'consertec.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
                     <Image
                       key={`second-${idx}`}
                       src={`/carousel/${img}`}
@@ -595,6 +595,20 @@ export default function Home() {
                       width={80}
                       height={60}
                       className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+                      style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+                      unoptimized
+                    />
+                  ))}
+                  {/* Terceira sequência (para loop infinito fluido) */}
+                  {['aguaviva.png', 'brahma.png', 'casamadeira.png', 'consertec.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
+                    <Image
+                      key={`third-${idx}`}
+                      src={`/carousel/${img}`}
+                      alt=""
+                      width={80}
+                      height={60}
+                      className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+                      style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
                       unoptimized
                     />
                   ))}

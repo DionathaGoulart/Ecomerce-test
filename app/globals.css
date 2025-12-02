@@ -35,10 +35,10 @@ body {
 
 @keyframes scroll {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-33.333%, 0, 0);
   }
 }
 
@@ -46,4 +46,68 @@ body {
   animation: scroll 20s linear infinite;
   display: flex;
   will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+/* Efeito de fade out lateral para carousel usando mask-image */
+.carousel-fade {
+  position: relative;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  transform: translateZ(0);
+  will-change: contents;
+}
+
+/* Responsivo - ajusta a área de fade em telas menores */
+@media (min-width: 640px) {
+  .carousel-fade {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-fade {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 8%,
+      black 92%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 8%,
+      black 92%,
+      transparent 100%
+    );
+  }
 }
