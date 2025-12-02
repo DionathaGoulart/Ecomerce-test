@@ -114,6 +114,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardsSectionRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const comofuncionaSectionRef = useRef<HTMLElement>(null)
 
   // Inicializa as linhas como invisíveis
   useEffect(() => {
@@ -388,6 +389,72 @@ export default function Home() {
 
     return () => {
       observers.forEach((observer) => observer.disconnect())
+    }
+  }, [])
+
+  // Anima as linhas da seção Como Funciona seguindo o scroll
+  useEffect(() => {
+    const section = comofuncionaSectionRef.current
+    if (!section) return
+
+    const updateLines = () => {
+      const windowHeight = window.innerHeight
+      const windowCenter = windowHeight * 0.5
+      const sectionRect = section.getBoundingClientRect()
+      const sectionTop = sectionRect.top
+      
+      const greenLines = section.querySelectorAll('.line-animated')
+      
+      greenLines.forEach((line, index) => {
+        const lineEl = line as HTMLElement
+        const lineContainer = lineEl.parentElement
+        if (!lineContainer) return
+        
+        // Pega a posição do card que contém esta linha
+        const cardContainer = lineContainer.closest('.relative')
+        if (!cardContainer) return
+        
+        const cardRect = cardContainer.getBoundingClientRect()
+        const cardTop = cardRect.top
+        
+        // Calcula o progresso baseado na posição do centro da tela
+        // A linha começa a crescer quando o topo do card passa pelo centro da tela
+        // E completa quando o topo do próximo card passa pelo centro
+        
+        // Distância do centro da tela até o topo do card atual
+        const distanceFromCenter = windowCenter - cardTop
+        
+        // Altura da linha (600px)
+        const lineHeight = 600
+        
+        // Progresso: quando o centro da tela está no topo do card = 0%
+        // Quando o centro da tela está 600px abaixo do topo do card = 100%
+        let progress = 0
+        
+        if (distanceFromCenter > 0) {
+          // Se o centro já passou do topo do card, calcula o progresso
+          progress = Math.min(distanceFromCenter / lineHeight, 1)
+        }
+        
+        // Garante que o progresso não seja negativo
+        progress = Math.max(progress, 0)
+        
+        lineEl.style.height = `${progress * 100}%`
+      })
+    }
+
+    // Atualiza no scroll
+    const handleScroll = () => {
+      updateLines()
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', updateLines)
+    updateLines()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', updateLines)
     }
   }, [])
 
@@ -682,6 +749,113 @@ export default function Home() {
           </div>
         </section>
         </div>
+
+        {/* Seção Como Funciona */}
+        <section id="comofunciona" ref={comofuncionaSectionRef} className="w-full py-24 sm:py-32">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Coluna Esquerda - Vazia */}
+              <div className="hidden lg:block"></div>
+              
+              {/* Coluna Direita - Cards */}
+              <div className="flex flex-col items-start">
+              {[
+                {
+                  step: 1,
+                  icon: '/icons/card1.svg',
+                  title: 'Escolha o Produto',
+                  description: 'Navegue pelo nosso catálogo e selecione o produto que melhor atende às suas necessidades.'
+                },
+                {
+                  step: 2,
+                  icon: '/icons/card2.svg',
+                  title: 'Personalize',
+                  description: 'Adicione sua marca, logo ou arte personalizada. Nossa equipe revisa antes da produção.'
+                },
+                {
+                  step: 3,
+                  icon: '/icons/card3.svg',
+                  title: 'Aprovação',
+                  description: 'Você recebe uma prévia para aprovação. Ajustes podem ser feitos antes da confirmação.'
+                },
+                {
+                  step: 4,
+                  icon: '/icons/card4.svg',
+                  title: 'Produção',
+                  description: 'Após aprovação, iniciamos a produção com materiais de qualidade e acabamento premium.'
+                },
+                {
+                  step: 5,
+                  icon: '/icons/card5.svg',
+                  title: 'Entrega',
+                  description: 'Seu pedido é cuidadosamente embalado e enviado. Acompanhe o status em tempo real.'
+                }
+              ].map((etapa, index, array) => {
+                // Calcula a cor da linha baseado no progresso
+                const progress = index / (array.length - 1)
+                const lineColor = progress < 0.5 
+                  ? `linear-gradient(to bottom, #3D3D3D ${progress * 200}%, #E9EF33 ${progress * 200}%)`
+                  : '#E9EF33'
+                
+                return (
+                  <div key={etapa.step} className="relative w-full">
+                    <div className="flex items-stretch gap-4">
+                      {/* Card do Número */}
+                      <div className="flex-shrink-0 relative z-10">
+                        <div className="w-16 sm:w-20 md:w-24 h-full rounded-[16px] bg-[#E9EF33] flex items-center justify-center">
+                          <span className="text-[32px] font-semibold text-[#121212]">
+                            {etapa.step}
+                          </span>
+                        </div>
+                        
+                        {/* Linha vertical conectando etapas */}
+                        {index < array.length - 1 && (
+                          <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden" style={{ height: '600px' }}>
+                            {/* Linha cinza de fundo */}
+                            <div className="absolute inset-0 bg-[#3D3D3D]" />
+                            {/* Linha verde que vai crescendo */}
+                            <div 
+                              className="line-animated absolute left-0 top-0 w-full bg-[#E9EF33]"
+                              style={{ height: '0%' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Card de Conteúdo */}
+                      <div className="flex-1 rounded-[16px] bg-[#E9EF33] p-4 sm:p-6">
+                        <div className="flex flex-col gap-4">
+                          <div className="flex-shrink-0">
+                            <Image
+                              src={etapa.icon}
+                              alt=""
+                              width={24}
+                              height={24}
+                              className="w-4 h-4 sm:w-5 sm:h-5"
+                              style={{ filter: 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)' }}
+                            />
+                          </div>
+                          <h3 className="text-[32px] font-semibold text-[#121212]">
+                            {etapa.title}
+                          </h3>
+                          <p className="text-[16px] text-[#121212]/80 leading-relaxed">
+                            {etapa.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Espaço entre etapas */}
+                    {index < array.length - 1 && (
+                      <div className="h-[600px]" />
+                    )}
+                  </div>
+                )
+              })}
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Espaço para scroll */}
         <div className="h-[200vh]" />

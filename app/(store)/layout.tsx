@@ -20,7 +20,7 @@ export default function StoreLayout({
   const navItems = [
     { href: '/#home', label: 'Home' },
     { href: '/#beneficios', label: 'Benefícios' },
-    { href: '/como-funciona', label: 'Como Funciona' },
+    { href: '/#comofunciona', label: 'Como Funciona' },
     { href: '/store', label: 'Catálogo' },
   ]
 
@@ -48,7 +48,7 @@ export default function StoreLayout({
             <nav className="hidden md:flex items-center gap-2 lg:gap-4">
               {navItems.map((item) => {
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (item.href === '/#home' || item.href === '/#beneficios') {
+                  if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona') {
                     e.preventDefault()
                     e.stopPropagation()
                     
@@ -68,7 +68,7 @@ export default function StoreLayout({
                         
                         smoothScrollTo(targetPosition, 1000)
                       } else {
-                        // Para home, usa o método padrão
+                        // Para home e comofunciona, usa o método padrão
                         const isMobile = window.innerWidth < 768
                         const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
                         const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
@@ -152,7 +152,7 @@ export default function StoreLayout({
             {navItems.map((item) => {
               const handleMobileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                 setMobileMenuOpen(false)
-                if (item.href === '/#home' || item.href === '/#beneficios') {
+                if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona') {
                   e.preventDefault()
                   const sectionId = item.href.replace('/#', '')
                   const section = document.getElementById(sectionId)
@@ -169,7 +169,7 @@ export default function StoreLayout({
                       
                       smoothScrollTo(targetPosition, 1000)
                     } else {
-                      // Para home, usa o método padrão
+                      // Para home e comofunciona, usa o método padrão
                       const isMobile = window.innerWidth < 768
                       const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
                       const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
