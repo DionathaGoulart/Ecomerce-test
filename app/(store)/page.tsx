@@ -196,11 +196,11 @@ export default function Home() {
           const hLength = hLine.getTotalLength()
           hLine.style.strokeDasharray = `${hLength}`
           hLine.style.strokeDashoffset = `${hLength}`
-          hLine.style.transition = 'stroke-dashoffset 0.8s ease-in-out'
+          hLine.style.transition = 'stroke-dashoffset 0.4s ease-in-out'
           
           setTimeout(() => {
             hLine.style.strokeDashoffset = '0'
-          }, 50 + (svgIndex * 100)) // Delay escalonado por SVG (mais rápido)
+          }, 30 + (svgIndex * 50)) // Delay escalonado por SVG (mais rápido)
         }
         
         // Anima linha vertical depois
@@ -209,22 +209,22 @@ export default function Home() {
           const vLength = vLine.getTotalLength()
           vLine.style.strokeDasharray = `${vLength}`
           vLine.style.strokeDashoffset = `${vLength}`
-          vLine.style.transition = 'stroke-dashoffset 0.8s ease-in-out'
+          vLine.style.transition = 'stroke-dashoffset 0.4s ease-in-out'
           
           setTimeout(() => {
             vLine.style.strokeDashoffset = '0'
-          }, 900 + (svgIndex * 100)) // Após a horizontal terminar (mais rápido)
+          }, 450 + (svgIndex * 50)) // Após a horizontal terminar (mais rápido)
         }
         
         // Mostra a bolinha por último
         if (svgCircle) {
           const circleEl = svgCircle as SVGCircleElement
           circleEl.style.opacity = '0'
-          circleEl.style.transition = 'opacity 0.3s ease-in-out'
+          circleEl.style.transition = 'opacity 0.2s ease-in-out'
           
           setTimeout(() => {
             circleEl.style.opacity = '0.5'
-          }, 1800 + (svgIndex * 100)) // Após ambas as linhas terminarem (mais rápido)
+          }, 900 + (svgIndex * 50)) // Após ambas as linhas terminarem (mais rápido)
         }
       })
       
@@ -317,11 +317,11 @@ export default function Home() {
             const hLength = hLine.getTotalLength()
             hLine.style.strokeDasharray = `${hLength}`
             hLine.style.strokeDashoffset = `${hLength}`
-            hLine.style.transition = 'stroke-dashoffset 1.5s ease-in-out'
+            hLine.style.transition = 'stroke-dashoffset 0.6s ease-in-out'
             
             setTimeout(() => {
               hLine.style.strokeDashoffset = '0'
-            }, 50)
+            }, 30)
           }
           
           // Depois anima a linha vertical (após a horizontal terminar)
@@ -330,24 +330,24 @@ export default function Home() {
             const vLength = vLine.getTotalLength()
             vLine.style.strokeDasharray = `${vLength}`
             vLine.style.strokeDashoffset = `${vLength}`
-            vLine.style.transition = 'stroke-dashoffset 1.5s ease-in-out'
+            vLine.style.transition = 'stroke-dashoffset 0.6s ease-in-out'
             
             setTimeout(() => {
               vLine.style.strokeDashoffset = '0'
-            }, 1550) // Começa após a horizontal terminar (1.5s + 50ms)
+            }, 650) // Começa após a horizontal terminar (0.6s + 50ms)
           }
           
           // Por fim mostra a bolinha
           if (svgCircle) {
             const circleEl = svgCircle as SVGCircleElement
             circleEl.style.opacity = '0'
-            circleEl.style.transition = 'opacity 0.5s ease-in-out'
+            circleEl.style.transition = 'opacity 0.3s ease-in-out'
             
             setTimeout(() => {
               if (circleEl) {
                 circleEl.style.opacity = '0.5'
               }
-            }, 3050) // Após ambas as linhas terminarem (1.5s + 1.5s + 50ms)
+            }, 1300) // Após ambas as linhas terminarem (0.6s + 0.6s + 100ms)
           }
         })
       } else {
@@ -394,7 +394,7 @@ export default function Home() {
   // Dados dos cards
   const cardsData = [
     {
-      icon: '/icons/project.svg',
+      icon: '/icons/card1.svg',
       title: 'Produtos\nValidados',
       description: 'Itens testados para garantir durabilidade e funcionalidade.',
       lineConfig: {
@@ -409,7 +409,7 @@ export default function Home() {
       className: 'w-full lg:w-auto'
     },
     {
-      icon: '/icons/eye.svg',
+      icon: '/icons/card2.svg',
       title: 'Sem pedido\nMínimo',
       description: 'Viabilizamos desde uma peça exclusiva até grandes lotes.',
       lineConfig: {
@@ -422,7 +422,7 @@ export default function Home() {
       }
     },
     {
-      icon: '/icons/project.svg',
+      icon: '/icons/card3.svg',
       title: 'Processo\nSimplificado',
       description: 'Você escolhe o produto, nós colocamos sua marca ou arte.',
       lineConfig: {
@@ -436,7 +436,7 @@ export default function Home() {
       }
     },
     {
-      icon: '/icons/eye.svg',
+      icon: '/icons/card4.svg',
       title: 'Material\nIncluso',
       description: 'O preço do catálogo já contempla a peça, o corte e a gravação.',
       lineConfig: {
@@ -450,7 +450,7 @@ export default function Home() {
       }
     },
     {
-      icon: '/icons/project.svg',
+      icon: '/icons/card5.svg',
       title: 'Revisão\nProfissional',
       description: 'Verificamos sua arte antes da produção para garantir o resultado.',
       lineConfig: {
@@ -464,7 +464,7 @@ export default function Home() {
       }
     },
     {
-      icon: '/icons/eye.svg',
+      icon: '/icons/card6.svg',
       title: 'Acabamento\nPremium',
       description: 'Cortes limpos e gravações nítidas em Pinus ou MDF.',
       lineConfig: {
