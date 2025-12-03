@@ -33,6 +33,11 @@ body {
   }
 }
 
+/* Limita o Spline para não ultrapassar o container */
+.spline-container {
+  /* O Spline será limitado pelo container pai via JavaScript */
+}
+
 /* Animação do carousel agora é controlada via JavaScript para loop perfeito */
 
 /* Efeito de fade out lateral para carousel usando mask-image */

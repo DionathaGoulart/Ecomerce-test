@@ -211,7 +211,7 @@ export default function StoreLayout({
       )}
       
       {/* Main com container padronizado */}
-      <main className="flex-1 pt-16 sm:pt-24 md:pt-32 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
         {children}
       </main>
     </div>
