@@ -115,6 +115,7 @@ export default function Home() {
   const cardsSectionRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const comofuncionaSectionRef = useRef<HTMLElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
 
   // Inicializa as linhas como invisíveis
   useEffect(() => {
@@ -458,6 +459,48 @@ export default function Home() {
     }
   }, [])
 
+  // Anima o carousel com loop perfeito
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel) return
+
+    // Aguarda o carregamento completo para calcular dimensões corretas
+    const initAnimation = () => {
+      const carouselWidth = carousel.scrollWidth
+      const sequenceWidth = carouselWidth / 3
+      const duration = 30000 // 30 segundos para completar uma sequência
+      const speed = sequenceWidth / duration // pixels por milissegundo
+
+      let startTime: number | null = null
+      let lastPosition = 0
+
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp
+        const elapsed = timestamp - startTime
+
+        // Calcula a posição baseada no tempo decorrido
+        const totalDistance = elapsed * speed
+        const currentPosition = -(totalDistance % sequenceWidth)
+
+        // Só atualiza se a posição mudou (evita repaints desnecessários)
+        if (Math.abs(currentPosition - lastPosition) > 0.1) {
+          carousel.style.transform = `translate3d(${currentPosition}px, 0, 0)`
+          lastPosition = currentPosition
+        }
+
+        requestAnimationFrame(animate)
+      }
+
+      requestAnimationFrame(animate)
+    }
+
+    // Aguarda um frame para garantir que o DOM está renderizado
+    requestAnimationFrame(() => {
+      // Aguarda mais um pouco para garantir que as imagens carregaram
+      setTimeout(initAnimation, 100)
+    })
+  }, [])
+
   // Dados dos cards
   const cardsData = [
     {
@@ -639,7 +682,7 @@ export default function Home() {
               {/* Carousel */}
               <div className="carousel-fade relative max-w-xl overflow-hidden bg-transparent">
                 {/* Container do carousel */}
-                <div className="flex animate-scroll" style={{ width: 'max-content', transform: 'translateZ(0)' }}>
+                <div ref={carouselRef} className="flex" style={{ width: 'max-content', transform: 'translateZ(0)' }}>
                   {/* Primeira sequência */}
                   {['aguaviva.png', 'brahma.png', 'casamadeira.png', 'consertec.png', 'laz.png', 'peterlongo.png', 'super7.png'].map((img, idx) => (
                     <Image
