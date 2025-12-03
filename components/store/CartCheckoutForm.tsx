@@ -8,6 +8,8 @@ import { createOrderSchema, type CreateOrderInput } from '@/lib/validations/orde
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertTitle, AlertDescription } from '@/components/molecules/Alert'
+import { Card, CardContent } from '@/components/molecules/Card'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/utils'
 import {
@@ -188,7 +190,7 @@ export default function CartCheckoutForm() {
   if (cartItems.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Seu carrinho está vazio.</p>
+        <p className="text-neutral-600">Seu carrinho está vazio.</p>
         <Button
           onClick={() => router.push('/store')}
           className="mt-4"
@@ -204,11 +206,10 @@ export default function CartCheckoutForm() {
     <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-8">
       {/* Mensagem de erro geral */}
       {Object.keys(errors).length > 0 && (
-        <div className="rounded-xl bg-red-50 border border-red-100 p-6">
-          <p className="text-sm font-semibold text-red-900 mb-3">
-            Por favor, corrija os erros abaixo antes de continuar:
-          </p>
-          <ul className="list-disc list-inside text-sm text-red-700 space-y-1.5">
+        <Alert variant="destructive">
+          <AlertTitle>Por favor, corrija os erros abaixo antes de continuar:</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc list-inside space-y-1.5 mt-2">
             {errors.name && (
               <li>Nome: {errors.name.message}</li>
             )}
@@ -236,79 +237,79 @@ export default function CartCheckoutForm() {
             {errors.address?.zipcode && (
               <li>CEP: {errors.address.zipcode.message}</li>
             )}
-          </ul>
-        </div>
+            </ul>
+          </AlertDescription>
+        </Alert>
       )}
       {/* Itens do carrinho */}
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-gray-900">Itens</h3>
+        <h3 className="text-xl font-semibold text-neutral-900">Itens</h3>
         {cartItems.map((item) => {
           const product = products[item.productId]
           if (!product) return null
 
           return (
-            <div
-              key={item.productId}
-              className="flex items-start gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm"
-            >
-              {product.image_url && (
-                <Image
-                  src={product.image_url}
-                  alt={product.title}
-                  width={80}
-                  height={80}
-                  className="h-20 w-20 rounded-xl object-cover"
-                />
-              )}
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-900">{product.title}</h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  Quantidade: {item.quantity}
-                </p>
-                {(item.personalizationImageUrl || item.personalizationDescription) && (
-                  <div className="mt-3 space-y-2">
-                    {item.personalizationImageUrl && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-700">Imagem de personalização:</p>
-                        <Image
-                          src={item.personalizationImageUrl}
-                          alt="Personalização"
-                          width={64}
-                          height={64}
-                          className="mt-2 h-16 w-16 rounded-xl object-cover border border-gray-200"
-                          unoptimized
-                        />
-                      </div>
-                    )}
-                    {item.personalizationDescription && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-700">Descrição:</p>
-                        <p className="mt-1 text-xs text-gray-600">{item.personalizationDescription}</p>
-                      </div>
-                    )}
-                  </div>
+            <Card key={item.productId} variant="default" padding="md">
+              <div className="flex items-start gap-4">
+                {product.image_url && (
+                  <Image
+                    src={product.image_url}
+                    alt={product.title}
+                    width={80}
+                    height={80}
+                    className="h-20 w-20 rounded-xl object-cover"
+                  />
                 )}
+                <div className="flex-1">
+                  <h4 className="font-semibold text-neutral-900">{product.title}</h4>
+                  <p className="mt-1 text-sm text-neutral-500">
+                    Quantidade: {item.quantity}
+                  </p>
+                  {(item.personalizationImageUrl || item.personalizationDescription) && (
+                    <div className="mt-3 space-y-2">
+                      {item.personalizationImageUrl && (
+                        <div>
+                          <p className="text-xs font-medium text-neutral-700">Imagem de personalização:</p>
+                          <Image
+                            src={item.personalizationImageUrl}
+                            alt="Personalização"
+                            width={64}
+                            height={64}
+                            className="mt-2 h-16 w-16 rounded-xl object-cover border border-neutral-200"
+                            unoptimized
+                          />
+                        </div>
+                      )}
+                      {item.personalizationDescription && (
+                        <div>
+                          <p className="text-xs font-medium text-neutral-700">Descrição:</p>
+                          <p className="mt-1 text-xs text-neutral-600">{item.personalizationDescription}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-neutral-900">
+                    {formatCurrency(product.price_cents * item.quantity)}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFromCart(item.productId)}
+                    className="mt-3"
+                  >
+                    Remover
+                  </Button>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-gray-900">
-                  {formatCurrency(product.price_cents * item.quantity)}
-                </p>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeFromCart(item.productId)}
-                  className="mt-3"
-                >
-                  Remover
-                </Button>
-              </div>
-            </div>
+            </Card>
           )
         })}
-        <div className="flex justify-between border-t border-gray-200 pt-6 mt-6">
-          <span className="text-xl font-semibold text-gray-900">Total:</span>
-          <span className="text-2xl font-semibold text-gray-900">
+        <div className="flex justify-between border-t border-neutral-200 pt-6 mt-6">
+          <span className="text-xl font-semibold text-neutral-900">Total:</span>
+          <span className="text-2xl font-semibold text-neutral-900">
             {formatCurrency(totalCents)}
           </span>
         </div>
@@ -317,10 +318,10 @@ export default function CartCheckoutForm() {
       {/* Formulário de dados do cliente */}
       <div className="mt-12 space-y-6">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">
+          <h3 className="text-xl font-semibold text-neutral-900">
             Dados do Cliente
           </h3>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-neutral-500">
             Preencha seus dados para finalizar o pedido
           </p>
         </div>
@@ -339,7 +340,7 @@ export default function CartCheckoutForm() {
             placeholder="João Silva"
           />
           {errors.name && (
-            <p className="mt-2 text-sm text-red-600">
+            <p className="mt-2 text-sm text-error-600">
               {errors.name.message}
             </p>
           )}
@@ -354,7 +355,7 @@ export default function CartCheckoutForm() {
             placeholder="joao@example.com"
           />
           {errors.email && (
-            <p className="mt-2 text-sm text-red-600">
+            <p className="mt-2 text-sm text-error-600">
               {errors.email.message}
             </p>
           )}
@@ -375,7 +376,7 @@ export default function CartCheckoutForm() {
             maxLength={14}
           />
           {errors.cpf && (
-            <p className="mt-2 text-sm text-red-600">
+            <p className="mt-2 text-sm text-error-600">
               {errors.cpf.message}
             </p>
           )}
@@ -395,20 +396,20 @@ export default function CartCheckoutForm() {
             placeholder="(68) 97293-2250"
             type="tel"
           />
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-2 text-xs text-neutral-400">
             Digite com DDD ou código do país (ex: (68) 97293-2250 ou +55 68 97293-2250)
           </p>
           {errors.whatsapp && (
-            <p className="mt-2 text-sm text-red-600">
+            <p className="mt-2 text-sm text-error-600">
               {errors.whatsapp.message}
             </p>
           )}
         </div>
 
-        <div className="space-y-6 border-t border-gray-200 pt-8">
+        <div className="space-y-6 border-t border-neutral-200 pt-8">
           <div>
-            <h4 className="text-lg font-semibold text-gray-900">Endereço</h4>
-            <p className="mt-1 text-sm text-gray-500">Informe o endereço de entrega</p>
+            <h4 className="text-lg font-semibold text-neutral-900">Endereço</h4>
+            <p className="mt-1 text-sm text-neutral-500">Informe o endereço de entrega</p>
           </div>
 
           <div>
@@ -425,7 +426,7 @@ export default function CartCheckoutForm() {
               placeholder="Rua das Flores"
             />
             {errors.address?.street && (
-              <p className="mt-2 text-sm text-red-600">
+              <p className="mt-2 text-sm text-error-600">
                 {errors.address.street.message}
               </p>
             )}
@@ -440,7 +441,7 @@ export default function CartCheckoutForm() {
                 placeholder="123"
               />
               {errors.address?.number && (
-                <p className="mt-2 text-sm text-red-600">
+                <p className="mt-2 text-sm text-error-600">
                   {errors.address.number.message}
                 </p>
               )}
@@ -461,7 +462,7 @@ export default function CartCheckoutForm() {
                 maxLength={9}
               />
               {errors.address?.zipcode && (
-                <p className="mt-2 text-sm text-red-600">
+                <p className="mt-2 text-sm text-error-600">
                   {errors.address.zipcode.message}
                 </p>
               )}
@@ -482,7 +483,7 @@ export default function CartCheckoutForm() {
               placeholder="Rio Branco"
             />
             {errors.address?.city && (
-              <p className="mt-2 text-sm text-red-600">
+              <p className="mt-2 text-sm text-error-600">
                 {errors.address.city.message}
               </p>
             )}
@@ -502,7 +503,7 @@ export default function CartCheckoutForm() {
               maxLength={2}
             />
             {errors.address?.state && (
-              <p className="mt-2 text-sm text-red-600">
+              <p className="mt-2 text-sm text-error-600">
                 {errors.address.state.message}
               </p>
             )}

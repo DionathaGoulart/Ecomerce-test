@@ -623,7 +623,7 @@ export default function Home() {
                 {/* Botão Ver Catálogo (estilo carrinho) */}
                 <Link
                   href="/store"
-                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-[#E9EF33] px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#121212] transition-opacity hover:opacity-90"
+                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-primary-500 px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-opacity hover:opacity-90"
                 >
                   <Image
                     src="/icons/eye.svg"
@@ -659,7 +659,7 @@ export default function Home() {
                       })
                     }
                   }}
-                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-[#E9EF33] bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-[#E9EF33] transition-opacity hover:opacity-80"
+                  className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-opacity hover:opacity-80"
                 >
                   <Image
                     src="/icons/project.svg"
@@ -805,33 +805,27 @@ export default function Home() {
               {[
                 {
                   step: 1,
-                  icon: '/icons/card1.svg',
-                  title: 'Escolha o Produto',
-                  description: 'Navegue pelo nosso catálogo e selecione o produto que melhor atende às suas necessidades.'
+                  icon: '/icons/step1.svg',
+                  title: 'Escolha no Catálogo',
+                  description: 'Navegue por nossas categorias e selecione o produto base que atende sua necessidade.'
                 },
                 {
                   step: 2,
-                  icon: '/icons/card2.svg',
-                  title: 'Personalize',
-                  description: 'Adicione sua marca, logo ou arte personalizada. Nossa equipe revisa antes da produção.'
+                  icon: '/icons/step2.svg',
+                  title: 'Defina Quantidade e Arte',
+                  description: 'Selecione quantas unidades precisa e faça o upload do arquivo (logo ou desenho) que será gravado na peça.'
                 },
                 {
                   step: 3,
-                  icon: '/icons/card3.svg',
-                  title: 'Aprovação',
-                  description: 'Você recebe uma prévia para aprovação. Ajustes podem ser feitos antes da confirmação.'
+                  icon: '/icons/step3.svg',
+                  title: 'Realize o Pagamento',
+                  description: 'Finalize seu pedido de forma segura diretamente pelo site para garantir sua reserva de produção.'
                 },
                 {
                   step: 4,
-                  icon: '/icons/card4.svg',
-                  title: 'Produção',
-                  description: 'Após aprovação, iniciamos a produção com materiais de qualidade e acabamento premium.'
-                },
-                {
-                  step: 5,
-                  icon: '/icons/card5.svg',
-                  title: 'Entrega',
-                  description: 'Seu pedido é cuidadosamente embalado e enviado. Acompanhe o status em tempo real.'
+                  icon: '/icons/step4.svg',
+                  title: 'Pronto!',
+                  description: 'Aguarde nossa equipe entrar em contato. Vamos confirmar os detalhes da arte e garantir que tudo esteja perfeito antes de ligar as máquinas.'
                 }
               ].map((etapa, index, array) => {
                 // Calcula a cor da linha baseado no progresso
@@ -845,8 +839,8 @@ export default function Home() {
                     <div className="flex items-stretch gap-4">
                       {/* Card do Número */}
                       <div className="flex-shrink-0 relative z-10">
-                        <div className="w-16 sm:w-20 md:w-24 h-full rounded-[16px] bg-[#E9EF33] flex items-center justify-center">
-                          <span className="text-[32px] font-semibold text-[#121212]">
+                        <div className="w-16 sm:w-20 md:w-24 h-full rounded-[16px] bg-primary-500 flex items-center justify-center">
+                          <span className="text-[32px] font-semibold text-neutral-950">
                             {etapa.step}
                           </span>
                         </div>
@@ -855,10 +849,10 @@ export default function Home() {
                         {index < array.length - 1 && (
                           <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden" style={{ height: '600px' }}>
                             {/* Linha cinza de fundo */}
-                            <div className="absolute inset-0 bg-[#3D3D3D]" />
+                            <div className="absolute inset-0 bg-header-border" />
                             {/* Linha verde que vai crescendo */}
                             <div 
-                              className="line-animated absolute left-0 top-0 w-full bg-[#E9EF33]"
+                              className="line-animated absolute left-0 top-0 w-full bg-primary-500"
                               style={{ height: '0%' }}
                             />
                           </div>
@@ -866,7 +860,7 @@ export default function Home() {
                       </div>
                       
                       {/* Card de Conteúdo */}
-                      <div className="flex-1 rounded-[16px] bg-[#E9EF33] p-4 sm:p-6">
+                      <div className="flex-1 rounded-[16px] bg-primary-500 p-4 sm:p-6">
                         <div className="flex flex-col gap-4">
                           <div className="flex-shrink-0">
                             <Image
@@ -878,10 +872,10 @@ export default function Home() {
                               style={{ filter: 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)' }}
                             />
                           </div>
-                          <h3 className="text-[32px] font-semibold text-[#121212]">
+                          <h3 className="text-[32px] font-semibold text-neutral-950">
                             {etapa.title}
                           </h3>
-                          <p className="text-[16px] text-[#121212]/80 leading-relaxed">
+                          <p className="text-[16px] text-neutral-950/80 leading-relaxed">
                             {etapa.description}
                           </p>
                         </div>

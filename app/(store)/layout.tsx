@@ -25,10 +25,10 @@ export default function StoreLayout({
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#121212]">
+    <div className="flex min-h-screen flex-col bg-neutral-950">
       {/* Header fixo */}
-      <header className="fixed top-2 sm:top-[45px] left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
-        <div className="rounded-xl sm:rounded-2xl border border-[#3D3D3D] bg-[#212121] px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+      <header className="fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+        <div className="rounded-xl sm:rounded-2xl border border-header-border bg-header-bg px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo à esquerda */}
             <Link href="/" className="flex items-center flex-shrink-0">
@@ -126,7 +126,7 @@ export default function StoreLayout({
               {/* Botão Minha Conta */}
               <Link
                 href="/minha-conta"
-                className="flex items-center gap-1 sm:gap-2 rounded-lg border border-[#E9EF33] bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-[#E9EF33] transition-opacity hover:opacity-80"
+                className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-opacity hover:opacity-80"
               >
                 <User className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Minha Conta</span>
@@ -135,7 +135,7 @@ export default function StoreLayout({
               {/* Botão Carrinho */}
               <Link
                 href="/store/cart"
-                className="flex items-center gap-1 sm:gap-2 rounded-lg bg-[#E9EF33] px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-[#121212] transition-opacity hover:opacity-90"
+                className="flex items-center gap-1 sm:gap-2 rounded-lg bg-primary-500 px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-neutral-950 transition-opacity hover:opacity-90"
               >
                 <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Carrinho</span>
@@ -147,7 +147,7 @@ export default function StoreLayout({
 
       {/* Menu Mobile */}
       {mobileMenuOpen && (
-        <div className="fixed top-[73px] left-0 right-0 z-30 md:hidden bg-[#212121] border-t border-[#3D3D3D]">
+        <div className="fixed top-[73px] left-0 right-0 z-30 md:hidden bg-header-bg border-t border-header-border">
           <nav className="flex flex-col p-4 gap-2">
             {navItems.map((item) => {
               const handleMobileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

@@ -139,7 +139,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           placeholder="Caneca Personalizada"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+          <p className="mt-1 text-sm text-error-600">{errors.title.message}</p>
         )}
       </div>
 
@@ -152,7 +152,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           placeholder="Descrição do produto..."
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="mt-1 text-sm text-error-600">
             {errors.description.message}
           </p>
         )}
@@ -167,11 +167,11 @@ export default function ProductForm({ product }: ProductFormProps) {
           className="mt-1"
           placeholder="2990"
         />
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-neutral-500">
           Exemplo: 2990 = R$ 29,90
         </p>
         {errors.price_cents && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="mt-1 text-sm text-error-600">
             {errors.price_cents.message}
           </p>
         )}
@@ -184,11 +184,11 @@ export default function ProductForm({ product }: ProductFormProps) {
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
-          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+          className="mt-1 block w-full text-sm text-neutral-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
           disabled={uploadingImage}
         />
         {uploadingImage && (
-          <p className="mt-2 text-sm text-gray-500">Enviando...</p>
+          <p className="mt-2 text-sm text-neutral-500">Enviando...</p>
         )}
         {imageUrl && (
           <div className="mt-4">
