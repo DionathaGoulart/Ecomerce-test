@@ -15,7 +15,7 @@ export function ClientCarousel() {
       {/* Carousel */}
       <div className="carousel-fade relative max-w-xl overflow-hidden bg-transparent">
         {/* Container do carousel */}
-        <div ref={carouselRef} className="flex" style={{ width: 'max-content', transform: 'translateZ(0)' }}>
+        <div ref={carouselRef} className="flex w-max" style={{ transform: 'translateZ(0)' }}>
           {/* Primeira sequência */}
           {CLIENT_IMAGES.map((img, idx) => (
             <Image

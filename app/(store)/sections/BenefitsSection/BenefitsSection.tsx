@@ -103,7 +103,7 @@ export function BenefitsSection() {
   useBenefitsAnimation(cardsSectionRef, cardRefs)
 
   return (
-    <div className="relative" style={{ height: '220vh' }}>
+    <div className="relative h-[220vh]">
       <section id="beneficios" ref={cardsSectionRef} className="w-full py-52 sticky top-0">
         <div className="flex flex-col lg:flex-row justify-between items-start w-full gap-8 lg:gap-0">
           {/* Coluna Esquerda - 3 cards */}

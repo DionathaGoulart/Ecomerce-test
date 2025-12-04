@@ -26,7 +26,7 @@ export default function StoreLayout({
   ]
 
   return (
-    <div className="flex min-h-screen flex-col" style={{ backgroundColor: '#060606' }}>
+    <div className="flex min-h-screen flex-col bg-[#060606]">
       {/* Header fixo */}
       <header className="fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
         <div className="rounded-xl sm:rounded-2xl border border-header-border bg-header-bg px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">

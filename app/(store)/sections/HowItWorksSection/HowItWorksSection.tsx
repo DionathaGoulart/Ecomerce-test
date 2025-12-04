@@ -68,7 +68,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                       
                       {/* Linha vertical conectando etapas */}
                       {index < array.length - 1 && (
-                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden" style={{ height: '600px' }}>
+                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden h-[600px]">
                           {/* Linha cinza de fundo */}
                           <div className="absolute inset-0 bg-header-border" />
                           {/* Linha verde que vai crescendo */}

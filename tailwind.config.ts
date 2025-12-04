@@ -117,6 +117,8 @@ const config: Config = {
         'header-border': '#3D3D3D',
         'cart-button': '#E9EF33',
         'body-bg': '#0A0A0A',
+        'green-light': '#9AF032',
+        'red-error': '#F03932',
       },
       fontFamily: {
         sans: ['Instrument Sans', 'system-ui', 'sans-serif'],
@@ -136,6 +138,9 @@ const config: Config = {
         '7xl': ['4.5rem', { lineHeight: '1' }],
         '8xl': ['6rem', { lineHeight: '1' }],
         '9xl': ['8rem', { lineHeight: '1' }],
+        'catalog-title': ['96px', { lineHeight: '1' }],
+        'product-title': ['20px', { lineHeight: '1.5rem' }],
+        'product-price': ['16px', { lineHeight: '1.5rem' }],
       },
       fontWeight: {
         light: '300',

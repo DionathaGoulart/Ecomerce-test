@@ -33,8 +33,7 @@ export default function Home() {
         {/* Container principal - conteúdo começa no topo, sem espaço extra */}
         <div 
           ref={containerRef} 
-          className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96"
-          style={{ marginTop: 0, paddingTop: 0 }}
+          className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 m-0 p-0"
         >
           {/* Seção Home - deve aparecer logo abaixo do header */}
           <HomeHero />

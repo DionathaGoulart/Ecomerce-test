@@ -33,6 +33,17 @@ body {
   }
 }
 
+/* Remove spinners de inputs number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Limita o Spline para não ultrapassar o container */
 .spline-container {
   /* O Spline será limitado pelo container pai via JavaScript */

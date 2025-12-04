@@ -62,11 +62,10 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
       </div>
       {/* Linha decorativa */}
       <svg 
-        className={`hidden lg:block absolute top-1/2 ${lineConfig.position === 'left' ? 'left-full' : 'right-full'} pointer-events-none`}
+        className={`hidden lg:block absolute top-1/2 -translate-y-1/2 ${lineConfig.position === 'left' ? 'left-full' : 'right-full'} pointer-events-none`}
         width={lineConfig.svgWidth}
         height={lineConfig.svgHeight}
         viewBox={lineConfig.viewBox}
-        style={{ transform: 'translateY(-50%)' }}
       >
         {lineConfig.horizontalLine && (
           <line 
