@@ -154,7 +154,7 @@ export default function CatalogSection() {
     <section id="catalogo" className="relative z-20 w-full py-16 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Título */}
-        <h2 className="text-4xl font-semibold text-neutral-900 mb-8">
+        <h2 className="font-semibold mb-8" style={{ fontSize: '96px', color: '#FFFFFF' }}>
           Catálogo
         </h2>
 

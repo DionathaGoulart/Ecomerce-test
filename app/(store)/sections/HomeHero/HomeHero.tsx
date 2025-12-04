@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
-import { ClientCarousel } from './ClientCarousel'
+import { ClientCarousel } from '../ClientCarousel/ClientCarousel'
 
 export function HomeHero() {
   const handleScrollToBenefits = (e: React.MouseEvent<HTMLAnchorElement>) => {

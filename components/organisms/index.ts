@@ -2,5 +2,3 @@
 export { ProductCard } from './ProductCard'
 export type { ProductCardProps, Product } from './ProductCard'
 
-export { CatalogSection } from './CatalogSection'
-

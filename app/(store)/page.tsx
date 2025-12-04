@@ -1,14 +1,13 @@
 'use client'
 
 import { useRef } from 'react'
-import { CatalogSection } from '@/components/organisms/CatalogSection'
 import { 
   SplineBackground, 
   HomeHero, 
-  ClientCarousel, 
   BenefitsSection, 
-  HowItWorksSection 
-} from '@/components/landing'
+  HowItWorksSection,
+  CatalogSection
+} from './sections'
 import { useSplineLimit } from '@/hooks/useSplineLimit'
 
 export default function Home() {
@@ -24,6 +23,7 @@ export default function Home() {
       <div 
         className="relative -mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-48 2xl:-mx-96" 
         ref={splineContainerRef}
+        style={{ overflowX: 'clip' }}
       >
         {/* Spline de fundo - absolute para não empurrar conteúdo */}
         <div className="absolute inset-0 z-0">
@@ -48,7 +48,7 @@ export default function Home() {
       </div>
 
       {/* Seção Catálogo - Separada, sem Spline de fundo */}
-      <div className="relative z-30 bg-transparent">
+      <div className="relative z-30 bg-transparent overflow-x-hidden">
         <CatalogSection />
       </div>
     </>
