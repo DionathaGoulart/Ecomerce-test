@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import Image from 'next/image'
 import UpdateOrderStatus from '@/components/admin/UpdateOrderStatus'
 import PersonalizationImage from '@/components/admin/PersonalizationImage'
-import WhatsAppButton from '@/components/admin/WhatsAppButton'
+import InvoiceUploadForm from '@/components/admin/InvoiceUploadForm'
 
 const statusLabels: Record<string, string> = {
   pending: 'Pendente',
@@ -29,7 +29,6 @@ export default async function OrderDetailPage({
     .select(
       `
       *,
-      customer:customers(*),
       items:order_items(
         *,
         product:products(*)
@@ -43,18 +42,16 @@ export default async function OrderDetailPage({
     notFound()
   }
 
-  const customer = order.customer as {
-    name: string
-    email: string
-    cpf: string
-    whatsapp?: string
-    address?: {
-      street: string
-      number: string
-      city: string
-      state: string
-      zipcode: string
-    }
+  // Buscar perfil do usuário separadamente
+  let profile: { id: string; email: string; full_name: string | null } | null = null
+  if (order.user_id) {
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email, full_name')
+      .eq('id', order.user_id)
+      .single()
+    
+    profile = profileData
   }
 
   return (
@@ -76,43 +73,27 @@ export default async function OrderDetailPage({
         {/* Informações do Cliente */}
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Informações do Cliente
-              </h2>
-              {customer.whatsapp && (
-                <WhatsAppButton
-                  phoneNumber={customer.whatsapp}
-                  orderNumber={order.order_number}
-                  customerName={customer.name}
-                />
-              )}
-            </div>
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+              Informações do Cliente
+            </h2>
             <div className="space-y-2">
               <p>
-                <span className="font-medium">Nome:</span> {customer.name}
+                <span className="font-medium">Nome:</span>{' '}
+                {profile?.full_name || 'Não informado'}
               </p>
               <p>
-                <span className="font-medium">Email:</span> {customer.email}
+                <span className="font-medium">Email:</span> {profile?.email || '-'}
               </p>
-              <p>
-                <span className="font-medium">CPF:</span> {customer.cpf}
-              </p>
-              {customer.whatsapp && (
-                <p>
-                  <span className="font-medium">WhatsApp:</span>{' '}
-                  {customer.whatsapp}
-                </p>
-              )}
-              {customer.address && (
+              {order.delivery_address && (
                 <div className="mt-4">
-                  <p className="font-medium">Endereço:</p>
+                  <p className="font-medium">Endereço de Entrega:</p>
                   <p className="text-sm text-gray-600">
-                    {customer.address.street}, {customer.address.number}
+                    {order.delivery_address.street}, {order.delivery_address.number}
+                    {order.delivery_address.complement && ` - ${order.delivery_address.complement}`}
                     <br />
-                    {customer.address.city} - {customer.address.state}
+                    {order.delivery_address.city} - {order.delivery_address.state}
                     <br />
-                    CEP: {customer.address.zipcode}
+                    CEP: {order.delivery_address.zipcode}
                   </p>
                 </div>
               )}
@@ -220,6 +201,7 @@ export default async function OrderDetailPage({
 
           {order.receipt_url && (
             <div className="rounded-lg border border-gray-200 bg-white p-6">
+              <h3 className="mb-2 text-sm font-medium text-gray-900">Recibo</h3>
               <a
                 href={order.receipt_url}
                 target="_blank"
@@ -230,8 +212,29 @@ export default async function OrderDetailPage({
               </a>
             </div>
           )}
+
+          {/* Upload de Nota Fiscal */}
+          <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <h3 className="mb-4 text-sm font-medium text-gray-900">Nota Fiscal</h3>
+            {order.invoice_url ? (
+              <div className="space-y-2">
+                <a
+                  href={order.invoice_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-blue-600 hover:underline"
+                >
+                  Ver Nota Fiscal →
+                </a>
+                <InvoiceUploadForm orderId={order.id} currentUrl={order.invoice_url} />
+              </div>
+            ) : (
+              <InvoiceUploadForm orderId={order.id} />
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
+

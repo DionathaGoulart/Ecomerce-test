@@ -41,48 +41,37 @@ export async function middleware(request: NextRequest) {
     // Permitir acesso à página de login e APIs sem autenticação
     if (
       request.nextUrl.pathname === '/admin/login' ||
-      request.nextUrl.pathname.startsWith('/admin/api')
+      request.nextUrl.pathname.startsWith('/api')
     ) {
       return response
     }
 
-    // Tentar obter a sessão primeiro para ver se conseguimos ler os cookies
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-    
     // Verificar autenticação para rotas protegidas
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
 
-    // Log para debug
-    console.log('🔒 Middleware - Rota:', request.nextUrl.pathname)
-    const authCookie = request.cookies.get('sb-buqfssxanuvsxxhfpteg-auth-token')
-    if (authCookie) {
-      console.log('🔒 Middleware - Cookie auth encontrado')
-      console.log('🔒 Middleware - Cookie value length:', authCookie.value?.length || 0)
-      console.log('🔒 Middleware - Session data:', sessionData?.session ? 'OK' : 'Não encontrada')
-      if (sessionError) {
-        console.log('🔒 Middleware - Session error:', sessionError.message)
-      }
-      // Tentar ver o início do cookie para debug (primeiros 50 caracteres)
-      const cookiePreview = authCookie.value?.substring(0, 50) || ''
-      console.log('🔒 Middleware - Cookie preview:', cookiePreview)
-    } else {
-      console.log('🔒 Middleware - Cookie auth NÃO encontrado')
-    }
-    console.log('🔒 Middleware - Usuário:', user ? user.email : 'Não encontrado')
-    console.log('🔒 Middleware - Erro:', authError ? authError.message : 'Nenhum')
-
     // Se não estiver autenticado, redirecionar para login
     if (!user || authError) {
-      console.log('🔒 Middleware: Redirecionando para /admin/login')
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
       return NextResponse.redirect(url)
     }
 
-    console.log('✅ Middleware: Acesso permitido para', user.email)
+    // Verificar se é admin (verificação real no banco)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      url.searchParams.set('error', 'Acesso negado. Apenas administradores podem acessar esta área.')
+      return NextResponse.redirect(url)
+    }
   }
 
   return response

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       console.log('🔍 Buscando pedido no banco...')
       const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
-        .select('id, order_number, total_cents, customer_id')
+        .select('id, order_number, total_cents, user_id')
         .eq('stripe_session_id', session.id)
         .single()
       
@@ -81,23 +81,23 @@ export async function POST(request: NextRequest) {
 
       console.log(`✅ Pedido encontrado: #${order.order_number}`)
 
-      // Buscar dados do cliente
-      console.log('👤 Buscando dados do cliente...')
-      const { data: customer, error: customerError } = await supabaseAdmin
-        .from('customers')
-        .select('name, email, whatsapp')
-        .eq('id', order.customer_id)
+      // Buscar dados do usuário
+      console.log('👤 Buscando dados do usuário...')
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', order.user_id)
         .single()
       
-      if (customerError || !customer) {
-        console.error('❌ Cliente não encontrado:', customerError)
+      if (profileError || !profile) {
+        console.error('❌ Perfil não encontrado:', profileError)
         return NextResponse.json(
-          { error: 'Cliente não encontrado' },
+          { error: 'Perfil não encontrado' },
           { status: 404 }
         )
       }
       
-      console.log(`✅ Cliente encontrado: ${customer.email}`)
+      console.log(`✅ Perfil encontrado: ${profile.email}`)
 
       // Buscar itens do pedido
       console.log('🛒 Buscando itens do pedido...')
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Enviar email de confirmação
-      if (customer && orderItems && orderItems.length > 0) {
+      if (profile && orderItems && orderItems.length > 0) {
         const emailItems = orderItems.map((item: any) => {
           // A query do Supabase pode retornar product como objeto ou null
           const product = item.product
@@ -174,16 +174,16 @@ export async function POST(request: NextRequest) {
           console.log('\n' + '📧'.repeat(20))
           console.log('📧 INICIANDO ENVIO DE EMAIL')
           console.log('📧'.repeat(20))
-          console.log(`📧 Para: ${customer.email}`)
+          console.log(`📧 Para: ${profile.email}`)
           console.log(`📧 Pedido: #${order.order_number}`)
           console.log(`📧 Itens: ${emailItems.length}`)
           console.log(`📧 RESEND_API_KEY configurada: ${!!process.env.RESEND_API_KEY}`)
           
           const emailResult = await sendOrderConfirmation({
-            to: customer.email,
+            to: profile.email,
             orderNumber: order.order_number,
-            customerName: customer.name,
-            customerWhatsApp: customer.whatsapp || undefined,
+            customerName: profile.full_name || 'Cliente',
+            customerWhatsApp: undefined, // Não armazenamos mais WhatsApp
             items: emailItems,
             receiptUrl,
             totalCents: order.total_cents,
@@ -214,8 +214,8 @@ export async function POST(request: NextRequest) {
           // Não falhar o webhook se o email falhar, mas logamos o erro
         }
       } else {
-        console.warn('Não foi possível enviar email: customer ou orderItems não encontrados', {
-          hasCustomer: !!customer,
+        console.warn('Não foi possível enviar email: profile ou orderItems não encontrados', {
+          hasProfile: !!profile,
           hasOrderItems: !!orderItems,
         })
       }

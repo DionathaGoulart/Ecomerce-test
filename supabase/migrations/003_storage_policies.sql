@@ -9,6 +9,8 @@ DROP POLICY IF EXISTS "Permitir upload de imagens de personalização" ON storag
 DROP POLICY IF EXISTS "Permitir leitura de imagens de personalização" ON storage.objects;
 DROP POLICY IF EXISTS "Permitir upload anon personalizations" ON storage.objects;
 DROP POLICY IF EXISTS "Permitir leitura anon personalizations" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir upload authenticated personalizations" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir leitura authenticated personalizations" ON storage.objects;
 
 -- Política para permitir INSERT (upload) de imagens
 -- Permite upload de qualquer arquivo no bucket personalizations

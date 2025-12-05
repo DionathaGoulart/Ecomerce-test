@@ -13,11 +13,7 @@ import { Card, CardContent } from '@/components/molecules/Card'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/utils'
 import {
-  formatCPF,
-  formatWhatsApp,
   formatCEP,
-  formatWhatsAppForAPI,
-  unformatCPF,
   unformatCEP,
   capitalizeWords,
 } from '@/lib/utils/formatting'
@@ -124,8 +120,6 @@ export default function CartCheckoutForm() {
       const formattedData = {
         customer: {
           ...customerData,
-          cpf: unformatCPF(customerData.cpf), // Remove formatação do CPF
-          whatsapp: formatWhatsAppForAPI(customerData.whatsapp), // Converte para formato API
           address: {
             ...customerData.address,
             zipcode: unformatCEP(customerData.address.zipcode), // Remove formatação do CEP
@@ -215,12 +209,6 @@ export default function CartCheckoutForm() {
             )}
             {errors.email && (
               <li>Email: {errors.email.message}</li>
-            )}
-            {errors.cpf && (
-              <li>CPF: {errors.cpf.message}</li>
-            )}
-            {errors.whatsapp && (
-              <li>WhatsApp: {errors.whatsapp.message}</li>
             )}
             {errors.address?.street && (
               <li>Rua: {errors.address.street.message}</li>
@@ -361,51 +349,6 @@ export default function CartCheckoutForm() {
           )}
         </div>
 
-        <div>
-          <Label htmlFor="cpf" className="mb-3 block">CPF *</Label>
-          <Input
-            id="cpf"
-            {...register('cpf', {
-              onChange: (e) => {
-                // Formata automaticamente enquanto digita
-                const formatted = formatCPF(e.target.value)
-                e.target.value = formatted
-              },
-            })}
-            placeholder="000.000.000-00"
-            maxLength={14}
-          />
-          {errors.cpf && (
-            <p className="mt-2 text-sm text-error-600">
-              {errors.cpf.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="whatsapp" className="mb-3 block">WhatsApp *</Label>
-          <Input
-            id="whatsapp"
-            {...register('whatsapp', {
-              onChange: (e) => {
-                // Formata automaticamente enquanto digita
-                const formatted = formatWhatsApp(e.target.value)
-                e.target.value = formatted
-              },
-            })}
-            placeholder="(68) 97293-2250"
-            type="tel"
-          />
-          <p className="mt-2 text-xs text-neutral-400">
-            Digite com DDD ou código do país (ex: (68) 97293-2250 ou +55 68 97293-2250)
-          </p>
-          {errors.whatsapp && (
-            <p className="mt-2 text-sm text-error-600">
-              {errors.whatsapp.message}
-            </p>
-          )}
-        </div>
-
         <div className="space-y-6 border-t border-neutral-200 pt-8">
           <div>
             <h4 className="text-lg font-semibold text-neutral-900">Endereço</h4>
@@ -433,22 +376,32 @@ export default function CartCheckoutForm() {
           </div>
 
           <div className="grid grid-cols-2 gap-6">
-            <div>
-              <Label htmlFor="number" className="mb-3 block">Número *</Label>
-              <Input
-                id="number"
-                {...register('address.number')}
-                placeholder="123"
-              />
-              {errors.address?.number && (
-                <p className="mt-2 text-sm text-error-600">
-                  {errors.address.number.message}
-                </p>
-              )}
-            </div>
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="number" className="mb-3 block">Número *</Label>
+                <Input
+                  id="number"
+                  {...register('address.number')}
+                  placeholder="123"
+                />
+                {errors.address?.number && (
+                  <p className="mt-2 text-sm text-error-600">
+                    {errors.address.number.message}
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <Label htmlFor="zipcode" className="mb-3 block">CEP *</Label>
+              <div>
+                <Label htmlFor="complement" className="mb-3 block">Complemento</Label>
+                <Input
+                  id="complement"
+                  {...register('address.complement')}
+                  placeholder="Apto 101"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="zipcode" className="mb-3 block">CEP *</Label>
               <Input
                 id="zipcode"
                 {...register('address.zipcode', {
@@ -461,13 +414,13 @@ export default function CartCheckoutForm() {
                 placeholder="00000-000"
                 maxLength={9}
               />
-              {errors.address?.zipcode && (
-                <p className="mt-2 text-sm text-error-600">
-                  {errors.address.zipcode.message}
-                </p>
-              )}
+                {errors.address?.zipcode && (
+                  <p className="mt-2 text-sm text-error-600">
+                    {errors.address.zipcode.message}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
 
           <div>
             <Label htmlFor="city" className="mb-3 block">Cidade *</Label>

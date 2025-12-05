@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
-const updateStatusSchema = z.object({
-  status: z.enum(['pending', 'paid', 'production', 'shipped', 'delivered', 'cancelled']),
+const updateInvoiceSchema = z.object({
+  invoice_url: z.string().url('URL inválida'),
 })
 
 export async function PATCH(
@@ -35,36 +36,37 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const validation = updateStatusSchema.safeParse(body)
+    const validation = updateInvoiceSchema.safeParse(body)
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Status inválido', details: validation.error.errors },
+        { error: 'URL inválida', details: validation.error.errors },
         { status: 400 }
       )
     }
 
-    const { status } = validation.data
+    const { invoice_url } = validation.data
 
-    // Atualizar status
-    const { error } = await supabase
+    // Atualizar nota fiscal usando supabaseAdmin para bypassar RLS
+    const { error } = await supabaseAdmin
       .from('orders')
-      .update({ status })
+      .update({ invoice_url })
       .eq('id', id)
 
     if (error) {
       return NextResponse.json(
-        { error: 'Erro ao atualizar status' },
+        { error: 'Erro ao atualizar nota fiscal' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Erro ao atualizar status:', error)
+    console.error('Erro ao atualizar nota fiscal:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
 }
+

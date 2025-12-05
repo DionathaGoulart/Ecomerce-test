@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Logo from '@/components/store/Logo'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 
@@ -17,6 +18,7 @@ export default function StoreLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, loading } = useAuth()
 
   const navItems = [
     { href: '/#home', label: 'Home' },
@@ -166,14 +168,16 @@ export default function StoreLayout({
 
             {/* Botões à direita */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-              {/* Botão Minha Conta */}
-              <Link
-                href="/minha-conta"
-                className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-opacity hover:opacity-80"
-              >
-                <User className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Minha Conta</span>
-              </Link>
+              {/* Botão Login/Minha Conta */}
+              {!loading && (
+                <Link
+                  href={user ? "/minha-conta" : "/login"}
+                  className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-opacity hover:opacity-80"
+                >
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">{user ? "Minha Conta" : "Login"}</span>
+                </Link>
+              )}
               
               {/* Botão Carrinho */}
               <Link

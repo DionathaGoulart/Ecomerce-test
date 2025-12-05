@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createOrderSchema } from '@/lib/validations/order'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/server'
 import { generateOrderNumber } from '@/lib/utils'
 
@@ -18,6 +19,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { customer, items } = validation.data
+
+    // Verificar autenticação do usuário
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Usuário não autenticado. Faça login para continuar.' },
+        { status: 401 }
+      )
+    }
 
     // Buscar produtos e calcular total
     const productIds = items.map((item) => item.productId)
@@ -48,47 +60,12 @@ export async function POST(request: NextRequest) {
       totalCents += product.price_cents * item.quantity
     }
 
-    // Criar ou buscar cliente
-    const { data: existingCustomer } = await supabaseAdmin
-      .from('customers')
-      .select('id')
-      .eq('email', customer.email)
-      .single()
-
-    let customerId: string
-    if (existingCustomer) {
-      customerId = existingCustomer.id
-      // Atualizar dados do cliente
+    // Atualizar perfil do usuário com nome se fornecido
+    if (customer.name) {
       await supabaseAdmin
-        .from('customers')
-        .update({
-          name: customer.name,
-          cpf: customer.cpf,
-          whatsapp: customer.whatsapp,
-          address: customer.address,
-        })
-        .eq('id', customerId)
-    } else {
-      // Criar novo cliente
-      const { data: newCustomer, error: customerError } = await supabaseAdmin
-        .from('customers')
-        .insert({
-          name: customer.name,
-          email: customer.email,
-          cpf: customer.cpf,
-          whatsapp: customer.whatsapp,
-          address: customer.address,
-        })
-        .select('id')
-        .single()
-
-      if (customerError || !newCustomer) {
-        return NextResponse.json(
-          { error: 'Erro ao criar cliente' },
-          { status: 500 }
-        )
-      }
-      customerId = newCustomer.id
+        .from('profiles')
+        .update({ full_name: customer.name })
+        .eq('id', user.id)
     }
 
     // Gerar número único do pedido
@@ -117,9 +94,10 @@ export async function POST(request: NextRequest) {
       .from('orders')
       .insert({
         order_number: orderNumber,
-        customer_id: customerId,
+        user_id: user.id,
         status: 'pending',
         total_cents: totalCents,
+        delivery_address: customer.address,
       })
       .select('id')
       .single()

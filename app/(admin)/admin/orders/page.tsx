@@ -33,10 +33,7 @@ export default async function AdminOrdersPage({
   // Construir query com filtro opcional
   let query = supabaseAdmin
     .from('orders')
-    .select(`
-      *,
-      customer:customers(name, email)
-    `)
+    .select('*')
     .order('created_at', { ascending: false })
 
   if (statusFilter && statusFilter !== 'all') {
@@ -53,6 +50,24 @@ export default async function AdminOrdersPage({
         <p className="text-sm text-gray-500 mt-2">{error.message}</p>
       </div>
     )
+  }
+
+  // Buscar perfis dos usuários
+  const userIds = orders?.map((o) => o.user_id).filter(Boolean) || []
+  const profilesMap = new Map<string, { email: string; full_name: string | null }>()
+  
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email, full_name')
+      .in('id', userIds)
+    
+    profiles?.forEach((profile) => {
+      profilesMap.set(profile.id, {
+        email: profile.email,
+        full_name: profile.full_name,
+      })
+    })
   }
 
   console.log(`📦 Total de pedidos encontrados: ${orders?.length || 0}`)
@@ -91,7 +106,7 @@ export default async function AdminOrdersPage({
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {orders.map((order) => {
-                const customer = order.customer as { name: string; email: string } | null
+                const profile = order.user_id ? profilesMap.get(order.user_id) : null
                 return (
                   <tr key={order.id}>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
@@ -99,10 +114,10 @@ export default async function AdminOrdersPage({
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {customer?.name || '-'}
+                        {profile?.full_name || '-'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {customer?.email || '-'}
+                        {profile?.email || '-'}
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">

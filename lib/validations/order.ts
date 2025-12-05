@@ -8,32 +8,14 @@ export const addressSchema = z.object({
   zipcode: z.string().regex(/^\d{5}-?\d{3}$/, 'CEP inválido'),
 })
 
+export const addressSchemaWithComplement = addressSchema.extend({
+  complement: z.string().optional(),
+})
+
 export const customerSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  // Aceita CPF com ou sem formatação, mas valida como 11 dígitos
-  cpf: z
-    .string()
-    .refine(
-      (val) => val.replace(/\D/g, '').length === 11,
-      'CPF deve ter 11 dígitos'
-    ),
-  // Aceita WhatsApp em vários formatos, mas valida se pode converter para formato API
-  whatsapp: z
-    .string()
-    .min(10, 'WhatsApp inválido')
-    .refine(
-      (val) => {
-        const cleaned = val.replace(/\D/g, '')
-        // Deve ter pelo menos 10 dígitos (DDD + número) ou 12-13 com código do país
-        return (
-          (cleaned.length >= 10 && cleaned.length <= 11) ||
-          (cleaned.startsWith('55') && (cleaned.length === 12 || cleaned.length === 13))
-        )
-      },
-      'WhatsApp inválido. Use o formato: (00) 00000-0000'
-    ),
-  address: addressSchema,
+  address: addressSchemaWithComplement,
 })
 
 export const cartItemSchema = z.object({
@@ -50,5 +32,5 @@ export const createOrderSchema = z.object({
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>
 export type CustomerInput = z.infer<typeof customerSchema>
-export type AddressInput = z.infer<typeof addressSchema>
+export type AddressInput = z.infer<typeof addressSchemaWithComplement>
 export type CartItemInput = z.infer<typeof cartItemSchema>
