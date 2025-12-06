@@ -26,9 +26,6 @@ export async function GET(request: NextRequest) {
       console.error('Erro ao buscar perfil na API /auth/me:', profileError)
     }
 
-    console.log('Perfil encontrado na API:', profile)
-    console.log('Role do perfil:', profile?.role)
-
     return NextResponse.json({
       user: {
         id: user.id,

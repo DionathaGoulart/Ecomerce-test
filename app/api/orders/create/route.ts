@@ -91,6 +91,51 @@ export async function POST(request: NextRequest) {
       }
     } while (true)
 
+    // Verificar se o endereço já existe salvo
+    const addressForCheck = {
+      street: customer.address.street,
+      number: customer.address.number,
+      city: customer.address.city,
+      state: customer.address.state,
+      zipcode: customer.address.zipcode.replace(/-/g, ''), // Remove formatação
+    }
+
+    const { data: existingAddresses } = await supabaseAdmin
+      .from('user_addresses')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('street', addressForCheck.street)
+      .eq('number', addressForCheck.number)
+      .eq('city', addressForCheck.city)
+      .eq('state', addressForCheck.state)
+      .eq('zipcode', addressForCheck.zipcode)
+      .limit(1)
+
+    // Se não existe, salvar o endereço automaticamente
+    if (!existingAddresses || existingAddresses.length === 0) {
+      // Verificar se é o primeiro endereço (será o padrão)
+      const { count } = await supabaseAdmin
+        .from('user_addresses')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+
+      const isFirstAddress = (count || 0) === 0
+
+      await supabaseAdmin
+        .from('user_addresses')
+        .insert({
+          user_id: user.id,
+          label: null, // Sem apelido, será preenchido pelo usuário depois se quiser
+          street: addressForCheck.street,
+          number: addressForCheck.number,
+          complement: customer.address.complement || null,
+          city: addressForCheck.city,
+          state: addressForCheck.state,
+          zipcode: addressForCheck.zipcode,
+          is_default: isFirstAddress, // Primeiro endereço é padrão
+        })
+    }
+
     // Criar pedido
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
@@ -171,7 +216,7 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       mode: 'payment',
       success_url: `${appUrl}/store/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/store/cart`,
+      cancel_url: `${appUrl}/cart`,
       metadata: {
         order_id: order.id,
         order_number: orderNumber,

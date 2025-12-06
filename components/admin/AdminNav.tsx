@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from './LogoutButton'
+import { Home } from 'lucide-react'
 
 export default function AdminNav({
   user,
@@ -56,6 +57,14 @@ export default function AdminNav({
             <span className="hidden sm:inline text-[10px] sm:text-xs text-white/70">
               {user.email}
             </span>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg border border-neutral-600 bg-transparent px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium text-white transition-opacity hover:opacity-80"
+            >
+              <Home className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Voltar ao Site</span>
+              <span className="sm:hidden">Site</span>
+            </Link>
             <LogoutButton />
           </div>
         </div>

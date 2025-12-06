@@ -12,13 +12,15 @@ export function useCart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Carregar carrinho do localStorage
-  useEffect(() => {
+  // Função para carregar carrinho do localStorage
+  const loadCart = useCallback(() => {
     try {
       const stored = localStorage.getItem(CART_STORAGE_KEY)
       if (stored) {
         const items = JSON.parse(stored) as CartItem[]
         setCartItems(items)
+      } else {
+        setCartItems([])
       }
     } catch (error) {
       console.error('Erro ao carregar carrinho:', error)
@@ -27,11 +29,36 @@ export function useCart() {
     }
   }, [])
 
+  // Carregar carrinho do localStorage na inicialização
+  useEffect(() => {
+    loadCart()
+  }, [loadCart])
+
+  // Escutar mudanças no localStorage (de outras abas apenas)
+  // Não escutamos 'cart-updated' aqui porque isso causaria recarregamento desnecessário
+  // O estado React já é atualizado automaticamente quando usamos setCartItems
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === CART_STORAGE_KEY && e.newValue !== e.oldValue) {
+        // Só recarrega se veio de outra aba (storage event só dispara em outras abas)
+        loadCart()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [loadCart])
+
   // Salvar no localStorage sempre que o carrinho mudar
   useEffect(() => {
     if (!isLoading) {
       try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems))
+        // Disparar evento customizado para notificar outros componentes
+        window.dispatchEvent(new Event('cart-updated'))
       } catch (error) {
         console.error('Erro ao salvar carrinho:', error)
       }

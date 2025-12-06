@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,7 +10,7 @@ import { Input } from '@/components/atoms/Input'
 import { Button } from '@/components/atoms/Button'
 import { Label } from '@/components/atoms/Label'
 import Logo from '@/components/store/Logo'
-import { Alert } from '@/components/molecules/Alert'
+import { createClient } from '@/lib/supabase/client'
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
@@ -24,10 +24,10 @@ type ResetPasswordForm = z.infer<typeof resetPasswordSchema>
 
 function ResetPasswordForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
 
   const {
     register,
@@ -38,12 +38,31 @@ function ResetPasswordForm() {
   })
 
   useEffect(() => {
-    // Verificar se há token de recuperação na URL
-    const token = searchParams.get('token')
-    if (!token) {
-      setError('Link inválido ou expirado')
+    // O Supabase processa automaticamente os hash fragments (#access_token=...)
+    // quando a página carrega. Vamos aguardar um pouco para garantir que o processamento aconteceu.
+    const checkSession = async () => {
+      try {
+        const supabase = createClient()
+        
+        // Aguardar um pouco para o Supabase processar o hash fragment
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        // Não vamos mostrar erro aqui, pois o hash fragment pode ainda estar sendo processado
+        // O erro real será mostrado quando o usuário tentar atualizar a senha
+        if (sessionError) {
+          console.log('Erro ao verificar sessão:', sessionError)
+        }
+      } catch (err) {
+        console.error('Erro ao verificar sessão:', err)
+      } finally {
+        setCheckingSession(false)
+      }
     }
-  }, [searchParams])
+
+    checkSession()
+  }, [])
 
   const onSubmit = async (data: ResetPasswordForm) => {
     setLoading(true)
@@ -61,7 +80,18 @@ function ResetPasswordForm() {
       const result = await response.json()
 
       if (!response.ok) {
-        setError(result.error || 'Erro ao redefinir senha')
+        // Traduzir mensagens de erro comuns
+        let errorMessage = result.error || 'Erro ao redefinir senha'
+        
+        if (errorMessage.includes('Auth session missing') || errorMessage.includes('session')) {
+          errorMessage = 'Link inválido ou expirado. Por favor, solicite um novo link de recuperação de senha.'
+        } else if (errorMessage.includes('expired') || errorMessage.includes('expirado')) {
+          errorMessage = 'Este link expirou. Por favor, solicite um novo link de recuperação de senha.'
+        } else if (errorMessage.includes('invalid') || errorMessage.includes('inválido')) {
+          errorMessage = 'Link inválido. Por favor, verifique o link ou solicite um novo.'
+        }
+        
+        setError(errorMessage)
         setLoading(false)
         return
       }
@@ -171,9 +201,27 @@ function ResetPasswordForm() {
           </div>
 
           {error && (
-            <Alert variant="destructive" title="Erro">
-              {error}
-            </Alert>
+            <div className="rounded-xl border border-error-500/50 bg-error-950/50 p-4 text-error-400">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="h-5 w-5 mt-0.5 text-error-500 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="flex-1">
+                  <h5 className="mb-1 font-medium text-error-300">Erro ao redefinir senha</h5>
+                  <p className="text-sm text-error-400">{error}</p>
+                </div>
+              </div>
+            </div>
           )}
 
           <Button

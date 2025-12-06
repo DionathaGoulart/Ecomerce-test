@@ -27,7 +27,7 @@ export default async function SuccessPage({
             Verifique seu email para ver todos os detalhes do pedido.
           </p>
           <a
-            href="/store"
+            href="/"
             className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
           >
             Continuar Comprando
@@ -66,7 +66,7 @@ export default async function SuccessPage({
               O email contém todas as informações, incluindo número do pedido, itens comprados e formas de contato.
             </p>
             <a
-              href="/store"
+              href="/"
               className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
             >
               Continuar Comprando
@@ -99,7 +99,7 @@ export default async function SuccessPage({
           Verifique seu email para ver todos os detalhes do pedido.
         </p>
         <a
-          href="/store"
+          href="/"
           className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
         >
           Continuar Comprando

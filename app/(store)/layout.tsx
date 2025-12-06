@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Logo from '@/components/store/Logo'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useCart } from '@/hooks/useCart'
 import { Spinner } from '@/components/atoms/Spinner'
 
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
+import { CART_STORAGE_KEY } from '@/lib/constants'
 
 export default function StoreLayout({
   children,
@@ -20,6 +22,44 @@ export default function StoreLayout({
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, loading, refresh } = useAuth()
+  const { cartItems } = useCart()
+  const [cartItemCount, setCartItemCount] = useState(0)
+  
+  // Função para atualizar contador do carrinho (quantidade de produtos únicos)
+  const updateCartCount = useCallback(() => {
+    try {
+      const stored = localStorage.getItem(CART_STORAGE_KEY)
+      if (stored) {
+        const items = JSON.parse(stored)
+        // Contar produtos únicos, não a soma das quantidades
+        setCartItemCount(items.length)
+      } else {
+        setCartItemCount(0)
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar contador do carrinho:', error)
+    }
+  }, [])
+
+  // Atualizar quando cartItems mudar (do hook useCart)
+  // Contar produtos únicos, não a soma das quantidades
+  useEffect(() => {
+    setCartItemCount(cartItems.length)
+  }, [cartItems])
+
+  // Escutar mudanças no carrinho de outros componentes
+  useEffect(() => {
+    window.addEventListener('cart-updated', updateCartCount)
+    window.addEventListener('storage', updateCartCount)
+
+    // Atualizar imediatamente ao montar
+    updateCartCount()
+
+    return () => {
+      window.removeEventListener('cart-updated', updateCartCount)
+      window.removeEventListener('storage', updateCartCount)
+    }
+  }, [updateCartCount])
 
   // Escutar eventos customizados de mudança de auth
   useEffect(() => {
@@ -199,11 +239,16 @@ export default function StoreLayout({
               
               {/* Botão Carrinho */}
               <Link
-                href="/store/cart"
-                className="flex items-center gap-1 sm:gap-2 rounded-lg bg-primary-500 px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-neutral-950 transition-opacity hover:opacity-90"
+                href="/cart"
+                className="relative flex items-center gap-1 sm:gap-2 rounded-lg bg-primary-500 px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-neutral-950 transition-opacity hover:opacity-90"
               >
                 <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Carrinho</span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-error-500 text-[10px] sm:text-xs font-bold text-white shadow-lg">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
@@ -317,6 +362,32 @@ export default function StoreLayout({
                 </Link>
               )
             })}
+            
+            {/* Botões de Ação no Mobile */}
+            <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
+              <Link
+                href={user ? "/minha-conta" : "/login"}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <User className="h-4 w-4" />
+                <span>{user ? "Minha Conta" : "Login"}</span>
+              </Link>
+              
+              <Link
+                href="/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                className="relative flex items-center gap-2 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                <span>Carrinho</span>
+                {cartItemCount > 0 && (
+                  <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </nav>
         </div>
       )}

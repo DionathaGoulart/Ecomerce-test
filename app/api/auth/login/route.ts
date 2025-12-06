@@ -30,8 +30,17 @@ export async function POST(request: NextRequest) {
     })
 
     if (error) {
+      // Traduzir mensagens de erro comuns do Supabase
+      let errorMessage = 'Email ou senha incorretos'
+      
+      if (error.message === 'Invalid login credentials' || error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Email ou senha incorretos. Verifique suas credenciais e tente novamente.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       return NextResponse.json(
-        { error: error.message || 'Email ou senha incorretos' },
+        { error: errorMessage },
         { status: 401 }
       )
     }

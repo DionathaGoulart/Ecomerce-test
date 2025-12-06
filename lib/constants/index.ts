@@ -35,8 +35,8 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
 // Routes
 export const ROUTES = {
   HOME: '/',
-  STORE: '/store',
-  CART: '/store/cart',
+  STORE: '/', // Removido /store, agora usa a página inicial
+  CART: '/cart',
   PRODUCT: (id: string) => `/store/products/${id}`,
   ADMIN: '/admin',
   ADMIN_PRODUCTS: '/admin/products',

@@ -38,8 +38,22 @@ export function HomeHero() {
           {/* Botões */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             {/* Botão Ver Catálogo */}
-            <Link
-              href="/store"
+            <a
+              href="#catalogo"
+              onClick={(e) => {
+                e.preventDefault()
+                const element = document.getElementById('catalogo')
+                if (element) {
+                  const rect = element.getBoundingClientRect()
+                  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                  const elementTop = rect.top + scrollTop
+                  const isMobile = window.innerWidth < 768
+                  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                  const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
+                  const targetPosition = elementTop - headerOffset
+                  smoothScrollTo(targetPosition, 1000)
+                }
+              }}
               className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-primary-500 px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-opacity hover:opacity-90"
             >
               <Image
@@ -50,7 +64,7 @@ export function HomeHero() {
                 className="h-4 w-4 sm:h-5 sm:w-5"
               />
               <span>Ver catálogo</span>
-            </Link>
+            </a>
 
             {/* Botão Orçar Projeto */}
             <a

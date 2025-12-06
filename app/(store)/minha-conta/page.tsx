@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/atoms/Button'
 import { Card } from '@/components/molecules/Card'
 import { formatCurrency } from '@/lib/utils'
-import { LogOut, Package, MapPin, Receipt, FileText, Settings, Lock, Eye, EyeOff } from 'lucide-react'
+import { formatCEP, unformatCEP, capitalizeWords } from '@/lib/utils/formatting'
+import { LogOut, Package, MapPin, Receipt, FileText, Settings, Lock, Eye, EyeOff, Plus, Edit, Trash2, Check } from 'lucide-react'
 import { LoadingDots } from '@/components/atoms/LoadingDots'
 import { Input } from '@/components/atoms/Input'
 import { Label } from '@/components/atoms/Label'
@@ -44,6 +45,38 @@ export default function MinhaContaPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  
+  // Estados para gerenciamento de endereços
+  const [addresses, setAddresses] = useState<any[]>([])
+  const [loadingAddresses, setLoadingAddresses] = useState(false)
+  const [showAddAddress, setShowAddAddress] = useState(false)
+  const [editingAddress, setEditingAddress] = useState<string | null>(null)
+  const [loadingCEP, setLoadingCEP] = useState(false)
+  const [addressForm, setAddressForm] = useState({
+    label: '',
+    street: '',
+    number: '',
+    complement: '',
+    city: '',
+    state: '',
+    zipcode: '',
+    is_default: false,
+  })
+
+  const loadAddresses = useCallback(async () => {
+    setLoadingAddresses(true)
+    try {
+      const response = await fetch('/api/addresses')
+      if (response.ok) {
+        const data = await response.json()
+        setAddresses(data.addresses || [])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar endereços:', error)
+    } finally {
+      setLoadingAddresses(false)
+    }
+  }, [])
 
   const loadUserAndOrders = useCallback(async () => {
     try {
@@ -116,16 +149,156 @@ export default function MinhaContaPage() {
       if (ordersData) {
         setOrders(ordersData)
       }
+
+      // Buscar endereços
+      await loadAddresses()
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setLoading(false)
     }
-  }, [router])
+  }, [router, loadAddresses])
 
   useEffect(() => {
     loadUserAndOrders()
   }, [loadUserAndOrders])
+
+  const lastFetchedCEP = useRef<string>('')
+
+  // Função para buscar CEP na API ViaCEP
+  const fetchCEP = useCallback(async (cep: string) => {
+    const cleanedCEP = unformatCEP(cep)
+    
+    // Só busca se tiver 8 dígitos
+    if (cleanedCEP.length !== 8) {
+      return
+    }
+
+    // Evitar buscar o mesmo CEP novamente
+    if (lastFetchedCEP.current === cleanedCEP) {
+      return
+    }
+
+    lastFetchedCEP.current = cleanedCEP
+    setLoadingCEP(true)
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCEP}/json/`)
+      const data = await response.json()
+
+      console.log('Dados do CEP recebidos:', data)
+
+      if (data.erro) {
+        // CEP não encontrado, mas não mostra erro (usuário pode digitar manualmente)
+        setLoadingCEP(false)
+        lastFetchedCEP.current = ''
+        return
+      }
+
+      // Preencher campos automaticamente - usar função de atualização para garantir que o estado seja atualizado
+      setAddressForm(prev => {
+        const newForm = {
+          ...prev,
+          street: data.logradouro ? capitalizeWords(data.logradouro) : '',
+          city: data.localidade ? capitalizeWords(data.localidade) : '',
+          state: data.uf ? data.uf.toUpperCase() : '',
+        }
+        console.log('Dados recebidos da API:', data)
+        console.log('Formulário antes:', prev)
+        console.log('Formulário depois:', newForm)
+        return newForm
+      })
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error)
+      lastFetchedCEP.current = ''
+    } finally {
+      setLoadingCEP(false)
+    }
+  }, [])
+
+  // Observar mudanças no CEP e buscar quando completo
+  useEffect(() => {
+    if (addressForm.zipcode && showAddAddress) {
+      const cleanedCEP = unformatCEP(addressForm.zipcode)
+      if (cleanedCEP.length === 8 && cleanedCEP !== lastFetchedCEP.current) {
+        // Pequeno delay para evitar múltiplas requisições
+        const timeoutId = setTimeout(() => {
+          fetchCEP(addressForm.zipcode)
+        }, 500)
+        return () => clearTimeout(timeoutId)
+      }
+    }
+  }, [addressForm.zipcode, showAddAddress, fetchCEP])
+
+  const handleSaveAddress = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    try {
+      const url = editingAddress ? `/api/addresses/${editingAddress}` : '/api/addresses'
+      const method = editingAddress ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addressForm),
+      })
+
+      if (response.ok) {
+        await loadAddresses()
+        setShowAddAddress(false)
+        setEditingAddress(null)
+        setAddressForm({
+          label: '',
+          street: '',
+          number: '',
+          complement: '',
+          city: '',
+          state: '',
+          zipcode: '',
+          is_default: false,
+        })
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erro ao salvar endereço')
+      }
+    } catch (error) {
+      console.error('Erro ao salvar endereço:', error)
+      alert('Erro ao salvar endereço')
+    }
+  }
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este endereço?')) return
+
+    try {
+      const response = await fetch(`/api/addresses/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await loadAddresses()
+      } else {
+        alert('Erro ao excluir endereço')
+      }
+    } catch (error) {
+      console.error('Erro ao excluir endereço:', error)
+      alert('Erro ao excluir endereço')
+    }
+  }
+
+  const handleEditAddress = (address: any) => {
+    setEditingAddress(address.id)
+    setAddressForm({
+      label: address.label || '',
+      street: address.street,
+      number: address.number,
+      complement: address.complement || '',
+      city: address.city,
+      state: address.state,
+      zipcode: address.zipcode.replace(/(\d{5})(\d{3})/, '$1-$2'), // Formatar CEP
+      is_default: address.is_default,
+    })
+    setShowAddAddress(true)
+  }
 
   const handleLogout = async () => {
     try {
@@ -233,44 +406,20 @@ export default function MinhaContaPage() {
   console.log('isAdmin:', isAdmin)
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen pt-32 pb-12">
       <div className="mx-auto max-w-4xl space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Minha Conta</h1>
-            <p className="mt-2 text-neutral-400">
-              {user.email}
-            </p>
-            {/* Debug: mostrar role na tela */}
-            <p className="mt-1 text-xs text-neutral-500">
-              Role atual: {user.role || 'não definido'} | É admin? {isAdmin ? 'SIM' : 'NÃO'}
-            </p>
+        {/* Botão Admin */}
+        {isAdmin && (
+          <div className="flex items-center gap-3 pt-8">
+            <a 
+              href="/admin"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
+            >
+              <Settings className="h-4 w-4" />
+              <span>Admin</span>
+            </a>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Botão Admin */}
-            {isAdmin && (
-              <>
-                <a 
-                  href="/admin"
-                  className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Admin</span>
-                </a>
-                {/* Teste: botão sempre visível para debug */}
-                <div className="text-xs text-green-500 bg-green-500/20 px-2 py-1 rounded">
-                  ✓ Admin ativo
-                </div>
-              </>
-            )}
-            {!isAdmin && (
-              <div className="text-xs text-red-500 bg-red-500/20 px-2 py-1 rounded">
-                ✗ Não é admin (role: {user.role})
-              </div>
-            )}
-          </div>
-        </div>
+        )}
 
         {/* Informações do Usuário */}
         <Card className="bg-neutral-900 border-neutral-800">
@@ -409,6 +558,233 @@ export default function MinhaContaPage() {
           </div>
         </Card>
 
+        {/* Endereços Salvos */}
+        <Card className="bg-neutral-900 border-neutral-800">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">Endereços Salvos</h2>
+              <Button
+                onClick={() => {
+                  setShowAddAddress(!showAddAddress)
+                  setEditingAddress(null)
+                  setAddressForm({
+                    label: '',
+                    street: '',
+                    number: '',
+                    complement: '',
+                    city: '',
+                    state: '',
+                    zipcode: '',
+                    is_default: addresses.length === 0,
+                  })
+                }}
+                variant="outline"
+                size="sm"
+                className="border-neutral-600 text-white hover:bg-neutral-800"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Endereço
+              </Button>
+            </div>
+
+            {showAddAddress && (
+              <form onSubmit={handleSaveAddress} className="space-y-4 rounded-lg bg-neutral-800 p-4">
+                <div>
+                  <Label htmlFor="label" className="mb-2 block text-white">Apelido (opcional)</Label>
+                  <Input
+                    id="label"
+                    value={addressForm.label}
+                    onChange={(e) => setAddressForm({ ...addressForm, label: e.target.value })}
+                    placeholder="Ex: Casa, Trabalho"
+                    className="bg-neutral-900 border-neutral-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="street" className="mb-2 block text-white">Rua *</Label>
+                  <Input
+                    id="street"
+                    value={addressForm.street}
+                    onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                    required
+                    className="bg-neutral-900 border-neutral-600 text-white"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="number" className="mb-2 block text-white">Número *</Label>
+                    <Input
+                      id="number"
+                      value={addressForm.number}
+                      onChange={(e) => setAddressForm({ ...addressForm, number: e.target.value })}
+                      required
+                      className="bg-neutral-900 border-neutral-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="complement" className="mb-2 block text-white">Complemento</Label>
+                    <Input
+                      id="complement"
+                      value={addressForm.complement}
+                      onChange={(e) => setAddressForm({ ...addressForm, complement: e.target.value })}
+                      className="bg-neutral-900 border-neutral-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="zipcode" className="mb-2 block text-white">CEP *</Label>
+                    <div className="relative">
+                      <Input
+                        id="zipcode"
+                        value={addressForm.zipcode}
+                        onChange={async (e) => {
+                          const value = e.target.value.replace(/\D/g, '')
+                          const formatted = value.length <= 5 ? value : `${value.slice(0, 5)}-${value.slice(5, 8)}`
+                          setAddressForm(prev => ({ ...prev, zipcode: formatted }))
+                          
+                          // Buscar CEP imediatamente quando tiver 8 dígitos
+                          if (value.length === 8 && value !== lastFetchedCEP.current) {
+                            setTimeout(() => {
+                              fetchCEP(formatted)
+                            }, 300)
+                          }
+                        }}
+                        maxLength={9}
+                        required
+                        className="bg-neutral-900 border-neutral-600 text-white pr-10"
+                      />
+                      {loadingCEP && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <LoadingDots size="sm" />
+                        </div>
+                      )}
+                    </div>
+                    {addressForm.zipcode && unformatCEP(addressForm.zipcode).length === 8 && !loadingCEP && addressForm.street && (
+                      <p className="mt-2 text-xs text-green-400">
+                        ✓ CEP encontrado! Campos preenchidos automaticamente.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="city" className="mb-2 block text-white">Cidade *</Label>
+                    <Input
+                      id="city"
+                      value={addressForm.city}
+                      onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                      required
+                      className="bg-neutral-900 border-neutral-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state" className="mb-2 block text-white">Estado *</Label>
+                    <Input
+                      id="state"
+                      value={addressForm.state}
+                      onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value.toUpperCase() })}
+                      maxLength={2}
+                      required
+                      className="bg-neutral-900 border-neutral-600 text-white"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_default"
+                    checked={addressForm.is_default}
+                    onChange={(e) => setAddressForm({ ...addressForm, is_default: e.target.checked })}
+                    className="h-4 w-4 rounded border-neutral-600 bg-neutral-900 text-primary-500"
+                  />
+                  <Label htmlFor="is_default" className="text-white">Definir como endereço padrão</Label>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" className="flex-1">
+                    {editingAddress ? 'Atualizar' : 'Salvar'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowAddAddress(false)
+                      setEditingAddress(null)
+                      setAddressForm({
+                        label: '',
+                        street: '',
+                        number: '',
+                        complement: '',
+                        city: '',
+                        state: '',
+                        zipcode: '',
+                        is_default: false,
+                      })
+                    }}
+                    className="border-neutral-600 text-white"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {loadingAddresses ? (
+              <div className="flex items-center justify-center py-8">
+                <LoadingDots size="sm" />
+              </div>
+            ) : addresses.length === 0 ? (
+              <div className="py-8 text-center">
+                <MapPin className="mx-auto h-12 w-12 text-neutral-600" />
+                <p className="mt-4 text-neutral-400">Nenhum endereço salvo</p>
+                <p className="mt-2 text-sm text-neutral-500">Adicione um endereço para facilitar suas compras</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {addresses.map((address) => (
+                  <div
+                    key={address.id}
+                    className="rounded-lg border border-neutral-700 bg-neutral-800 p-4"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold text-white">
+                            {address.label || 'Endereço sem nome'}
+                          </h3>
+                          {address.is_default && (
+                            <span className="px-2 py-0.5 text-xs font-medium rounded bg-primary-500/20 text-primary-400">
+                              Padrão
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-neutral-300">
+                          {address.street}, {address.number}
+                          {address.complement && ` - ${address.complement}`}
+                        </p>
+                        <p className="text-sm text-neutral-400">
+                          {address.city} - {address.state} | CEP: {address.zipcode.replace(/(\d{5})(\d{3})/, '$1-$2')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleEditAddress(address)}
+                          className="p-2 rounded-lg border border-neutral-600 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(address.id)}
+                          className="p-2 rounded-lg border border-error-500/50 text-error-500 hover:bg-error-500/10 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* Pedidos */}
         <div>
           <h2 className="mb-6 text-2xl font-bold text-white">Meus Pedidos</h2>
@@ -418,7 +794,7 @@ export default function MinhaContaPage() {
               <div className="py-12 text-center">
                 <Package className="mx-auto h-12 w-12 text-neutral-600" />
                 <p className="mt-4 text-neutral-400">Você ainda não fez nenhum pedido</p>
-                <Link href="/store" className="mt-4 inline-block">
+                <Link href="/" className="mt-4 inline-block">
                   <Button className="mt-4">Ver Produtos</Button>
                 </Link>
               </div>

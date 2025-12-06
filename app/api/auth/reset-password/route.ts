@@ -23,14 +23,37 @@ export async function POST(request: NextRequest) {
     const { password } = validation.data
     const supabase = await createClient()
 
+    // Verificar se há uma sessão válida (necessária para reset de senha)
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Link inválido ou expirado. Por favor, solicite um novo link de recuperação de senha.' },
+        { status: 401 }
+      )
+    }
+
     // Atualizar senha
     const { error } = await supabase.auth.updateUser({
       password,
     })
 
     if (error) {
+      // Traduzir mensagens de erro comuns
+      let errorMessage = 'Erro ao redefinir senha'
+      
+      if (error.message.includes('Auth session missing') || error.message.includes('session')) {
+        errorMessage = 'Link inválido ou expirado. Por favor, solicite um novo link de recuperação de senha.'
+      } else if (error.message.includes('expired')) {
+        errorMessage = 'Este link expirou. Por favor, solicite um novo link de recuperação de senha.'
+      } else if (error.message.includes('invalid')) {
+        errorMessage = 'Link inválido. Por favor, verifique o link ou solicite um novo.'
+      } else {
+        errorMessage = error.message
+      }
+      
       return NextResponse.json(
-        { error: error.message || 'Erro ao redefinir senha' },
+        { error: errorMessage },
         { status: 400 }
       )
     }

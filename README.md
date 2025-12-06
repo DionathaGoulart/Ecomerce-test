@@ -123,7 +123,117 @@ Acesse [http://localhost:3000](http://localhost:3000)
 
 ## 📧 Configuração de Email
 
-O sistema usa Resend para envio de emails. Configure seu domínio no Resend e atualize o `from` em `lib/email.ts`.
+### Emails de Pedidos (Resend)
+O sistema usa Resend para envio de emails de confirmação de pedidos. Configure seu domínio no Resend e atualize o `from` em `lib/email.ts`.
+
+### Emails de Autenticação (Supabase)
+Para personalizar o email que envia as mensagens de recuperação de senha e outros emails de autenticação:
+
+1. **Acesse o Dashboard do Supabase:**
+   - Vá para: `https://app.supabase.com/project/[seu-projeto]/settings/auth`
+
+2. **Configure SMTP Customizado:**
+   - Na seção **SMTP Settings**, ative **Enable Custom SMTP**
+   - Preencha as informações do seu provedor de email:
+     - **Host**: smtp do seu provedor (ex: `smtp.resend.com`, `smtp.gmail.com`, `smtp.sendgrid.net`)
+     - **Port**: Porta SMTP (geralmente 587 ou 465)
+     - **Username**: Seu usuário SMTP
+     - **Password**: Sua senha SMTP
+     - **Sender email**: O email que aparecerá como remetente (ex: `noreply@seudominio.com`)
+     - **Sender name**: Nome que aparecerá (ex: "Sua Loja")
+
+3. **Personalizar Templates (Opcional):**
+   - Na seção **Email Templates**, você pode personalizar os templates de:
+     - Reset Password (Recuperação de senha)
+     - Magic Link
+     - Email Change
+     - Email Confirmation
+
+4. **Provedores Recomendados:**
+   - **Resend**: `smtp.resend.com:587` (use a mesma conta do Resend que você já tem)
+   - **SendGrid**: `smtp.sendgrid.net:587`
+   - **Mailgun**: `smtp.mailgun.org:587`
+   - **Gmail**: `smtp.gmail.com:587` (requer App Password)
+
+**Nota:** Se você já usa Resend para emails de pedidos, pode usar a mesma conta para SMTP do Supabase!
+
+## 🔐 Configuração do Login com Google
+
+Para configurar o login com Google OAuth:
+
+### 1. Configurar no Google Cloud Console
+
+1. **Acesse o Google Cloud Console:**
+   - Vá para: `https://console.cloud.google.com/apis/credentials`
+   - Selecione seu projeto (ou crie um novo)
+
+2. **Criar Credenciais OAuth 2.0:**
+   - Clique em **"Criar credenciais"** > **"ID do cliente OAuth 2.0"**
+   - Tipo de aplicativo: **"Aplicativo da Web"**
+   - Nome: "Sua Loja - Login"
+
+3. **Configurar Authorized JavaScript origins:**
+   Adicione as seguintes URLs (uma por linha):
+   ```
+   http://localhost:3000
+   https://seudominio.com
+   ```
+   ⚠️ **Importante:** Use `http://` para desenvolvimento local e `https://` para produção
+
+4. **Configurar Authorized redirect URIs:**
+   Adicione as seguintes URLs (uma por linha):
+   ```
+   https://[seu-projeto-id].supabase.co/auth/v1/callback
+   http://localhost:3000/api/auth/google
+   https://seudominio.com/api/auth/google
+   ```
+   ⚠️ **Importante:** 
+   - Substitua `[seu-projeto-id]` pelo ID do seu projeto Supabase (encontre em: Supabase Dashboard > Settings > API)
+   - O formato é: `https://[projeto-id].supabase.co/auth/v1/callback`
+   - Adicione também a URL do seu app (`/api/auth/google`) para ambos ambientes
+
+5. **Copiar as credenciais:**
+   - Copie o **Client ID** e **Client Secret**
+   - Você precisará deles no próximo passo
+
+### 2. Configurar no Supabase
+
+1. **Acesse o Dashboard do Supabase:**
+   - Vá para: `https://app.supabase.com/project/[seu-projeto]/settings/auth`
+   - Role até a seção **Providers**
+
+2. **Ativar Google Provider:**
+   - Encontre **Google** na lista de provedores
+   - Ative o toggle
+   - Cole o **Client ID** do Google
+   - Cole o **Client Secret** do Google
+   - Clique em **Save**
+
+### 3. URLs de Exemplo
+
+**Para desenvolvimento local:**
+- **Authorized JavaScript origins:** `http://localhost:3000`
+- **Authorized redirect URIs:** 
+  - `https://[projeto-id].supabase.co/auth/v1/callback`
+  - `http://localhost:3000/api/auth/google`
+
+**Para produção:**
+- **Authorized JavaScript origins:** `https://seudominio.com`
+- **Authorized redirect URIs:**
+  - `https://[projeto-id].supabase.co/auth/v1/callback`
+  - `https://seudominio.com/api/auth/google`
+
+### 4. Verificar se está funcionando
+
+1. Acesse `/login` no seu site
+2. Clique em "Continuar com Google"
+3. Você deve ser redirecionado para o Google para autorizar
+4. Após autorizar, deve voltar para `/minha-conta`
+
+**Troubleshooting:**
+- Se aparecer erro "redirect_uri_mismatch", verifique se todas as URLs estão corretas no Google Console
+- Certifique-se de que o Client ID e Secret estão corretos no Supabase
+- Verifique se o projeto do Google está no modo de teste (pode precisar adicionar usuários de teste)
 
 ## 🚀 Deploy
 

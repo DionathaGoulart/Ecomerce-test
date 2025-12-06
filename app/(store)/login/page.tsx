@@ -10,7 +10,6 @@ import { Input } from '@/components/atoms/Input'
 import { Button } from '@/components/atoms/Button'
 import { Label } from '@/components/atoms/Label'
 import Logo from '@/components/store/Logo'
-import { Alert } from '@/components/molecules/Alert'
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -138,9 +137,27 @@ function LoginForm() {
           </div>
 
           {error && (
-            <Alert variant="destructive" title="Erro">
-              {error}
-            </Alert>
+            <div className="rounded-xl border border-error-500/50 bg-error-950/50 p-4 text-error-400">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="h-5 w-5 mt-0.5 text-error-500 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="flex-1">
+                  <h5 className="mb-1 font-medium text-error-300">Erro ao fazer login</h5>
+                  <p className="text-sm text-error-400">{error}</p>
+                </div>
+              </div>
+            </div>
           )}
 
           <Button
