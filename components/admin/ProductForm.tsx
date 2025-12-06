@@ -18,6 +18,7 @@ interface ProductFormProps {
     description?: string | null
     price_cents: number
     image_url?: string | null
+    category_id?: string | null
   }
 }
 
@@ -28,6 +29,36 @@ export default function ProductForm({ product }: ProductFormProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(
     product?.image_url || null
   )
+
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [creatingCategory, setCreatingCategory] = useState(false)
+  const [priceDisplay, setPriceDisplay] = useState(
+    product ? (product.price_cents / 100).toFixed(2).replace('.', ',') : ''
+  )
+
+  // Função para formatar valor em reais
+  const formatCurrencyInput = (value: string): string => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '')
+    
+    if (!numbers) return ''
+    
+    // Converte para número e divide por 100 para ter centavos
+    const cents = parseInt(numbers, 10)
+    const reais = cents / 100
+    
+    // Formata com 2 casas decimais
+    return reais.toFixed(2).replace('.', ',')
+  }
+
+  // Função para converter valor formatado para centavos
+  const parseCurrencyToCents = (value: string): number => {
+    const numbers = value.replace(/\D/g, '')
+    if (!numbers) return 0
+    return parseInt(numbers, 10)
+  }
 
   const {
     register,
@@ -42,9 +73,26 @@ export default function ProductForm({ product }: ProductFormProps) {
           description: product.description || '',
           price_cents: product.price_cents,
           image_url: product.image_url || '',
+          category_id: product.category_id || null,
         }
       : undefined,
   })
+
+  useEffect(() => {
+    // Buscar categorias
+    const fetchCategories = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name', { ascending: true })
+      
+      if (data) {
+        setCategories(data)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     if (imageUrl) {
@@ -69,30 +117,81 @@ export default function ProductForm({ product }: ProductFormProps) {
     setUploadingImage(true)
 
     try {
-      const supabase = createClient()
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `products/${fileName}`
+      // Usar API route para fazer upload (bypassa RLS usando supabaseAdmin)
+      const formData = new FormData()
+      formData.append('file', file)
 
-      const { error: uploadError } = await supabase.storage
-        .from('products')
-        .upload(filePath, file, { upsert: true })
+      const response = await fetch('/api/storage/upload-product', {
+        method: 'POST',
+        body: formData,
+      })
 
-      if (uploadError) {
-        throw uploadError
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao fazer upload da imagem')
       }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('products').getPublicUrl(filePath)
-
-      setImageUrl(publicUrl)
-      setValue('image_url', publicUrl)
+      const data = await response.json()
+      
+      setImageUrl(data.url)
+      setValue('image_url', data.url)
     } catch (error) {
       console.error('Erro ao fazer upload:', error)
-      alert('Erro ao fazer upload da imagem')
+      alert(error instanceof Error ? error.message : 'Erro ao fazer upload da imagem')
     } finally {
       setUploadingImage(false)
+    }
+  }
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      alert('Por favor, informe o nome da categoria')
+      return
+    }
+
+    setCreatingCategory(true)
+
+    try {
+      // Gerar slug automaticamente
+      const slug = newCategoryName
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
+
+      const response = await fetch('/api/admin/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newCategoryName.trim(),
+          slug,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao criar categoria')
+      }
+
+      const newCategory = await response.json()
+
+      // Atualizar lista de categorias
+      setCategories([...categories, { id: newCategory.id, name: newCategory.name }])
+
+      // Selecionar a nova categoria automaticamente
+      setValue('category_id', newCategory.id)
+
+      // Fechar modal e limpar
+      setShowCategoryModal(false)
+      setNewCategoryName('')
+    } catch (error) {
+      console.error('Erro:', error)
+      alert(error instanceof Error ? error.message : 'Erro ao criar categoria')
+    } finally {
+      setCreatingCategory(false)
     }
   }
 
@@ -100,6 +199,15 @@ export default function ProductForm({ product }: ProductFormProps) {
     setLoading(true)
 
     try {
+      // Converter o valor formatado para centavos
+      const priceInCents = parseCurrencyToCents(priceDisplay)
+      
+      if (!priceDisplay || priceInCents <= 0) {
+        alert('Por favor, informe um preço válido maior que zero')
+        setLoading(false)
+        return
+      }
+
       const url = product
         ? `/api/admin/products/${product.id}`
         : '/api/admin/products'
@@ -111,7 +219,10 @@ export default function ProductForm({ product }: ProductFormProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          price_cents: priceInCents,
+        }),
       })
 
       if (!response.ok) {
@@ -131,64 +242,113 @@ export default function ProductForm({ product }: ProductFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
       <div>
-        <Label htmlFor="title">Título *</Label>
+        <Label htmlFor="title" className="text-white">Título *</Label>
         <Input
           id="title"
           {...register('title')}
-          className="mt-1"
+          className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
           placeholder="Caneca Personalizada"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-error-600">{errors.title.message}</p>
+          <p className="mt-1 text-sm text-error-500">{errors.title.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="description">Descrição</Label>
+        <Label htmlFor="description" className="text-white">Descrição</Label>
         <textarea
           id="description"
           {...register('description')}
-          className="mt-1 flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 flex min-h-[100px] w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           placeholder="Descrição do produto..."
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-error-600">
+          <p className="mt-1 text-sm text-error-500">
             {errors.description.message}
           </p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="price_cents">Preço (em centavos) *</Label>
-        <Input
-          id="price_cents"
-          type="number"
-          {...register('price_cents', { valueAsNumber: true })}
-          className="mt-1"
-          placeholder="2990"
-        />
-        <p className="mt-1 text-xs text-neutral-500">
-          Exemplo: 2990 = R$ 29,90
+        <div className="flex items-center justify-between mb-1">
+          <Label htmlFor="category_id" className="text-white">Categoria</Label>
+          <button
+            type="button"
+            onClick={() => setShowCategoryModal(true)}
+            className="text-xs text-primary-500 hover:text-primary-400 transition-colors"
+          >
+            + Nova Categoria
+          </button>
+        </div>
+        <select
+          id="category_id"
+          {...register('category_id')}
+          className="mt-1 flex h-11 w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        >
+          <option value="">Sem categoria</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        {errors.category_id && (
+          <p className="mt-1 text-sm text-error-500">
+            {errors.category_id.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="price" className="text-white">Preço *</Label>
+        <div className="relative mt-1">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 text-sm">
+            R$
+          </span>
+          <Input
+            id="price"
+            type="text"
+            value={priceDisplay}
+            onChange={(e) => {
+              const formatted = formatCurrencyInput(e.target.value)
+              setPriceDisplay(formatted)
+              // Atualizar o valor em centavos no form
+              const cents = parseCurrencyToCents(formatted)
+              setValue('price_cents', cents, { shouldValidate: true })
+            }}
+            onBlur={() => {
+              // Garantir que sempre tenha pelo menos 0,00
+              if (!priceDisplay || priceDisplay === '') {
+                setPriceDisplay('0,00')
+                setValue('price_cents', 0, { shouldValidate: true })
+              }
+            }}
+            className="pl-10 bg-header-bg border-header-border text-white placeholder:text-white/50"
+            placeholder="0,00"
+          />
+        </div>
+        <p className="mt-1 text-xs text-white/70">
+          Digite o valor em reais (ex: 29,90)
         </p>
         {errors.price_cents && (
-          <p className="mt-1 text-sm text-error-600">
+          <p className="mt-1 text-sm text-error-500">
             {errors.price_cents.message}
           </p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="image">Imagem</Label>
+        <Label htmlFor="image" className="text-white">Imagem</Label>
         <input
           id="image"
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
-          className="mt-1 block w-full text-sm text-neutral-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+          className="mt-1 block w-full text-sm text-white/70 file:mr-4 file:rounded-md file:border-0 file:bg-primary-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-neutral-950 hover:file:opacity-90"
           disabled={uploadingImage}
         />
         {uploadingImage && (
-          <p className="mt-2 text-sm text-neutral-500">Enviando...</p>
+          <p className="mt-2 text-sm text-white/70">Enviando...</p>
         )}
         {imageUrl && (
           <div className="mt-4">
@@ -206,17 +366,79 @@ export default function ProductForm({ product }: ProductFormProps) {
       </div>
 
       <div className="flex gap-4">
-        <Button type="submit" disabled={loading}>
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="bg-primary-500 text-neutral-950 hover:opacity-90"
+        >
           {loading ? 'Salvando...' : product ? 'Atualizar' : 'Criar'}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push('/admin/products')}
+          className="border-header-border text-white hover:bg-white/10"
         >
           Cancelar
         </Button>
       </div>
+
+      {/* Modal de Criar Categoria */}
+      {showCategoryModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setShowCategoryModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl border border-header-border bg-header-bg p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-4 text-xl font-bold text-white">Nova Categoria</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="new_category_name" className="text-white">
+                  Nome da Categoria *
+                </Label>
+                <Input
+                  id="new_category_name"
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
+                  placeholder="Ex: Canecas"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleCreateCategory()
+                    }
+                  }}
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  onClick={handleCreateCategory}
+                  disabled={creatingCategory || !newCategoryName.trim()}
+                  className="flex-1 bg-primary-500 text-neutral-950 hover:opacity-90"
+                >
+                  {creatingCategory ? 'Criando...' : 'Criar'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowCategoryModal(false)
+                    setNewCategoryName('')
+                  }}
+                  className="border-header-border text-white hover:bg-white/10"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   )
 }

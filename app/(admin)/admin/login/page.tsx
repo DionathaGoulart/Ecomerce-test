@@ -52,6 +52,20 @@ export default function AdminLoginPage() {
 
       console.log('✅ Login bem-sucedido! Usuário:', authData.user.email)
       
+      // Verificar se é admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (!profile || profile.role !== 'admin') {
+        await supabase.auth.signOut()
+        setError('Acesso negado. Apenas administradores podem acessar esta área.')
+        setLoading(false)
+        return
+      }
+      
       // Verificar se a sessão foi salva
       const { data: sessionData } = await supabase.auth.getSession()
       console.log('📋 Sessão após login:', sessionData?.session ? 'OK' : 'Não encontrada')
@@ -63,37 +77,9 @@ export default function AdminLoginPage() {
         return
       }
       
-      console.log('✅ Sessão confirmada! Atualizando sessão para sincronizar cookies...')
+      console.log('✅ Sessão confirmada! Redirecionando para /admin...')
       
-      // Forçar refresh da sessão para garantir que os cookies sejam atualizados
-      try {
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession(sessionData.session)
-        if (refreshError) {
-          console.warn('⚠️ Erro ao fazer refresh da sessão:', refreshError)
-        } else {
-          console.log('✅ Sessão atualizada com sucesso')
-        }
-      } catch (refreshErr) {
-        console.warn('⚠️ Erro ao tentar refresh:', refreshErr)
-      }
-      
-      // Aguardar mais tempo para garantir que os cookies HttpOnly foram salvos
-      // Cookies HttpOnly podem demorar um pouco mais para serem processados pelo navegador
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Verificar novamente a sessão antes de redirecionar
-      const { data: finalSession } = await supabase.auth.getSession()
-      if (!finalSession?.session) {
-        console.error('❌ Sessão foi perdida após refresh')
-        setError('Erro ao manter sessão. Tente novamente.')
-        setLoading(false)
-        return
-      }
-      
-      console.log('✅ Sessão final confirmada! Redirecionando para /admin...')
-      
-      // Usar window.location.href para forçar um reload completo
-      // Isso garante que o middleware processe os cookies corretamente
+      // Redirecionar para admin
       window.location.href = '/admin'
     } catch (err) {
       console.error('❌ Erro inesperado no login:', err)
@@ -104,44 +90,44 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center py-12">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
             Painel Administrativo
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-white/70">
             Faça login para continuar
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 rounded-md shadow-sm">
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white">Email</Label>
               <Input
                 id="email"
                 type="email"
                 {...register('email')}
-                className="mt-1"
+                className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
                 placeholder="admin@example.com"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-error-500">
                   {errors.email.message}
                 </p>
               )}
             </div>
             <div>
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className="text-white">Senha</Label>
               <Input
                 id="password"
                 type="password"
                 {...register('password')}
-                className="mt-1"
+                className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
                 placeholder="••••••••"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-error-500">
                   {errors.password.message}
                 </p>
               )}
@@ -149,13 +135,17 @@ export default function AdminLoginPage() {
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="rounded-md bg-error-500/20 border border-error-500 p-4">
+              <p className="text-sm text-error-400">{error}</p>
             </div>
           )}
 
           <div>
-            <Button type="submit" disabled={loading} className="w-full" size="lg">
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full bg-primary-500 text-neutral-950 hover:opacity-90 font-medium py-3"
+            >
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </div>

@@ -14,11 +14,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar perfil do usuário
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, full_name, role')
       .eq('id', user.id)
       .single()
+
+    if (profileError) {
+      console.error('Erro ao buscar perfil na API /auth/me:', profileError)
+    }
+
+    console.log('Perfil encontrado na API:', profile)
+    console.log('Role do perfil:', profile?.role)
 
     return NextResponse.json({
       user: {

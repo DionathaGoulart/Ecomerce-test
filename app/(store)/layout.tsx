@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Logo from '@/components/store/Logo'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { Spinner } from '@/components/atoms/Spinner'
 
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 
@@ -18,7 +19,20 @@ export default function StoreLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, loading } = useAuth()
+  const { user, loading, refresh } = useAuth()
+
+  // Escutar eventos customizados de mudança de auth
+  useEffect(() => {
+    const handleAuthChange = () => {
+      refresh()
+    }
+    
+    window.addEventListener('auth-state-changed', handleAuthChange)
+    
+    return () => {
+      window.removeEventListener('auth-state-changed', handleAuthChange)
+    }
+  }, [refresh])
 
   const navItems = [
     { href: '/#home', label: 'Home' },
@@ -169,7 +183,11 @@ export default function StoreLayout({
             {/* Botões à direita */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
               {/* Botão Login/Minha Conta */}
-              {!loading && (
+              {loading ? (
+                <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5">
+                  <Spinner size="sm" variant="default" />
+                </div>
+              ) : (
                 <Link
                   href={user ? "/minha-conta" : "/login"}
                   className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-opacity hover:opacity-80"

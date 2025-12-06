@@ -18,6 +18,7 @@ import {
   capitalizeWords,
 } from '@/lib/utils/formatting'
 import Image from 'next/image'
+import { LoadingDots } from '@/components/atoms/LoadingDots'
 
 interface CartItem {
   productId: string
@@ -178,7 +179,11 @@ export default function CartCheckoutForm() {
   }
 
   if (loadingProducts) {
-    return <div className="text-center py-12">Carregando...</div>
+    return (
+      <div className="text-center py-12">
+        <LoadingDots size="lg" />
+      </div>
+    )
   }
 
   if (cartItems.length === 0) {

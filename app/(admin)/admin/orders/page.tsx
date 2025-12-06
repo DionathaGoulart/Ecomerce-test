@@ -1,8 +1,12 @@
-import { supabaseAdmin } from '@/lib/supabase/admin'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import OrderFilters from '@/components/admin/OrderFilters'
+import { Spinner } from '@/components/atoms/Spinner'
 
 const statusLabels: Record<string, string> = {
   pending: 'Pendente',
@@ -14,144 +18,155 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  paid: 'bg-green-100 text-green-800',
-  production: 'bg-blue-100 text-blue-800',
-  shipped: 'bg-purple-100 text-purple-800',
-  delivered: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
+  pending: 'bg-warning-500/20 text-warning-500 border border-warning-500/30',
+  paid: 'bg-success-500/20 text-success-500 border border-success-500/30',
+  production: 'bg-info-500/20 text-info-500 border border-info-500/30',
+  shipped: 'bg-primary-500/20 text-primary-500 border border-primary-500/30',
+  delivered: 'bg-success-500/20 text-success-500 border border-success-500/30',
+  cancelled: 'bg-error-500/20 text-error-500 border border-error-500/30',
 }
 
-export default async function AdminOrdersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>
-}) {
-  const params = await searchParams
-  const statusFilter = params.status
+interface Order {
+  id: string
+  order_number: string
+  user_id: string
+  total_cents: number
+  status: string
+  created_at: string
+  profile?: {
+    email: string
+    full_name: string | null
+  } | null
+}
 
-  // Construir query com filtro opcional
-  let query = supabaseAdmin
-    .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (statusFilter && statusFilter !== 'all') {
-    query = query.eq('status', statusFilter)
-  }
-
-  const { data: orders, error } = await query
-
-  if (error) {
-    console.error('Erro ao buscar pedidos:', error)
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600">Erro ao carregar pedidos</p>
-        <p className="text-sm text-gray-500 mt-2">{error.message}</p>
-      </div>
-    )
-  }
-
-  // Buscar perfis dos usuários
-  const userIds = orders?.map((o) => o.user_id).filter(Boolean) || []
-  const profilesMap = new Map<string, { email: string; full_name: string | null }>()
+export default function AdminOrdersPage() {
+  const searchParams = useSearchParams()
+  const statusFilter = searchParams.get('status') || 'all'
   
-  if (userIds.length > 0) {
-    const { data: profiles } = await supabaseAdmin
-      .from('profiles')
-      .select('id, email, full_name')
-      .in('id', userIds)
-    
-    profiles?.forEach((profile) => {
-      profilesMap.set(profile.id, {
-        email: profile.email,
-        full_name: profile.full_name,
-      })
-    })
-  }
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  console.log(`📦 Total de pedidos encontrados: ${orders?.length || 0}`)
+  useEffect(() => {
+    fetchOrders()
+  }, [statusFilter])
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const url = statusFilter && statusFilter !== 'all'
+        ? `/api/admin/orders?status=${encodeURIComponent(statusFilter)}`
+        : '/api/admin/orders'
+      
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error('Erro ao carregar pedidos')
+      }
+
+      const data = await response.json()
+      setOrders(data)
+    } catch (err) {
+      console.error('Erro ao buscar pedidos:', err)
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Pedidos</h1>
-        <OrderFilters currentStatus={statusFilter || 'all'} />
+        <h1 className="text-3xl font-bold text-white">Pedidos</h1>
+        <OrderFilters currentStatus={statusFilter} />
       </div>
 
-      {orders && orders.length > 0 ? (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Spinner size="lg" variant="default" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-error-500">{error}</p>
+          <button
+            onClick={fetchOrders}
+            className="mt-4 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      ) : orders.length > 0 ? (
+        <div className="overflow-hidden rounded-xl border border-header-border bg-header-bg">
+          <table className="min-w-full divide-y divide-header-border">
+            <thead className="bg-header-bg">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Número
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Cliente
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Total
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Data
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
                   Ações
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {orders.map((order) => {
-                const profile = order.user_id ? profilesMap.get(order.user_id) : null
-                return (
-                  <tr key={order.id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                      #{order.order_number}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {profile?.full_name || '-'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {profile?.email || '-'}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                      {formatCurrency(order.total_cents)}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                          statusColors[order.status] || statusColors.pending
-                        }`}
-                      >
-                        {statusLabels[order.status] || order.status}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Ver Detalhes
-                      </Link>
-                    </td>
-                  </tr>
-                )
-              })}
+            <tbody className="divide-y divide-header-border bg-header-bg">
+              {orders.map((order) => (
+                <tr key={order.id} className="hover:bg-white/5 transition-colors">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-white">
+                    #{order.order_number}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-white">
+                      {order.profile?.full_name || '-'}
+                    </div>
+                    <div className="text-sm text-white/70">
+                      {order.profile?.email || '-'}
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
+                    {formatCurrency(order.total_cents)}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                        statusColors[order.status] || statusColors.pending
+                      }`}
+                    >
+                      {statusLabels[order.status] || order.status}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-white/70">
+                    {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      className="text-primary-500 hover:text-primary-400 transition-colors"
+                    >
+                      Ver Detalhes
+                    </Link>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-600">
+          <p className="text-white/70">
             {statusFilter && statusFilter !== 'all'
               ? `Nenhum pedido encontrado com status "${statusLabels[statusFilter] || statusFilter}".`
               : 'Nenhum pedido encontrado.'}

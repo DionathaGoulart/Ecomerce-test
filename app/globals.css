@@ -110,3 +110,19 @@ input[type="number"] {
     );
   }
 }
+
+/* Animação de bounce para loading dots */
+@keyframes loading-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-dot {
+  animation: loading-bounce 1.4s ease-in-out infinite;
+}

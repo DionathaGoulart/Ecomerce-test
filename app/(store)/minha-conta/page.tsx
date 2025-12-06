@@ -7,7 +7,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/atoms/Button'
 import { Card } from '@/components/molecules/Card'
 import { formatCurrency } from '@/lib/utils'
-import { LogOut, Package, MapPin, Receipt, FileText, Settings } from 'lucide-react'
+import { LogOut, Package, MapPin, Receipt, FileText, Settings, Lock, Eye, EyeOff } from 'lucide-react'
+import { LoadingDots } from '@/components/atoms/LoadingDots'
+import { Input } from '@/components/atoms/Input'
+import { Label } from '@/components/atoms/Label'
 
 interface Order {
   id: string
@@ -32,6 +35,15 @@ export default function MinhaContaPage() {
   const [user, setUser] = useState<User | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false)
+  const [changePasswordError, setChangePasswordError] = useState<string | null>(null)
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   useEffect(() => {
     loadUserAndOrders()
@@ -83,11 +95,14 @@ export default function MinhaContaPage() {
           }
         }
       } else if (profile) {
+        console.log('Perfil carregado:', profile)
+        console.log('Role do perfil:', profile.role)
+        console.log('É admin?', profile.role === 'admin')
         setUser({
           id: profile.id,
           email: profile.email,
           full_name: profile.full_name,
-          role: profile.role,
+          role: profile.role || 'user', // Garantir que sempre tenha um role
         })
       }
 
@@ -114,11 +129,66 @@ export default function MinhaContaPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      const supabase = createClient()
+      await supabase.auth.signOut()
       router.push('/')
       router.refresh()
+      // Forçar reload para atualizar o estado de autenticação
+      window.location.href = '/'
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
+    }
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setChangePasswordError(null)
+    setChangePasswordSuccess(false)
+
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError('As senhas não coincidem')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setChangePasswordError('A nova senha deve ter no mínimo 6 caracteres')
+      return
+    }
+
+    setChangePasswordLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setChangePasswordError(result.error || 'Erro ao alterar senha')
+        setChangePasswordLoading(false)
+        return
+      }
+
+      setChangePasswordSuccess(true)
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      setChangePasswordLoading(false)
+
+      // Fechar o formulário após 2 segundos
+      setTimeout(() => {
+        setShowChangePassword(false)
+        setChangePasswordSuccess(false)
+      }, 2000)
+    } catch (error) {
+      setChangePasswordError('Erro ao alterar senha. Tente novamente.')
+      setChangePasswordLoading(false)
     }
   }
 
@@ -147,7 +217,7 @@ export default function MinhaContaPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-white">Carregando...</div>
+        <LoadingDots size="lg" />
       </div>
     )
   }
@@ -155,6 +225,12 @@ export default function MinhaContaPage() {
   if (!user) {
     return null
   }
+
+  // Debug: mostrar role atual
+  const isAdmin = user?.role === 'admin'
+  console.log('User state atual:', user)
+  console.log('user.role:', user?.role)
+  console.log('isAdmin:', isAdmin)
 
   return (
     <div className="min-h-screen py-12">
@@ -166,24 +242,33 @@ export default function MinhaContaPage() {
             <p className="mt-2 text-neutral-400">
               {user.email}
             </p>
+            {/* Debug: mostrar role na tela */}
+            <p className="mt-1 text-xs text-neutral-500">
+              Role atual: {user.role || 'não definido'} | É admin? {isAdmin ? 'SIM' : 'NÃO'}
+            </p>
           </div>
-          <div className="flex gap-3">
-            {user.role === 'admin' && (
-              <Link href="/admin">
-                <Button variant="outline" className="border-neutral-600 bg-neutral-900 text-white hover:bg-neutral-800">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Admin
-                </Button>
-              </Link>
+          <div className="flex items-center gap-3">
+            {/* Botão Admin */}
+            {isAdmin && (
+              <>
+                <a 
+                  href="/admin"
+                  className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Admin</span>
+                </a>
+                {/* Teste: botão sempre visível para debug */}
+                <div className="text-xs text-green-500 bg-green-500/20 px-2 py-1 rounded">
+                  ✓ Admin ativo
+                </div>
+              </>
             )}
-            <Button
-              variant="outline"
-              className="border-neutral-600 bg-neutral-900 text-white hover:bg-neutral-800"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
+            {!isAdmin && (
+              <div className="text-xs text-red-500 bg-red-500/20 px-2 py-1 rounded">
+                ✗ Não é admin (role: {user.role})
+              </div>
+            )}
           </div>
         </div>
 
@@ -200,6 +285,126 @@ export default function MinhaContaPage() {
                 <span className="text-sm text-neutral-400">Email:</span>
                 <p className="text-white">{user.email}</p>
               </div>
+            </div>
+            <div className="pt-4 border-t border-neutral-800 space-y-4">
+              <button
+                onClick={() => setShowChangePassword(!showChangePassword)}
+                className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-transparent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+              >
+                <Lock className="h-4 w-4" />
+                {showChangePassword ? 'Cancelar' : 'Trocar Senha'}
+              </button>
+
+              {showChangePassword && (
+                <form onSubmit={handleChangePassword} className="space-y-4 rounded-lg bg-neutral-800 p-4">
+                  {changePasswordSuccess && (
+                    <div className="rounded-lg bg-success-500/20 border border-success-500/50 p-3 text-sm text-success-500">
+                      Senha alterada com sucesso!
+                    </div>
+                  )}
+                  {changePasswordError && (
+                    <div className="rounded-lg bg-error-500/20 border border-error-500/50 p-3 text-sm text-error-500">
+                      {changePasswordError}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword" className="text-white">
+                      Senha Atual
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="currentPassword"
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="bg-neutral-900 border-neutral-700 text-white pr-10"
+                        placeholder="Digite sua senha atual"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {showCurrentPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword" className="text-white">
+                      Nova Senha
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="newPassword"
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="bg-neutral-900 border-neutral-700 text-white pr-10"
+                        placeholder="Digite sua nova senha (mín. 6 caracteres)"
+                        required
+                        minLength={6}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-white">
+                      Confirmar Nova Senha
+                    </Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="bg-neutral-900 border-neutral-700 text-white"
+                      placeholder="Confirme sua nova senha"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={changePasswordLoading}
+                    className="w-full"
+                  >
+                    {changePasswordLoading ? (
+                      <span className="flex items-center gap-2">
+                        <LoadingDots size="sm" />
+                        <span>Alterando...</span>
+                      </span>
+                    ) : (
+                      'Alterar Senha'
+                    )}
+                  </Button>
+                </form>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </button>
             </div>
           </div>
         </Card>

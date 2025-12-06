@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/atoms/Button'
 import { Input } from '@/components/atoms/Input'
 import { Card } from '@/components/molecules/Card'
+import { LoadingDots } from '@/components/atoms/LoadingDots'
 import type { Product, CartItem } from '@/types'
 
 const CATEGORIES = [
@@ -238,7 +239,7 @@ export default function CatalogSection() {
           <div className="flex-1">
             {isLoading ? (
               <div className="text-center py-12">
-                <p className="text-neutral-500">Carregando produtos...</p>
+                <LoadingDots size="lg" />
               </div>
             ) : displayedProducts.length === 0 ? (
               <div className="text-center py-12">

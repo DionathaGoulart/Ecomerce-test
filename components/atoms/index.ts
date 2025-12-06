@@ -14,3 +14,6 @@ export type { BadgeProps } from './Badge'
 export { Spinner, spinnerVariants } from './Spinner'
 export type { SpinnerProps } from './Spinner'
 
+export { LoadingDots } from './LoadingDots'
+export type { LoadingDotsProps } from './LoadingDots'
+

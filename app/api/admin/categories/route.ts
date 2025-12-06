@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { productSchema } from '@/lib/validations/product'
+import { categorySchema } from '@/lib/validations/category'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient()
 
@@ -27,34 +27,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')?.trim() || ''
-
-    // Construir query
-    let query = supabaseAdmin
-      .from('products')
-      .select(`
-        *,
-        category:categories(name, slug)
-      `)
-      .order('created_at', { ascending: false })
-
-    if (search) {
-      query = query.ilike('title', `%${search}%`)
-    }
-
-    const { data, error } = await query
+    const { data, error } = await supabaseAdmin
+      .from('categories')
+      .select('*')
+      .order('name', { ascending: true })
 
     if (error) {
       return NextResponse.json(
-        { error: 'Erro ao buscar produtos' },
+        { error: 'Erro ao buscar categorias' },
         { status: 500 }
       )
     }
 
     return NextResponse.json(data || [])
   } catch (error) {
-    console.error('Erro ao buscar produtos:', error)
+    console.error('Erro ao buscar categorias:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -87,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validation = productSchema.safeParse(body)
+    const validation = categorySchema.safeParse(body)
 
     if (!validation.success) {
       return NextResponse.json(
@@ -97,24 +84,25 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('products')
+      .from('categories')
       .insert(validation.data)
       .select()
       .single()
 
     if (error) {
       return NextResponse.json(
-        { error: 'Erro ao criar produto' },
+        { error: 'Erro ao criar categoria' },
         { status: 500 }
       )
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Erro ao criar produto:', error)
+    console.error('Erro ao criar categoria:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
 }
+

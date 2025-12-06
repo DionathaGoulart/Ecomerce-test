@@ -5,6 +5,7 @@ export const productSchema = z.object({
   description: z.string().optional(),
   price_cents: z.number().int().positive('Preço deve ser positivo'),
   image_url: z.string().url('URL da imagem inválida').optional(),
+  category_id: z.string().uuid('ID da categoria inválido').optional().nullable(),
 })
 
 export const updateProductSchema = productSchema.partial().required({

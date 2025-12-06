@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface User {
@@ -14,6 +14,20 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const checkUser = useCallback(async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/auth/me', { cache: 'no-store' })
+      const data = await response.json()
+      setUser(data.user || null)
+    } catch (error) {
+      console.error('Erro ao verificar autenticação:', error)
+      setUser(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     checkUser()
     
@@ -21,28 +35,18 @@ export function useAuth() {
     const supabase = createClient()
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email)
+      // Forçar atualização imediata
       checkUser()
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [checkUser])
 
-  const checkUser = async () => {
-    try {
-      const response = await fetch('/api/auth/me')
-      const data = await response.json()
-      setUser(data.user)
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error)
-      setUser(null)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return { user, loading }
+  // Expor função para atualização manual
+  return { user, loading, refresh: checkUser }
 }
 

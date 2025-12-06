@@ -22,7 +22,7 @@ export default async function EditProductPage({
 
   return (
     <div>
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">Editar Produto</h1>
+      <h1 className="mb-8 text-3xl font-bold text-white">Editar Produto</h1>
       <ProductForm product={product} />
     </div>
   )

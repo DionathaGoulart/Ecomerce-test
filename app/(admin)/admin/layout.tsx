@@ -16,17 +16,19 @@ export default async function AdminLayout({
   // Se não tem usuário (página de login), renderizar sem AdminNav
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <main>{children}</main>
+      <div className="flex min-h-screen flex-col bg-[#060606]">
+        <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+          {children}
+        </main>
       </div>
     )
   }
 
   // Se tem usuário, renderizar com AdminNav (páginas protegidas)
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-[#060606]">
       <AdminNav user={user} />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 pt-24 sm:pt-32 md:pt-36">
         {children}
       </main>
     </div>

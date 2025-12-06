@@ -46,13 +46,22 @@ export default function ProductFilters({ currentSearch }: { currentSearch: strin
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         onKeyPress={handleKeyPress}
-        className="max-w-xs"
+        className="max-w-xs bg-header-bg border-header-border text-white placeholder:text-white/50"
       />
-      <Button onClick={handleSearch} size="sm">
+      <Button 
+        onClick={handleSearch} 
+        size="sm"
+        className="bg-primary-500 text-neutral-950 hover:opacity-90"
+      >
         Buscar
       </Button>
       {currentSearch && (
-        <Button variant="outline" onClick={handleClear} size="sm">
+        <Button 
+          variant="outline" 
+          onClick={handleClear} 
+          size="sm"
+          className="border-header-border text-white hover:bg-white/10"
+        >
           Limpar
         </Button>
       )}

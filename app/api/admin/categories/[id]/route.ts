@@ -1,69 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
-import { productSchema } from '@/lib/validations/product'
+import { categorySchema } from '@/lib/validations/category'
 
-export async function GET(request: NextRequest) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const supabase = await createClient()
-
-    // Verificar autenticação e se é admin
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-
-    // Verificar se é admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
-    }
-
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')?.trim() || ''
-
-    // Construir query
-    let query = supabaseAdmin
-      .from('products')
-      .select(`
-        *,
-        category:categories(name, slug)
-      `)
-      .order('created_at', { ascending: false })
-
-    if (search) {
-      query = query.ilike('title', `%${search}%`)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      return NextResponse.json(
-        { error: 'Erro ao buscar produtos' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json(data || [])
-  } catch (error) {
-    console.error('Erro ao buscar produtos:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
+    const { id } = await params
     const supabase = await createClient()
 
     // Verificar autenticação e se é admin
@@ -87,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validation = productSchema.safeParse(body)
+    const validation = categorySchema.safeParse(body)
 
     if (!validation.success) {
       return NextResponse.json(
@@ -97,24 +41,77 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('products')
-      .insert(validation.data)
+      .from('categories')
+      .update(validation.data)
+      .eq('id', id)
       .select()
       .single()
 
     if (error) {
       return NextResponse.json(
-        { error: 'Erro ao criar produto' },
+        { error: 'Erro ao atualizar categoria' },
         { status: 500 }
       )
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Erro ao criar produto:', error)
+    console.error('Erro ao atualizar categoria:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const supabase = await createClient()
+
+    // Verificar autenticação e se é admin
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    // Verificar se é admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
+    // Deletar categoria
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Erro ao deletar categoria' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro ao deletar categoria:', error)
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
+  }
+}
+

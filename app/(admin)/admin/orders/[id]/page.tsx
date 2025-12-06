@@ -58,10 +58,10 @@ export default async function OrderDetailPage({
     <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-white">
             Pedido #{order.order_number}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-white/70">
             Criado em{' '}
             {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
           </p>
@@ -72,11 +72,11 @@ export default async function OrderDetailPage({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Informações do Cliente */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          <div className="rounded-xl border border-header-border bg-header-bg p-6">
+            <h2 className="mb-4 text-xl font-semibold text-white">
               Informações do Cliente
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2 text-white">
               <p>
                 <span className="font-medium">Nome:</span>{' '}
                 {profile?.full_name || 'Não informado'}
@@ -87,7 +87,7 @@ export default async function OrderDetailPage({
               {order.delivery_address && (
                 <div className="mt-4">
                   <p className="font-medium">Endereço de Entrega:</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-white/70">
                     {order.delivery_address.street}, {order.delivery_address.number}
                     {order.delivery_address.complement && ` - ${order.delivery_address.complement}`}
                     <br />
@@ -101,8 +101,8 @@ export default async function OrderDetailPage({
           </div>
 
           {/* Itens do Pedido */}
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          <div className="rounded-xl border border-header-border bg-header-bg p-6">
+            <h2 className="mb-4 text-xl font-semibold text-white">
               Itens do Pedido
             </h2>
             <div className="space-y-4">
@@ -120,7 +120,7 @@ export default async function OrderDetailPage({
                 return (
                   <div
                     key={item.id}
-                    className="flex items-start gap-4 border-b border-gray-200 pb-4 last:border-0"
+                    className="flex items-start gap-4 border-b border-header-border pb-4 last:border-0"
                   >
                     {product.image_url && (
                       <Image
@@ -132,20 +132,20 @@ export default async function OrderDetailPage({
                       />
                     )}
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="font-medium text-white">
                         {product.title}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-white/70">
                         Quantidade: {item.quantity}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-white/70">
                         Preço unitário: {formatCurrency(item.unit_price_cents)}
                       </p>
                       {(personalization?.imageUrl || personalization?.description) && (
                         <div className="mt-2 space-y-2">
                           {personalization?.imageUrl && (
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium text-white">
                                 Imagem de Personalização:
                               </p>
                               <PersonalizationImage
@@ -156,10 +156,10 @@ export default async function OrderDetailPage({
                           )}
                           {personalization?.description && (
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium text-white">
                                 Descrição da Personalização:
                               </p>
-                              <p className="text-sm text-gray-700 mt-1 bg-gray-50 p-3 rounded border border-gray-200">
+                              <p className="text-sm text-white/70 mt-1 bg-white/5 p-3 rounded border border-header-border">
                                 {personalization.description}
                               </p>
                             </div>
@@ -168,7 +168,7 @@ export default async function OrderDetailPage({
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-white">
                         {formatCurrency(item.unit_price_cents * item.quantity)}
                       </p>
                     </div>
@@ -181,18 +181,18 @@ export default async function OrderDetailPage({
 
         {/* Resumo */}
         <div className="space-y-6">
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900">Resumo</h2>
+          <div className="rounded-xl border border-header-border bg-header-bg p-6">
+            <h2 className="mb-4 text-xl font-semibold text-white">Resumo</h2>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Status:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-white/70">Status:</span>
+                <span className="font-medium text-white">
                   {statusLabels[order.status] || order.status}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-gray-200 pt-2">
-                <span className="text-lg font-semibold text-gray-900">Total:</span>
-                <span className="text-lg font-bold text-gray-900">
+              <div className="flex justify-between border-t border-header-border pt-2">
+                <span className="text-lg font-semibold text-white">Total:</span>
+                <span className="text-lg font-bold text-white">
                   {formatCurrency(order.total_cents)}
                 </span>
               </div>
@@ -200,13 +200,13 @@ export default async function OrderDetailPage({
           </div>
 
           {order.receipt_url && (
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
-              <h3 className="mb-2 text-sm font-medium text-gray-900">Recibo</h3>
+            <div className="rounded-xl border border-header-border bg-header-bg p-6">
+              <h3 className="mb-2 text-sm font-medium text-white">Recibo</h3>
               <a
                 href={order.receipt_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+                className="text-primary-500 hover:text-primary-400 transition-colors"
               >
                 Ver Recibo do Stripe →
               </a>
@@ -214,15 +214,15 @@ export default async function OrderDetailPage({
           )}
 
           {/* Upload de Nota Fiscal */}
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h3 className="mb-4 text-sm font-medium text-gray-900">Nota Fiscal</h3>
+          <div className="rounded-xl border border-header-border bg-header-bg p-6">
+            <h3 className="mb-4 text-sm font-medium text-white">Nota Fiscal</h3>
             {order.invoice_url ? (
               <div className="space-y-2">
                 <a
                   href={order.invoice_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-blue-600 hover:underline"
+                  className="block text-primary-500 hover:text-primary-400 transition-colors"
                 >
                   Ver Nota Fiscal →
                 </a>

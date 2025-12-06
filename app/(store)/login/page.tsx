@@ -52,10 +52,15 @@ export default function LoginPage() {
         return
       }
 
-      // Redirecionar
+      // Redirecionar e forçar atualização do estado
       const redirectTo = searchParams.get('redirect') || '/minha-conta'
-      router.push(redirectTo)
-      router.refresh()
+      // Pequeno delay para garantir que a sessão foi salva
+      setTimeout(() => {
+        router.push(redirectTo)
+        router.refresh()
+        // Forçar atualização do estado de autenticação
+        window.dispatchEvent(new Event('auth-state-changed'))
+      }, 100)
     } catch (err) {
       setError('Erro ao fazer login. Tente novamente.')
       setLoading(false)
