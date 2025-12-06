@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -45,11 +45,7 @@ export default function MinhaContaPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  useEffect(() => {
-    loadUserAndOrders()
-  }, [])
-
-  const loadUserAndOrders = async () => {
+  const loadUserAndOrders = useCallback(async () => {
     try {
       const supabase = createClient()
 
@@ -125,7 +121,11 @@ export default function MinhaContaPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    loadUserAndOrders()
+  }, [loadUserAndOrders])
 
   const handleLogout = async () => {
     try {
@@ -140,7 +140,7 @@ export default function MinhaContaPage() {
     }
   }
 
-  const handleChangePassword = async (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setChangePasswordError(null)
     setChangePasswordSuccess(false)

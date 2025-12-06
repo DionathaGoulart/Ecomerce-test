@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {error && (
-            <Alert variant="error" title="Erro">
+            <Alert variant="destructive" title="Erro">
               {error}
             </Alert>
           )}

@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/server'
 import { generateOrderNumber } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()

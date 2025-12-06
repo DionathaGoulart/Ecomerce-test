@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -19,7 +19,7 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
@@ -138,7 +138,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <Alert variant="error" title="Erro">
+            <Alert variant="destructive" title="Erro">
               {error}
             </Alert>
           )}
@@ -206,6 +206,26 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-white">Entrar</h1>
+            <p className="mt-2 text-sm text-neutral-400">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
 

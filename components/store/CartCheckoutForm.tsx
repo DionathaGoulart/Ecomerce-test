@@ -380,33 +380,32 @@ export default function CartCheckoutForm() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div className="grid grid-cols-3 gap-6">
-              <div>
-                <Label htmlFor="number" className="mb-3 block">Número *</Label>
-                <Input
-                  id="number"
-                  {...register('address.number')}
-                  placeholder="123"
-                />
-                {errors.address?.number && (
-                  <p className="mt-2 text-sm text-error-600">
-                    {errors.address.number.message}
-                  </p>
-                )}
-              </div>
+          <div className="grid grid-cols-3 gap-6">
+            <div>
+              <Label htmlFor="number" className="mb-3 block">Número *</Label>
+              <Input
+                id="number"
+                {...register('address.number')}
+                placeholder="123"
+              />
+              {errors.address?.number && (
+                <p className="mt-2 text-sm text-error-600">
+                  {errors.address.number.message}
+                </p>
+              )}
+            </div>
 
-              <div>
-                <Label htmlFor="complement" className="mb-3 block">Complemento</Label>
-                <Input
-                  id="complement"
-                  {...register('address.complement')}
-                  placeholder="Apto 101"
-                />
-              </div>
+            <div>
+              <Label htmlFor="complement" className="mb-3 block">Complemento</Label>
+              <Input
+                id="complement"
+                {...register('address.complement')}
+                placeholder="Apto 101"
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="zipcode" className="mb-3 block">CEP *</Label>
+            <div>
+              <Label htmlFor="zipcode" className="mb-3 block">CEP *</Label>
               <Input
                 id="zipcode"
                 {...register('address.zipcode', {
@@ -419,52 +418,54 @@ export default function CartCheckoutForm() {
                 placeholder="00000-000"
                 maxLength={9}
               />
-                {errors.address?.zipcode && (
-                  <p className="mt-2 text-sm text-error-600">
-                    {errors.address.zipcode.message}
-                  </p>
-                )}
-              </div>
+              {errors.address?.zipcode && (
+                <p className="mt-2 text-sm text-error-600">
+                  {errors.address.zipcode.message}
+                </p>
+              )}
             </div>
-
-          <div>
-            <Label htmlFor="city" className="mb-3 block">Cidade *</Label>
-            <Input
-              id="city"
-              {...register('address.city', {
-                onChange: (e) => {
-                  // Capitaliza automaticamente
-                  const formatted = capitalizeWords(e.target.value)
-                  e.target.value = formatted
-                },
-              })}
-              placeholder="Rio Branco"
-            />
-            {errors.address?.city && (
-              <p className="mt-2 text-sm text-error-600">
-                {errors.address.city.message}
-              </p>
-            )}
           </div>
 
-          <div>
-            <Label htmlFor="state" className="mb-3 block">Estado (UF) *</Label>
-            <Input
-              id="state"
-              {...register('address.state', {
-                onChange: (e) => {
-                  // Converte para maiúsculo automaticamente
-                  e.target.value = e.target.value.toUpperCase()
-                },
-              })}
-              placeholder="AC"
-              maxLength={2}
-            />
-            {errors.address?.state && (
-              <p className="mt-2 text-sm text-error-600">
-                {errors.address.state.message}
-              </p>
-            )}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="city" className="mb-3 block">Cidade *</Label>
+              <Input
+                id="city"
+                {...register('address.city', {
+                  onChange: (e) => {
+                    // Capitaliza automaticamente
+                    const formatted = capitalizeWords(e.target.value)
+                    e.target.value = formatted
+                  },
+                })}
+                placeholder="Rio Branco"
+              />
+              {errors.address?.city && (
+                <p className="mt-2 text-sm text-error-600">
+                  {errors.address.city.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="state" className="mb-3 block">Estado (UF) *</Label>
+              <Input
+                id="state"
+                {...register('address.state', {
+                  onChange: (e) => {
+                    // Converte para maiúsculo automaticamente
+                    e.target.value = e.target.value.toUpperCase()
+                  },
+                })}
+                placeholder="AC"
+                maxLength={2}
+              />
+              {errors.address?.state && (
+                <p className="mt-2 text-sm text-error-600">
+                  {errors.address.state.message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

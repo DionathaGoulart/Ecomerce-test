@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const updateInvoiceSchema = z.object({
   invoice_url: z.string().url('URL inválida'),
 })

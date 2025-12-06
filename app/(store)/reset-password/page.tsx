@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -22,7 +22,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
@@ -171,7 +171,7 @@ export default function ResetPasswordPage() {
           </div>
 
           {error && (
-            <Alert variant="error" title="Erro">
+            <Alert variant="destructive" title="Erro">
               {error}
             </Alert>
           )}
@@ -197,6 +197,26 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-white">Redefinir Senha</h1>
+            <p className="mt-2 text-sm text-neutral-400">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
 
