@@ -51,11 +51,11 @@ export default function UpdateOrderStatus({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
       <select
         value={status}
         onChange={(e) => setStatus(e.target.value)}
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+        className="flex-1 sm:flex-none rounded-md border border-header-border bg-header-bg px-3 py-2 text-xs sm:text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
         disabled={loading}
       >
         {statuses.map((s) => (
@@ -64,7 +64,11 @@ export default function UpdateOrderStatus({
           </option>
         ))}
       </select>
-      <Button onClick={handleUpdate} disabled={loading || status === currentStatus}>
+      <Button 
+        onClick={handleUpdate} 
+        disabled={loading || status === currentStatus}
+        className="w-full sm:w-auto text-xs sm:text-sm"
+      >
         {loading ? 'Salvando...' : 'Atualizar'}
       </Button>
     </div>

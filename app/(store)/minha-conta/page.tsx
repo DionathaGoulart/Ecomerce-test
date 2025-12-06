@@ -406,16 +406,16 @@ export default function MinhaContaPage() {
   console.log('isAdmin:', isAdmin)
 
   return (
-    <div className="min-h-screen pt-32 pb-12">
-      <div className="mx-auto max-w-4xl space-y-8">
+    <div className="min-h-screen pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6">
+      <div className="mx-auto max-w-4xl space-y-6 sm:space-y-8">
         {/* Botão Admin */}
         {isAdmin && (
-          <div className="flex items-center gap-3 pt-8">
+          <div className="flex items-center gap-3 pt-6 sm:pt-8">
             <a 
               href="/admin"
-              className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-4 py-2 text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>Admin</span>
             </a>
           </div>
@@ -423,8 +423,8 @@ export default function MinhaContaPage() {
 
         {/* Informações do Usuário */}
         <Card className="bg-neutral-900 border-neutral-800">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-white">Informações Pessoais</h2>
+          <div className="space-y-3 sm:space-y-4 p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Informações Pessoais</h2>
             <div className="space-y-2">
               <div>
                 <span className="text-sm text-neutral-400">Nome:</span>
@@ -560,9 +560,9 @@ export default function MinhaContaPage() {
 
         {/* Endereços Salvos */}
         <Card className="bg-neutral-900 border-neutral-800">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">Endereços Salvos</h2>
+          <div className="space-y-3 sm:space-y-4 p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Endereços Salvos</h2>
               <Button
                 onClick={() => {
                   setShowAddAddress(!showAddAddress)
@@ -580,57 +580,57 @@ export default function MinhaContaPage() {
                 }}
                 variant="outline"
                 size="sm"
-                className="border-neutral-600 text-white hover:bg-neutral-800"
+                className="w-full sm:w-auto text-xs sm:text-sm border-neutral-600 text-white hover:bg-neutral-800"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 Adicionar Endereço
               </Button>
             </div>
 
             {showAddAddress && (
-              <form onSubmit={handleSaveAddress} className="space-y-4 rounded-lg bg-neutral-800 p-4">
+              <form onSubmit={handleSaveAddress} className="space-y-3 sm:space-y-4 rounded-lg bg-neutral-800 p-3 sm:p-4">
                 <div>
-                  <Label htmlFor="label" className="mb-2 block text-white">Apelido (opcional)</Label>
+                  <Label htmlFor="label" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Apelido (opcional)</Label>
                   <Input
                     id="label"
                     value={addressForm.label}
                     onChange={(e) => setAddressForm({ ...addressForm, label: e.target.value })}
                     placeholder="Ex: Casa, Trabalho"
-                    className="bg-neutral-900 border-neutral-600 text-white"
+                    className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="street" className="mb-2 block text-white">Rua *</Label>
+                  <Label htmlFor="street" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Rua *</Label>
                   <Input
                     id="street"
                     value={addressForm.street}
                     onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
                     required
-                    className="bg-neutral-900 border-neutral-600 text-white"
+                    className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <Label htmlFor="number" className="mb-2 block text-white">Número *</Label>
+                    <Label htmlFor="number" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Número *</Label>
                     <Input
                       id="number"
                       value={addressForm.number}
                       onChange={(e) => setAddressForm({ ...addressForm, number: e.target.value })}
                       required
-                      className="bg-neutral-900 border-neutral-600 text-white"
+                      className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="complement" className="mb-2 block text-white">Complemento</Label>
+                    <Label htmlFor="complement" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Complemento</Label>
                     <Input
                       id="complement"
                       value={addressForm.complement}
                       onChange={(e) => setAddressForm({ ...addressForm, complement: e.target.value })}
-                      className="bg-neutral-900 border-neutral-600 text-white"
+                      className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zipcode" className="mb-2 block text-white">CEP *</Label>
+                    <Label htmlFor="zipcode" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">CEP *</Label>
                     <div className="relative">
                       <Input
                         id="zipcode"
@@ -649,7 +649,7 @@ export default function MinhaContaPage() {
                         }}
                         maxLength={9}
                         required
-                        className="bg-neutral-900 border-neutral-600 text-white pr-10"
+                        className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white pr-10"
                       />
                       {loadingCEP && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -658,32 +658,32 @@ export default function MinhaContaPage() {
                       )}
                     </div>
                     {addressForm.zipcode && unformatCEP(addressForm.zipcode).length === 8 && !loadingCEP && addressForm.street && (
-                      <p className="mt-2 text-xs text-green-400">
+                      <p className="mt-1 sm:mt-2 text-xs text-green-400">
                         ✓ CEP encontrado! Campos preenchidos automaticamente.
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <Label htmlFor="city" className="mb-2 block text-white">Cidade *</Label>
+                    <Label htmlFor="city" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Cidade *</Label>
                     <Input
                       id="city"
                       value={addressForm.city}
                       onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
                       required
-                      className="bg-neutral-900 border-neutral-600 text-white"
+                      className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state" className="mb-2 block text-white">Estado *</Label>
+                    <Label htmlFor="state" className="mb-1 sm:mb-2 block text-xs sm:text-sm text-white">Estado *</Label>
                     <Input
                       id="state"
                       value={addressForm.state}
                       onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value.toUpperCase() })}
                       maxLength={2}
                       required
-                      className="bg-neutral-900 border-neutral-600 text-white"
+                      className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white"
                     />
                   </div>
                 </div>
@@ -693,12 +693,12 @@ export default function MinhaContaPage() {
                     id="is_default"
                     checked={addressForm.is_default}
                     onChange={(e) => setAddressForm({ ...addressForm, is_default: e.target.checked })}
-                    className="h-4 w-4 rounded border-neutral-600 bg-neutral-900 text-primary-500"
+                    className="h-3 w-3 sm:h-4 sm:w-4 rounded border-neutral-600 bg-neutral-900 text-primary-500"
                   />
-                  <Label htmlFor="is_default" className="text-white">Definir como endereço padrão</Label>
+                  <Label htmlFor="is_default" className="text-xs sm:text-sm text-white">Definir como endereço padrão</Label>
                 </div>
-                <div className="flex gap-2">
-                  <Button type="submit" className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button type="submit" className="flex-1 text-sm sm:text-base">
                     {editingAddress ? 'Atualizar' : 'Salvar'}
                   </Button>
                   <Button
@@ -718,7 +718,7 @@ export default function MinhaContaPage() {
                         is_default: false,
                       })
                     }}
-                    className="border-neutral-600 text-white"
+                    className="text-sm sm:text-base border-neutral-600 text-white"
                   >
                     Cancelar
                   </Button>

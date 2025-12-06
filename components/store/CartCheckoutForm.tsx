@@ -400,7 +400,7 @@ export default function CartCheckoutForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6 sm:space-y-8">
       {/* Mensagem de erro geral */}
       {Object.keys(errors).length > 0 && (
         <div className="rounded-xl border border-error-500/50 bg-error-950/50 p-4 text-error-400">
@@ -442,37 +442,37 @@ export default function CartCheckoutForm() {
         </div>
       )}
       {/* Itens do carrinho */}
-      <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-white">Itens</h3>
+      <div className="space-y-4 sm:space-y-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-white">Itens</h3>
         {cartItems.map((item) => {
           const product = products[item.productId]
           if (!product) return null
 
           return (
             <Card key={item.productId} variant="default" padding="md" className="bg-secondary-800 border-secondary-600">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                 {product.image_url && (
                   <Image
                     src={product.image_url}
                     alt={product.title}
                     width={80}
                     height={80}
-                    className="h-20 w-20 rounded-xl object-cover"
+                    className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover flex-shrink-0"
                   />
                 )}
-                <div className="flex-1">
-                  <h4 className="font-semibold text-white">{product.title}</h4>
-                  <div className="mt-3 flex items-center gap-3">
-                    <span className="text-sm text-neutral-400">Quantidade:</span>
+                <div className="flex-1 w-full sm:w-auto">
+                  <h4 className="font-semibold text-sm sm:text-base text-white">{product.title}</h4>
+                  <div className="mt-2 sm:mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <span className="text-xs sm:text-sm text-neutral-400">Quantidade:</span>
                     <div className="flex items-center gap-2">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => handleDecrease(item.productId)}
-                        className="h-8 w-8 p-0 text-white border-neutral-600 hover:bg-neutral-700"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-white border-neutral-600 hover:bg-neutral-700"
                       >
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                       <Input
                         type="number"
@@ -489,7 +489,7 @@ export default function CartCheckoutForm() {
                             handleQuantityChange(item.productId, 1)
                           }
                         }}
-                        className="w-16 text-center no-spinner bg-neutral-900 border-neutral-600 text-white"
+                        className="w-14 sm:w-16 text-sm sm:text-base text-center no-spinner bg-neutral-900 border-neutral-600 text-white"
                         min={1}
                       />
                       <Button
@@ -497,14 +497,14 @@ export default function CartCheckoutForm() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleIncrease(item.productId)}
-                        className="h-8 w-8 p-0 text-white border-neutral-600 hover:bg-neutral-700"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-white border-neutral-600 hover:bg-neutral-700"
                       >
-                        <ChevronUp className="h-4 w-4" />
+                        <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </div>
                   {(item.personalizationImageUrl || item.personalizationDescription) && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-2 sm:mt-3 space-y-2">
                       {item.personalizationImageUrl && (
                         <div>
                           <p className="text-xs font-medium text-neutral-300">Imagem de personalização:</p>
@@ -513,7 +513,7 @@ export default function CartCheckoutForm() {
                             alt="Personalização"
                             width={64}
                             height={64}
-                            className="mt-2 h-16 w-16 rounded-xl object-cover border border-neutral-600"
+                            className="mt-2 h-12 w-12 sm:h-16 sm:w-16 rounded-xl object-cover border border-neutral-600"
                             unoptimized
                           />
                         </div>
@@ -527,8 +527,8 @@ export default function CartCheckoutForm() {
                     </div>
                   )}
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-white">
+                <div className="flex items-center justify-between sm:flex-col sm:items-end w-full sm:w-auto gap-2 sm:gap-0">
+                  <p className="text-base sm:text-lg font-semibold text-white">
                     {formatCurrency(product.price_cents * item.quantity)}
                   </p>
                   <Button
@@ -536,7 +536,7 @@ export default function CartCheckoutForm() {
                     variant="outline"
                     size="sm"
                     onClick={() => removeFromCart(item.productId)}
-                    className="mt-3 text-error-500 border-error-500/50 hover:bg-error-500/10"
+                    className="text-xs sm:text-sm text-error-500 border-error-500/50 hover:bg-error-500/10"
                   >
                     Remover
                   </Button>
@@ -545,9 +545,9 @@ export default function CartCheckoutForm() {
             </Card>
           )
         })}
-        <div className="flex justify-between border-t border-neutral-600 pt-6 mt-6">
-          <span className="text-xl font-semibold text-white">Total:</span>
-          <span className="text-2xl font-semibold text-primary-500">
+        <div className="flex justify-between border-t border-neutral-600 pt-4 sm:pt-6 mt-4 sm:mt-6">
+          <span className="text-lg sm:text-xl font-semibold text-white">Total:</span>
+          <span className="text-xl sm:text-2xl font-semibold text-primary-500">
             {formatCurrency(totalCents)}
           </span>
         </div>
@@ -555,11 +555,11 @@ export default function CartCheckoutForm() {
 
       {/* Formulário de dados do cliente */}
       {!user && !loadingAuth ? (
-        <div className="mt-12">
-          <div className="rounded-xl border border-primary-500/50 bg-primary-950/20 p-6">
-            <div className="flex items-start gap-4">
+        <div className="mt-8 sm:mt-12">
+          <div className="rounded-xl border border-primary-500/50 bg-primary-950/20 p-4 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
               <svg
-                className="h-5 w-5 mt-0.5 text-primary-500 flex-shrink-0"
+                className="h-4 w-4 sm:h-5 sm:w-5 mt-0.5 text-primary-500 flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -572,12 +572,12 @@ export default function CartCheckoutForm() {
                 />
               </svg>
               <div className="flex-1">
-                <h5 className="mb-2 font-medium text-primary-300">Login necessário</h5>
-                <p className="text-sm text-primary-400 mb-4">
+                <h5 className="mb-2 text-sm sm:text-base font-medium text-primary-300">Login necessário</h5>
+                <p className="text-xs sm:text-sm text-primary-400 mb-3 sm:mb-4">
                   Você precisa estar logado para finalizar o pedido. Faça login para continuar com a compra.
                 </p>
                 <Link href={`/login?redirect=${encodeURIComponent('/cart')}`}>
-                  <Button className="bg-primary-500 text-neutral-950 hover:opacity-90">
+                  <Button className="w-full sm:w-auto text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90">
                     Fazer Login
                   </Button>
                 </Link>
@@ -586,29 +586,29 @@ export default function CartCheckoutForm() {
           </div>
         </div>
       ) : (
-        <div className="mt-12 space-y-6">
+        <div className="mt-8 sm:mt-12 space-y-4 sm:space-y-6">
           <div>
-            <h3 className="text-xl font-semibold text-white">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">
               Dados do Cliente
             </h3>
           </div>
 
           {/* Informações do usuário logado */}
           {user && !loadingAuth && (
-            <div className="rounded-xl border border-neutral-600 bg-neutral-900/50 p-4 space-y-2">
+            <div className="rounded-xl border border-neutral-600 bg-neutral-900/50 p-3 sm:p-4 space-y-2">
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-3 w-3 sm:h-4 sm:w-4 text-primary-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <p className="text-sm text-neutral-300">
+                <p className="text-xs sm:text-sm text-neutral-300 break-words">
                   <span className="font-medium">Nome:</span> {user.full_name || 'Não informado'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-3 w-3 sm:h-4 sm:w-4 text-primary-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <p className="text-sm text-neutral-300">
+                <p className="text-xs sm:text-sm text-neutral-300 break-words">
                   <span className="font-medium">Email:</span> {user.email}
                 </p>
               </div>
@@ -617,9 +617,9 @@ export default function CartCheckoutForm() {
 
           {/* Campos de endereço - só aparecem se estiver logado */}
           {user && !loadingAuth && (
-            <div className="space-y-6 border-t border-neutral-600 pt-8">
+            <div className="space-y-4 sm:space-y-6 border-t border-neutral-600 pt-6 sm:pt-8">
           <div>
-            <h4 className="text-lg font-semibold text-white">Endereço de Entrega</h4>
+            <h4 className="text-base sm:text-lg font-semibold text-white">Endereço de Entrega</h4>
           </div>
 
           {/* Lista de endereços salvos - só mostra se houver endereços salvos */}
@@ -715,7 +715,7 @@ export default function CartCheckoutForm() {
             <div className="space-y-6">
 
           <div>
-            <Label htmlFor="street" className="mb-3 block text-white">Rua *</Label>
+            <Label htmlFor="street" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">Rua *</Label>
             <Input
               id="street"
               {...register('address.street', {
@@ -726,43 +726,43 @@ export default function CartCheckoutForm() {
                 },
               })}
               placeholder="Rua das Flores"
-              className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
+              className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
             />
             {errors.address?.street && (
-              <p className="mt-2 text-sm text-error-500">
+              <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-error-500">
                 {errors.address.street.message}
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="number" className="mb-3 block text-white">Número *</Label>
+              <Label htmlFor="number" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">Número *</Label>
               <Input
                 id="number"
                 {...register('address.number')}
                 placeholder="123"
-                className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
+                className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
               />
               {errors.address?.number && (
-                <p className="mt-2 text-sm text-error-500">
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-error-500">
                   {errors.address.number.message}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="complement" className="mb-3 block text-white">Complemento</Label>
+              <Label htmlFor="complement" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">Complemento</Label>
               <Input
                 id="complement"
                 {...register('address.complement')}
                 placeholder="Apto 101"
-                className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
+                className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
               />
             </div>
 
             <div>
-              <Label htmlFor="zipcode" className="mb-3 block text-white">CEP *</Label>
+              <Label htmlFor="zipcode" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">CEP *</Label>
               <div className="relative">
                 <Input
                   id="zipcode"
@@ -775,7 +775,7 @@ export default function CartCheckoutForm() {
                   })}
                   placeholder="00000-000"
                   maxLength={9}
-                  className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500 pr-10"
+                  className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500 pr-10"
                 />
                 {loadingCEP && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -784,21 +784,21 @@ export default function CartCheckoutForm() {
                 )}
               </div>
               {errors.address?.zipcode && (
-                <p className="mt-2 text-sm text-error-500">
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-error-500">
                   {errors.address.zipcode.message}
                 </p>
               )}
               {zipcode && unformatCEP(zipcode).length === 8 && !loadingCEP && !errors.address?.zipcode && (
-                <p className="mt-2 text-xs text-neutral-400">
+                <p className="mt-1 sm:mt-2 text-xs text-neutral-400">
                   CEP encontrado! Campos preenchidos automaticamente.
                 </p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="city" className="mb-3 block text-white">Cidade *</Label>
+              <Label htmlFor="city" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">Cidade *</Label>
               <Input
                 id="city"
                 {...register('address.city', {
@@ -809,17 +809,17 @@ export default function CartCheckoutForm() {
                   },
                 })}
                 placeholder="Rio Branco"
-                className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
+                className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
               />
               {errors.address?.city && (
-                <p className="mt-2 text-sm text-error-500">
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-error-500">
                   {errors.address.city.message}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="state" className="mb-3 block text-white">Estado (UF) *</Label>
+              <Label htmlFor="state" className="mb-2 sm:mb-3 block text-sm sm:text-base text-white">Estado (UF) *</Label>
               <Input
                 id="state"
                 {...register('address.state', {
@@ -830,10 +830,10 @@ export default function CartCheckoutForm() {
                 })}
                 placeholder="AC"
                 maxLength={2}
-                className="bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
+                className="text-sm sm:text-base bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
               />
               {errors.address?.state && (
-                <p className="mt-2 text-sm text-error-500">
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-error-500">
                   {errors.address.state.message}
                 </p>
               )}
@@ -846,20 +846,20 @@ export default function CartCheckoutForm() {
         </div>
       )}
 
-      <div className="mt-12">
+      <div className="mt-8 sm:mt-12">
         {!user && !loadingAuth ? (
-          <div className="rounded-xl border border-neutral-600 bg-neutral-900/50 p-4 text-center">
-            <p className="text-sm text-neutral-400 mb-4">
+          <div className="rounded-xl border border-neutral-600 bg-neutral-900/50 p-4 sm:p-6 text-center">
+            <p className="text-xs sm:text-sm text-neutral-400 mb-3 sm:mb-4">
               Faça login para finalizar o pedido
             </p>
             <Link href={`/login?redirect=${encodeURIComponent('/cart')}`} className="block">
-              <Button className="w-full bg-primary-500 text-neutral-950 hover:opacity-90" size="lg">
+              <Button className="w-full text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90" size="lg">
                 Fazer Login e Continuar
               </Button>
             </Link>
           </div>
         ) : (
-          <Button type="submit" disabled={loading || loadingAuth} className="w-full bg-primary-500 text-neutral-950 hover:opacity-90" size="lg">
+          <Button type="submit" disabled={loading || loadingAuth} className="w-full text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90" size="lg">
             {loading ? 'Processando...' : 'Finalizar Pedido'}
           </Button>
         )}

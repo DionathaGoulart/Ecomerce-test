@@ -46,9 +46,9 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
   useHowItWorksAnimation(sectionRef)
 
   return (
-    <section id="comofunciona" ref={sectionRef as React.RefObject<HTMLElement>} className="w-full py-24 sm:py-32">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <section id="comofunciona" ref={sectionRef as React.RefObject<HTMLElement>} className="w-full py-8 sm:py-12 md:py-16 lg:py-24 xl:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Coluna Esquerda - Vazia */}
           <div className="hidden lg:block"></div>
           
@@ -57,18 +57,18 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
             {STEPS.map((etapa, index, array) => {
               return (
                 <div key={etapa.step} className="relative w-full">
-                  <div className="flex items-stretch gap-4">
+                  <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4">
                     {/* Card do Número */}
                     <div className="flex-shrink-0 relative z-10">
-                      <div className="w-16 sm:w-20 md:w-24 h-full rounded-[16px] bg-primary-500 flex items-center justify-center">
-                        <span className="text-[32px] font-semibold text-neutral-950">
+                      <div className="w-10 sm:w-12 md:w-16 lg:w-20 xl:w-24 h-full rounded-lg sm:rounded-xl md:rounded-[16px] bg-primary-500 flex items-center justify-center min-h-[70px] sm:min-h-[80px] md:min-h-[100px]">
+                        <span className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-neutral-950">
                           {etapa.step}
                         </span>
                       </div>
                       
                       {/* Linha vertical conectando etapas */}
                       {index < array.length - 1 && (
-                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden h-[600px]">
+                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden h-[120px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]">
                           {/* Linha cinza de fundo */}
                           <div className="absolute inset-0 bg-header-border" />
                           {/* Linha verde que vai crescendo */}
@@ -81,22 +81,22 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     </div>
                     
                     {/* Card de Conteúdo */}
-                    <div className="flex-1 rounded-[16px] bg-primary-500 p-4 sm:p-6">
-                      <div className="flex flex-col gap-4">
+                    <div className="flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] bg-primary-500 p-2.5 sm:p-3 md:p-4 lg:p-6">
+                      <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
                         <div className="flex-shrink-0">
                           <Image
                             src={etapa.icon}
                             alt=""
                             width={24}
                             height={24}
-                            className="w-4 h-4 sm:w-5 sm:h-5"
+                            className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5"
                             style={{ filter: 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)' }}
                           />
                         </div>
-                        <h3 className="text-[32px] font-semibold text-neutral-950">
+                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-neutral-950">
                           {etapa.title}
                         </h3>
-                        <p className="text-[16px] text-neutral-950/80 leading-relaxed">
+                        <p className="text-xs sm:text-sm md:text-base lg:text-[16px] text-neutral-950/80 leading-relaxed">
                           {etapa.description}
                         </p>
                       </div>
@@ -105,7 +105,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                   
                   {/* Espaço entre etapas */}
                   {index < array.length - 1 && (
-                    <div className="h-[600px]" />
+                    <div className="h-[120px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]" />
                   )}
                 </div>
               )

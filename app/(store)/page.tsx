@@ -26,7 +26,7 @@ export default function Home() {
         style={{ overflowX: 'clip' }}
       >
         {/* Spline de fundo - absolute para não empurrar conteúdo */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 hidden md:block">
           <SplineBackground />
         </div>
 

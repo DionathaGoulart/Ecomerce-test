@@ -46,7 +46,7 @@ export default function DeleteProductButton({
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-error-500 hover:text-error-400 disabled:opacity-50 transition-colors"
+      className="text-xs sm:text-sm text-error-500 hover:text-error-400 disabled:opacity-50 transition-colors"
     >
       {loading ? 'Deletando...' : 'Deletar'}
     </button>

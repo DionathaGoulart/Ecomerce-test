@@ -36,7 +36,7 @@ interface BenefitCardProps {
 export function BenefitCard({ index, icon, title, description, lineConfig, cardRef, className = '' }: BenefitCardProps) {
   return (
     <div ref={cardRef} className={`relative ${className}`}>
-      <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px]">
+      <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px] h-full">
         <div className="flex flex-col gap-2">
           <div className="w-4 h-4 flex items-center justify-center">
             <Image

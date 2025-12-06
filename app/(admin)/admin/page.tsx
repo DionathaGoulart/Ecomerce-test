@@ -43,7 +43,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div>
-        <h1 className="mb-8 text-3xl font-bold text-white">Dashboard</h1>
+        <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold text-white">Dashboard</h1>
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" variant="default" />
         </div>
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
   if (error) {
     return (
       <div>
-        <h1 className="mb-8 text-3xl font-bold text-white">Dashboard</h1>
+        <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold text-white">Dashboard</h1>
         <div className="text-center py-12">
           <p className="text-error-500">{error}</p>
           <button
@@ -70,40 +70,40 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="mb-8 text-3xl font-bold text-white">Dashboard</h1>
+      <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold text-white">Dashboard</h1>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-xl border border-header-border bg-header-bg p-6">
-          <h3 className="text-sm font-medium text-white/70">Total de Produtos</h3>
-          <p className="mt-2 text-3xl font-bold text-white">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-xl border border-header-border bg-header-bg p-3 sm:p-4 md:p-6">
+          <h3 className="text-xs sm:text-sm font-medium text-white/70">Total de Produtos</h3>
+          <p className="mt-1 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-white">
             {stats?.products || 0}
           </p>
         </div>
 
-        <div className="rounded-xl border border-header-border bg-header-bg p-6">
-          <h3 className="text-sm font-medium text-white/70">Total de Pedidos</h3>
-          <p className="mt-2 text-3xl font-bold text-white">
+        <div className="rounded-xl border border-header-border bg-header-bg p-3 sm:p-4 md:p-6">
+          <h3 className="text-xs sm:text-sm font-medium text-white/70">Total de Pedidos</h3>
+          <p className="mt-1 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-white">
             {stats?.orders || 0}
           </p>
         </div>
 
-        <div className="rounded-xl border border-header-border bg-header-bg p-6">
-          <h3 className="text-sm font-medium text-white/70">Pedidos Pendentes</h3>
-          <p className="mt-2 text-3xl font-bold text-warning-500">
+        <div className="rounded-xl border border-header-border bg-header-bg p-3 sm:p-4 md:p-6">
+          <h3 className="text-xs sm:text-sm font-medium text-white/70">Pedidos Pendentes</h3>
+          <p className="mt-1 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-warning-500">
             {stats?.pendingOrders || 0}
           </p>
         </div>
 
-        <div className="rounded-xl border border-header-border bg-header-bg p-6">
-          <h3 className="text-sm font-medium text-white/70">Pedidos Pagos</h3>
-          <p className="mt-2 text-3xl font-bold text-success-500">
+        <div className="rounded-xl border border-header-border bg-header-bg p-3 sm:p-4 md:p-6">
+          <h3 className="text-xs sm:text-sm font-medium text-white/70">Pedidos Pagos</h3>
+          <p className="mt-1 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-success-500">
             {stats?.paidOrders || 0}
           </p>
         </div>
 
-        <div className="rounded-xl border border-header-border bg-header-bg p-6">
-          <h3 className="text-sm font-medium text-white/70">Pedidos Cancelados</h3>
-          <p className="mt-2 text-3xl font-bold text-error-500">
+        <div className="rounded-xl border border-header-border bg-header-bg p-3 sm:p-4 md:p-6">
+          <h3 className="text-xs sm:text-sm font-medium text-white/70">Pedidos Cancelados</h3>
+          <p className="mt-1 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-error-500">
             {stats?.cancelledOrders || 0}
           </p>
         </div>

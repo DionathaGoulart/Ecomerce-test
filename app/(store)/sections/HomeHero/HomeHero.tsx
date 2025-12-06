@@ -22,16 +22,16 @@ export function HomeHero() {
   }
 
   return (
-    <section id="home" className="min-h-screen flex items-start relative z-10">
-      <div className="w-full relative z-10 pt-24 sm:pt-28 md:pt-32 lg:pt-64">
+    <section id="home" className="min-h-0 md:min-h-screen flex items-start relative z-10">
+      <div className="w-full relative z-10 pt-24 sm:pt-28 md:pt-32 lg:pt-64 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
         <div className="max-w-2xl">
           {/* Título */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[96px] font-semibold text-white mb-6 sm:mb-8 md:mb-12 leading-none inline-block">
-            Soluções<br />em Madeira
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-[96px] font-semibold text-white mb-3 sm:mb-6 md:mb-8 lg:mb-12 leading-tight sm:leading-none">
+            Soluções<br className="hidden sm:block" /> em Madeira
           </h1>
 
           {/* Texto */}
-          <p className="text-sm sm:text-base text-white mb-8 sm:mb-12 md:mb-16 leading-relaxed max-w-[35rem]">
+          <p className="text-sm sm:text-base md:text-lg text-white mb-4 sm:mb-8 md:mb-12 lg:mb-16 leading-relaxed max-w-full sm:max-w-[35rem]">
             Materializamos a sua marca em peças exclusivas de MDF e Pinus desde embalagens premium até projetos complexos. Sem pedido mínimo.
           </p>
 
@@ -54,7 +54,7 @@ export function HomeHero() {
                   smoothScrollTo(targetPosition, 1000)
                 }
               }}
-              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-primary-500 px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-opacity hover:opacity-90"
+              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-opacity hover:opacity-90 w-full sm:w-auto"
             >
               <Image
                 src="/icons/eye.svg"
@@ -70,7 +70,7 @@ export function HomeHero() {
             <a
               href="#beneficios"
               onClick={handleScrollToBenefits}
-              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-4 sm:px-5 py-3 sm:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-opacity hover:opacity-80"
+              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-opacity hover:opacity-80 w-full sm:w-auto"
             >
               <Image
                 src="/icons/project.svg"
@@ -85,7 +85,9 @@ export function HomeHero() {
         </div>
 
         {/* Seção Clientes */}
-        <ClientCarousel />
+        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-12">
+          <ClientCarousel />
+        </div>
       </div>
     </section>
   )

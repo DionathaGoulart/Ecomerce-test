@@ -219,38 +219,6 @@ export default function StoreLayout({
                 )
               })}
             </nav>
-
-            {/* Botões à direita */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-              {/* Botão Login/Minha Conta */}
-              {loading ? (
-                <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5">
-                  <Spinner size="sm" variant="default" />
-                </div>
-              ) : (
-                <Link
-                  href={user ? "/minha-conta" : "/login"}
-                  className="flex items-center gap-1 sm:gap-2 rounded-lg border border-primary-500 bg-transparent px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-opacity hover:opacity-80"
-                >
-                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">{user ? "Minha Conta" : "Login"}</span>
-                </Link>
-              )}
-              
-              {/* Botão Carrinho */}
-              <Link
-                href="/cart"
-                className="relative flex items-center gap-1 sm:gap-2 rounded-lg bg-primary-500 px-2 sm:px-3 lg:px-5 py-1.5 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-neutral-950 transition-opacity hover:opacity-90"
-              >
-                <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Carrinho</span>
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-error-500 text-[10px] sm:text-xs font-bold text-white shadow-lg">
-                    {cartItemCount > 99 ? '99+' : cartItemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
           </div>
         </div>
       </header>

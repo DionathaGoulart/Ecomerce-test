@@ -78,9 +78,11 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Pedidos</h1>
-        <OrderFilters currentStatus={statusFilter} />
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Pedidos</h1>
+        <div className="w-full sm:w-auto">
+          <OrderFilters currentStatus={statusFilter} />
+        </div>
       </div>
 
       {loading ? (
@@ -98,72 +100,125 @@ export default function AdminOrdersPage() {
           </button>
         </div>
       ) : orders.length > 0 ? (
-        <div className="overflow-hidden rounded-xl border border-header-border bg-header-bg">
-          <table className="min-w-full divide-y divide-header-border">
-            <thead className="bg-header-bg">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Número
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Cliente
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Data
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-header-border bg-header-bg">
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-white">
-                    #{order.order_number}
-                  </td>
-                  <td className="px-6 py-4">
+        <>
+          {/* Desktop: Tabela */}
+          <div className="hidden md:block overflow-hidden rounded-xl border border-header-border bg-header-bg">
+            <table className="min-w-full divide-y divide-header-border">
+              <thead className="bg-header-bg">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Número
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Cliente
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Total
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Data
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-header-border bg-header-bg">
+                {orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-white/5 transition-colors">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-white">
+                      #{order.order_number}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-white">
+                        {order.profile?.full_name || '-'}
+                      </div>
+                      <div className="text-sm text-white/70">
+                        {order.profile?.email || '-'}
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
+                      {formatCurrency(order.total_cents)}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                          statusColors[order.status] || statusColors.pending
+                        }`}
+                      >
+                        {statusLabels[order.status] || order.status}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-white/70">
+                      {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                      <Link
+                        href={`/admin/orders/${order.id}`}
+                        className="text-primary-500 hover:text-primary-400 transition-colors"
+                      >
+                        Ver Detalhes
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: Cards */}
+          <div className="md:hidden space-y-3">
+            {orders.map((order) => (
+              <div key={order.id} className="rounded-xl border border-header-border bg-header-bg p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="text-sm font-semibold text-white">
+                      #{order.order_number}
+                    </div>
+                    <div className="text-xs text-white/70 mt-1">
+                      {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      statusColors[order.status] || statusColors.pending
+                    }`}
+                  >
+                    {statusLabels[order.status] || order.status}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <div>
+                    <div className="text-xs text-white/70">Cliente</div>
                     <div className="text-sm font-medium text-white">
                       {order.profile?.full_name || '-'}
                     </div>
-                    <div className="text-sm text-white/70">
+                    <div className="text-xs text-white/70">
                       {order.profile?.email || '-'}
                     </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
-                    {formatCurrency(order.total_cents)}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        statusColors[order.status] || statusColors.pending
-                      }`}
-                    >
-                      {statusLabels[order.status] || order.status}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-white/70">
-                    {format(new Date(order.created_at), "dd/MM/yyyy 'às' HH:mm")}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  </div>
+                  <div>
+                    <div className="text-xs text-white/70">Total</div>
+                    <div className="text-base font-semibold text-white">
+                      {formatCurrency(order.total_cents)}
+                    </div>
+                  </div>
+                  <div className="pt-2">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-primary-500 hover:text-primary-400 transition-colors"
+                      className="text-sm text-primary-500 hover:text-primary-400 transition-colors"
                     >
-                      Ver Detalhes
+                      Ver Detalhes →
                     </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <div className="text-center py-12">
           <p className="text-white/70">

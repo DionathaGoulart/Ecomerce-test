@@ -56,7 +56,7 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
   return (
     <Card variant="default" padding="none" className="overflow-hidden group flex flex-col h-full bg-secondary-800 border border-secondary-600">
       {product.image_url && (
-        <div className="overflow-hidden bg-transparent flex-shrink-0 p-6 pb-0">
+        <div className="overflow-hidden bg-transparent flex-shrink-0 p-4 sm:p-6 pb-0">
           <div className="aspect-square w-full relative">
             <Image
               src={product.image_url}
@@ -67,11 +67,11 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
           </div>
         </div>
       )}
-      <div className="flex flex-col flex-grow p-6 pt-0">
-        <h3 className="font-semibold mb-2 flex-shrink-0 text-product-title text-white/80 mt-6">
+      <div className="flex flex-col flex-grow p-4 sm:p-6 pt-0">
+        <h3 className="font-semibold mb-2 flex-shrink-0 text-base sm:text-lg md:text-product-title text-white/80 mt-4 sm:mt-6">
           {truncateText(product.title, 39)}
         </h3>
-        <p className="mb-4 flex-shrink-0 text-product-price text-white/80">
+        <p className="mb-3 sm:mb-4 flex-shrink-0 text-sm sm:text-base md:text-product-price text-white/80">
           A partir de<br />
           <span className="text-white opacity-100">{formatCurrency(product.price_cents)}</span> / 1 unid.
         </p>
@@ -82,9 +82,9 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
               onClick={handleAddClick}
               variant="primary"
               size="sm"
-              className="w-full"
+              className="w-full text-sm sm:text-base"
             >
-              <ShoppingCart className="h-4 w-4 mr-2" />
+              <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               Adicionar
             </Button>
         ) : (
@@ -93,10 +93,10 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
               onClick={handleIncrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-black border-none rounded-2xl"
+              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5"
               style={{ backgroundColor: '#9AF032' }}
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
             <Input
               type="number"
@@ -105,17 +105,17 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
                 const newQuantity = parseInt(e.target.value) || 0
                 onAddToCart(product.id, newQuantity)
               }}
-              className="flex-1 text-center no-spinner bg-transparent border border-secondary-600 text-white"
+              className="flex-1 text-center text-sm sm:text-base no-spinner bg-transparent border border-secondary-600 text-white"
               min={1}
             />
             <Button
               onClick={handleDecrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-white border-none rounded-2xl"
+              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5"
               style={{ backgroundColor: '#F03932' }}
             >
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         )}
@@ -167,33 +167,33 @@ export default function CatalogSection() {
   const displayedProducts = filteredProducts.slice(0, 6)
 
   return (
-    <section id="catalogo" className="relative z-20 w-full py-16 bg-transparent w-screen -mx-[calc(50vw-50%)]">
+    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent w-screen -mx-[calc(50vw-50%)]">
       <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
         {/* Título */}
-        <h2 className="font-semibold mb-8 text-catalog-title text-white">
+        <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words">
           Catálogo
         </h2>
 
         {/* Barra de Pesquisa */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="relative w-full">
-            <Search className="absolute top-1/2 -translate-y-1/2 h-5 w-5 text-primary-500 left-8" />
+            <Search className="absolute top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-primary-500 left-4 sm:left-8" />
             <Input
               type="text"
               placeholder="O que você está procurando?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-[76px] pr-8 py-6 text-white bg-secondary-800 border border-secondary-600 placeholder:text-white/60"
+              className="w-full pl-10 sm:pl-[76px] pr-4 sm:pr-8 py-4 sm:py-6 text-sm sm:text-base text-white bg-secondary-800 border border-secondary-600 placeholder:text-white/60"
             />
           </div>
         </div>
 
         {/* Layout: Sidebar + Catálogo */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Sidebar de Categorias */}
           <aside className="w-full lg:w-64 flex-shrink-0">
-            <div className="bg-transparent rounded-xl p-6 pl-0">
-              <ul className="space-y-2">
+            <div className="bg-transparent rounded-xl p-4 sm:p-6 lg:pl-0">
+              <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
                 {CATEGORIES.map((category) => {
                   const isSelected = selectedCategory === category
                   const isHovered = hoveredCategory === category
@@ -210,19 +210,19 @@ export default function CatalogSection() {
                   }
                   
                   const getFontSizeClass = () => {
-                    if (isHovered) return 'text-xl'
-                    if (hasAnyHover && isSelected) return 'text-base' // Selecionado mas há hover em outro, fica normal
-                    if (isSelected) return 'text-xl'
-                    return 'text-base'
+                    if (isHovered) return 'text-lg sm:text-xl'
+                    if (hasAnyHover && isSelected) return 'text-sm sm:text-base' // Selecionado mas há hover em outro, fica normal
+                    if (isSelected) return 'text-lg sm:text-xl'
+                    return 'text-sm sm:text-base'
                   }
                   
                   return (
-                    <li key={category}>
+                    <li key={category} className="flex-shrink-0 lg:flex-shrink">
                       <button
                         onClick={() => setSelectedCategory(
                           selectedCategory === category ? null : category
                         )}
-                        className={`w-full text-left py-2 pr-3 rounded-lg transition-all pl-0 ${getColorClass()} ${getFontSizeClass()}`}
+                        className={`w-full text-left py-2 px-3 lg:px-0 lg:pr-3 rounded-lg transition-all ${getColorClass()} ${getFontSizeClass()}`}
                         onMouseEnter={() => setHoveredCategory(category)}
                         onMouseLeave={() => setHoveredCategory(null)}
                       >
@@ -243,10 +243,10 @@ export default function CatalogSection() {
               </div>
             ) : displayedProducts.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-neutral-500">Nenhum produto encontrado.</p>
+                <p className="text-sm sm:text-base text-neutral-500">Nenhum produto encontrado.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {displayedProducts.map((product) => (
                   <CatalogCard
                     key={product.id}

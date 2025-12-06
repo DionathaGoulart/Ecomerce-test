@@ -39,32 +39,34 @@ export default function ProductFilters({ currentSearch }: { currentSearch: strin
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col sm:flex-row gap-2">
       <Input
         type="text"
         placeholder="Buscar produtos por nome..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         onKeyPress={handleKeyPress}
-        className="max-w-xs bg-header-bg border-header-border text-white placeholder:text-white/50"
+        className="w-full sm:max-w-xs bg-header-bg border-header-border text-white placeholder:text-white/50 text-sm sm:text-base"
       />
-      <Button 
-        onClick={handleSearch} 
-        size="sm"
-        className="bg-primary-500 text-neutral-950 hover:opacity-90"
-      >
-        Buscar
-      </Button>
-      {currentSearch && (
+      <div className="flex gap-2">
         <Button 
-          variant="outline" 
-          onClick={handleClear} 
+          onClick={handleSearch} 
           size="sm"
-          className="border-header-border text-white hover:bg-white/10"
+          className="flex-1 sm:flex-none text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90"
         >
-          Limpar
+          Buscar
         </Button>
-      )}
+        {currentSearch && (
+          <Button 
+            variant="outline" 
+            onClick={handleClear} 
+            size="sm"
+            className="text-sm sm:text-base border-header-border text-white hover:bg-white/10"
+          >
+            Limpar
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

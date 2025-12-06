@@ -90,13 +90,13 @@ export default function CategoryForm({ category }: CategoryFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-4 sm:space-y-6">
       <div>
-        <Label htmlFor="name" className="text-white">Nome *</Label>
+        <Label htmlFor="name" className="text-sm sm:text-base text-white">Nome *</Label>
         <Input
           id="name"
           {...register('name')}
-          className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
+          className="mt-1 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
           placeholder="Canecas"
           onChange={(e) => {
             // Auto-gerar slug quando nome mudar (se slug estiver vazio ou for novo)
@@ -107,46 +107,46 @@ export default function CategoryForm({ category }: CategoryFormProps) {
           }}
         />
         {errors.name && (
-          <p className="mt-1 text-sm text-error-500">{errors.name.message}</p>
+          <p className="mt-1 text-xs sm:text-sm text-error-500">{errors.name.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="slug" className="text-white">Slug *</Label>
+        <Label htmlFor="slug" className="text-sm sm:text-base text-white">Slug *</Label>
         <Input
           id="slug"
           {...register('slug')}
-          className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
+          className="mt-1 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
           placeholder="canecas"
         />
         <p className="mt-1 text-xs text-white/70">
           URL amigável (gerado automaticamente se deixar vazio)
         </p>
         {errors.slug && (
-          <p className="mt-1 text-sm text-error-500">{errors.slug.message}</p>
+          <p className="mt-1 text-xs sm:text-sm text-error-500">{errors.slug.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="description" className="text-white">Descrição</Label>
+        <Label htmlFor="description" className="text-sm sm:text-base text-white">Descrição</Label>
         <textarea
           id="description"
           {...register('description')}
-          className="mt-1 flex min-h-[100px] w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="mt-1 flex min-h-[100px] w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm sm:text-base text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           placeholder="Descrição da categoria..."
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-error-500">
+          <p className="mt-1 text-xs sm:text-sm text-error-500">
             {errors.description.message}
           </p>
         )}
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <Button 
           type="submit" 
           disabled={loading}
-          className="bg-primary-500 text-neutral-950 hover:opacity-90"
+          className="w-full sm:w-auto text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90"
         >
           {loading ? 'Salvando...' : category ? 'Atualizar' : 'Criar'}
         </Button>
@@ -154,7 +154,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.push('/admin/categories')}
-          className="border-header-border text-white hover:bg-white/10"
+          className="w-full sm:w-auto text-sm sm:text-base border-header-border text-white hover:bg-white/10"
         >
           Cancelar
         </Button>

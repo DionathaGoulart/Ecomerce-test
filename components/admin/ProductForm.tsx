@@ -240,30 +240,30 @@ export default function ProductForm({ product }: ProductFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-4 sm:space-y-6">
       <div>
-        <Label htmlFor="title" className="text-white">Título *</Label>
+        <Label htmlFor="title" className="text-sm sm:text-base text-white">Título *</Label>
         <Input
           id="title"
           {...register('title')}
-          className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
+          className="mt-1 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
           placeholder="Caneca Personalizada"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-error-500">{errors.title.message}</p>
+          <p className="mt-1 text-xs sm:text-sm text-error-500">{errors.title.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="description" className="text-white">Descrição</Label>
+        <Label htmlFor="description" className="text-sm sm:text-base text-white">Descrição</Label>
         <textarea
           id="description"
           {...register('description')}
-          className="mt-1 flex min-h-[100px] w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="mt-1 flex min-h-[100px] w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm sm:text-base text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           placeholder="Descrição do produto..."
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-error-500">
+          <p className="mt-1 text-xs sm:text-sm text-error-500">
             {errors.description.message}
           </p>
         )}
@@ -271,7 +271,7 @@ export default function ProductForm({ product }: ProductFormProps) {
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <Label htmlFor="category_id" className="text-white">Categoria</Label>
+          <Label htmlFor="category_id" className="text-sm sm:text-base text-white">Categoria</Label>
           <button
             type="button"
             onClick={() => setShowCategoryModal(true)}
@@ -283,7 +283,7 @@ export default function ProductForm({ product }: ProductFormProps) {
         <select
           id="category_id"
           {...register('category_id')}
-          className="mt-1 flex h-11 w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="mt-1 flex h-10 sm:h-11 w-full rounded-md border border-header-border bg-header-bg px-3 py-2 text-sm sm:text-base text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
         >
           <option value="">Sem categoria</option>
           {categories.map((category) => (
@@ -293,16 +293,16 @@ export default function ProductForm({ product }: ProductFormProps) {
           ))}
         </select>
         {errors.category_id && (
-          <p className="mt-1 text-sm text-error-500">
+          <p className="mt-1 text-xs sm:text-sm text-error-500">
             {errors.category_id.message}
           </p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="price" className="text-white">Preço *</Label>
+        <Label htmlFor="price" className="text-sm sm:text-base text-white">Preço *</Label>
         <div className="relative mt-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 text-sm">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 text-xs sm:text-sm">
             R$
           </span>
           <Input
@@ -323,7 +323,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                 setValue('price_cents', 0, { shouldValidate: true })
               }
             }}
-            className="pl-10 bg-header-bg border-header-border text-white placeholder:text-white/50"
+            className="pl-9 sm:pl-10 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
             placeholder="0,00"
           />
         </div>
@@ -331,24 +331,24 @@ export default function ProductForm({ product }: ProductFormProps) {
           Digite o valor em reais (ex: 29,90)
         </p>
         {errors.price_cents && (
-          <p className="mt-1 text-sm text-error-500">
+          <p className="mt-1 text-xs sm:text-sm text-error-500">
             {errors.price_cents.message}
           </p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="image" className="text-white">Imagem</Label>
+        <Label htmlFor="image" className="text-sm sm:text-base text-white">Imagem</Label>
         <input
           id="image"
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
-          className="mt-1 block w-full text-sm text-white/70 file:mr-4 file:rounded-md file:border-0 file:bg-primary-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-neutral-950 hover:file:opacity-90"
+          className="mt-1 block w-full text-xs sm:text-sm text-white/70 file:mr-2 sm:file:mr-4 file:rounded-md file:border-0 file:bg-primary-500 file:px-3 sm:file:px-4 file:py-1.5 sm:file:py-2 file:text-xs sm:file:text-sm file:font-semibold file:text-neutral-950 hover:file:opacity-90"
           disabled={uploadingImage}
         />
         {uploadingImage && (
-          <p className="mt-2 text-sm text-white/70">Enviando...</p>
+          <p className="mt-2 text-xs sm:text-sm text-white/70">Enviando...</p>
         )}
         {imageUrl && (
           <div className="mt-4">
@@ -357,7 +357,7 @@ export default function ProductForm({ product }: ProductFormProps) {
               alt="Preview"
               width={128}
               height={128}
-              className="h-32 w-32 rounded-md object-cover"
+              className="h-24 w-24 sm:h-32 sm:w-32 rounded-md object-cover"
               unoptimized
             />
           </div>
@@ -365,11 +365,11 @@ export default function ProductForm({ product }: ProductFormProps) {
         <input type="hidden" {...register('image_url')} />
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <Button 
           type="submit" 
           disabled={loading}
-          className="bg-primary-500 text-neutral-950 hover:opacity-90"
+          className="w-full sm:w-auto text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90"
         >
           {loading ? 'Salvando...' : product ? 'Atualizar' : 'Criar'}
         </Button>
@@ -377,7 +377,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.push('/admin/products')}
-          className="border-header-border text-white hover:bg-white/10"
+          className="w-full sm:w-auto text-sm sm:text-base border-header-border text-white hover:bg-white/10"
         >
           Cancelar
         </Button>
@@ -390,13 +390,13 @@ export default function ProductForm({ product }: ProductFormProps) {
           onClick={() => setShowCategoryModal(false)}
         >
           <div
-            className="w-full max-w-md rounded-xl border border-header-border bg-header-bg p-6"
+            className="w-full max-w-md rounded-xl border border-header-border bg-header-bg p-4 sm:p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="mb-4 text-xl font-bold text-white">Nova Categoria</h3>
+            <h3 className="mb-4 text-lg sm:text-xl font-bold text-white">Nova Categoria</h3>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="new_category_name" className="text-white">
+                <Label htmlFor="new_category_name" className="text-sm sm:text-base text-white">
                   Nome da Categoria *
                 </Label>
                 <Input
@@ -404,7 +404,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                   type="text"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="mt-1 bg-header-bg border-header-border text-white placeholder:text-white/50"
+                  className="mt-1 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
                   placeholder="Ex: Canecas"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
@@ -414,12 +414,12 @@ export default function ProductForm({ product }: ProductFormProps) {
                   }}
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   type="button"
                   onClick={handleCreateCategory}
                   disabled={creatingCategory || !newCategoryName.trim()}
-                  className="flex-1 bg-primary-500 text-neutral-950 hover:opacity-90"
+                  className="flex-1 text-sm sm:text-base bg-primary-500 text-neutral-950 hover:opacity-90"
                 >
                   {creatingCategory ? 'Criando...' : 'Criar'}
                 </Button>
@@ -430,7 +430,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                     setShowCategoryModal(false)
                     setNewCategoryName('')
                   }}
-                  className="border-header-border text-white hover:bg-white/10"
+                  className="text-sm sm:text-base border-header-border text-white hover:bg-white/10"
                 >
                   Cancelar
                 </Button>

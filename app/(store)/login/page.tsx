@@ -71,8 +71,8 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-8 sm:py-12">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         {/* Logo */}
         <div className="flex justify-center">
           <Logo />
@@ -80,14 +80,14 @@ function LoginForm() {
 
         {/* Título */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Entrar</h1>
-          <p className="mt-2 text-sm text-neutral-400">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Entrar</h1>
+          <p className="mt-2 text-xs sm:text-sm text-neutral-400">
             Acesse sua conta para continuar
           </p>
         </div>
 
         {/* Formulário */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-6 sm:mt-8 space-y-4 sm:space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
               <Label htmlFor="email" className="text-white">
@@ -137,10 +137,10 @@ function LoginForm() {
           </div>
 
           {error && (
-            <div className="rounded-xl border border-error-500/50 bg-error-950/50 p-4 text-error-400">
-              <div className="flex items-start gap-3">
+            <div className="rounded-xl border border-error-500/50 bg-error-950/50 p-3 sm:p-4 text-error-400">
+              <div className="flex items-start gap-2 sm:gap-3">
                 <svg
-                  className="h-5 w-5 mt-0.5 text-error-500 flex-shrink-0"
+                  className="h-4 w-4 sm:h-5 sm:w-5 mt-0.5 text-error-500 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -153,8 +153,8 @@ function LoginForm() {
                   />
                 </svg>
                 <div className="flex-1">
-                  <h5 className="mb-1 font-medium text-error-300">Erro ao fazer login</h5>
-                  <p className="text-sm text-error-400">{error}</p>
+                  <h5 className="mb-1 text-sm sm:text-base font-medium text-error-300">Erro ao fazer login</h5>
+                  <p className="text-xs sm:text-sm text-error-400">{error}</p>
                 </div>
               </div>
             </div>

@@ -35,11 +35,11 @@ export default function OrderFilters({ currentStatus }: { currentStatus: string 
           variant={currentStatus === option.value ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleStatusChange(option.value)}
-          className={
+          className={`text-xs sm:text-sm ${
             currentStatus === option.value
               ? 'bg-primary-500 text-neutral-950 hover:opacity-90'
               : 'border-header-border text-white hover:bg-white/10'
-          }
+          }`}
         >
           {option.label}
         </Button>
