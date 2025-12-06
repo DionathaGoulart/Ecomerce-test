@@ -23,10 +23,10 @@ export default function Home() {
       <div 
         className="relative -mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-48 2xl:-mx-96" 
         ref={splineContainerRef}
-        style={{ overflowX: 'clip' }}
+        style={{ overflowX: 'clip', overflowY: 'visible' }}
       >
         {/* Spline de fundo - absolute para não empurrar conteúdo */}
-        <div className="absolute inset-0 z-0 hidden md:block">
+        <div className="absolute inset-0 z-0 hidden md:block" style={{ zIndex: 0, isolation: 'isolate' }}>
           <SplineBackground />
         </div>
 
@@ -34,6 +34,7 @@ export default function Home() {
         <div 
           ref={containerRef} 
           className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 m-0 p-0"
+          style={{ overflow: 'visible' }}
         >
           {/* Seção Home - deve aparecer logo abaixo do header */}
           <HomeHero />

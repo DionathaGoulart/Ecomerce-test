@@ -24,6 +24,97 @@ export default function StoreLayout({
   const { user, loading, refresh } = useAuth()
   const { cartItems } = useCart()
   const [cartItemCount, setCartItemCount] = useState(0)
+  const [activeSection, setActiveSection] = useState<string>('home')
+  
+  // Detectar qual seção está ativa no scroll usando IntersectionObserver
+  useEffect(() => {
+    if (pathname !== '/') {
+      setActiveSection('')
+      return
+    }
+    
+    const sections = ['home', 'beneficios', 'comofunciona', 'catalogo']
+    const observers: IntersectionObserver[] = []
+    let scrollHandler: (() => void) | null = null
+    
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      // Encontrar a seção que está mais visível
+      interface VisibleSection {
+        id: string
+        ratio: number
+      }
+      let mostVisible: VisibleSection | null = null
+      
+      entries.forEach((entry) => {
+        const sectionId = entry.target.id
+        if (sections.includes(sectionId) && entry.isIntersecting) {
+          const currentRatio = entry.intersectionRatio
+          if (!mostVisible || currentRatio > mostVisible.ratio) {
+            mostVisible = { id: sectionId, ratio: currentRatio }
+          }
+        }
+      })
+      
+      if (mostVisible) {
+        const { id, ratio } = mostVisible
+        if (ratio > 0.2) {
+          setActiveSection(id)
+        }
+      }
+    }
+    
+    // Verificar posição inicial e durante scroll
+    const checkScrollPosition = () => {
+      const scrollY = window.scrollY
+      
+      if (scrollY < 200) {
+        setActiveSection('home')
+        return
+      }
+      
+      // Verificar qual seção está mais próxima do topo visível
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i])
+        if (section) {
+          const rect = section.getBoundingClientRect()
+          const headerOffset = 150
+          
+          // Se a seção está visível na área do header
+          if (rect.top <= headerOffset && rect.bottom > headerOffset) {
+            setActiveSection(sections[i])
+            return
+          }
+        }
+      }
+    }
+    
+    // Aguardar um pouco para garantir que as seções estejam renderizadas
+    const initTimeout = setTimeout(() => {
+      sections.forEach((sectionId) => {
+        const section = document.getElementById(sectionId)
+        if (section) {
+          const observer = new IntersectionObserver(handleIntersection, {
+            threshold: [0.2, 0.3, 0.5, 0.7, 1.0],
+            rootMargin: '-150px 0px -50% 0px'
+          })
+          observer.observe(section as Element)
+          observers.push(observer)
+        }
+      })
+      
+      checkScrollPosition()
+      scrollHandler = checkScrollPosition
+      window.addEventListener('scroll', scrollHandler, { passive: true })
+    }, 500)
+    
+    return () => {
+      clearTimeout(initTimeout)
+      observers.forEach((observer) => observer.disconnect())
+      if (scrollHandler) {
+        window.removeEventListener('scroll', scrollHandler)
+      }
+    }
+  }, [pathname])
   
   // Função para atualizar contador do carrinho (quantidade de produtos únicos)
   const updateCartCount = useCallback(() => {
@@ -101,15 +192,16 @@ export default function StoreLayout({
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 
-            {/* Nav no meio */}
+            {/* Nav no meio (Desktop) */}
             <nav className="hidden md:flex items-center gap-2 lg:gap-4">
               {navItems.map((item) => {
+                const sectionId = item.href.replace('/#', '')
+                const isActive = activeSection === sectionId
+                
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                   if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona' || item.href === '/#catalogo') {
                     e.preventDefault()
                     e.stopPropagation()
-                    
-                    const sectionId = item.href.replace('/#', '')
                     
                     const scrollToSection = () => {
                       // Aguardar um pouco para garantir que o DOM está pronto
@@ -195,7 +287,7 @@ export default function StoreLayout({
                         alt=""
                         width={10}
                         height={10}
-                        className="h-2.5 w-2.5 transition-transform duration-300 group-hover:rotate-90"
+                        className={`h-2.5 w-2.5 transition-transform duration-300 ${isActive ? 'rotate-90' : 'group-hover:rotate-90'}`}
                       />
                     </a>
                   )
@@ -219,6 +311,30 @@ export default function StoreLayout({
                 )
               })}
             </nav>
+
+            {/* Botões à direita (Desktop) */}
+            <div className="hidden md:flex items-center gap-1.5 sm:gap-2 lg:gap-3 min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] justify-end">
+              <Link
+                href={user ? "/minha-conta" : "/login"}
+                className="group relative flex items-center justify-center rounded-2xl border border-primary-500 px-2 sm:px-3 lg:px-5 py-2 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] overflow-hidden"
+              >
+                <User className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-primary-500 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" />
+                <span className="whitespace-nowrap inline-block">{user ? "Minha Conta" : "Login"}</span>
+              </Link>
+
+              <Link
+                href="/cart"
+                className="group relative flex items-center justify-center rounded-2xl bg-primary-500 px-2 sm:px-3 lg:px-5 py-2 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] overflow-hidden"
+              >
+                <ShoppingCart className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" />
+                <span className="whitespace-nowrap inline-block">Carrinho</span>
+                {cartItemCount > 0 && (
+                  <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white flex-shrink-0">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -228,11 +344,13 @@ export default function StoreLayout({
         <div className="fixed top-[73px] left-0 right-0 z-30 md:hidden bg-header-bg border-t border-header-border">
           <nav className="flex flex-col p-4 gap-2">
             {navItems.map((item) => {
+              const sectionId = item.href.replace('/#', '')
+              const isActive = activeSection === sectionId
+              
               const handleMobileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                 setMobileMenuOpen(false)
                 if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona' || item.href === '/#catalogo') {
                   e.preventDefault()
-                  const sectionId = item.href.replace('/#', '')
                   
                   // Se não estiver na página home, navegar primeiro
                   if (pathname !== '/') {
@@ -312,9 +430,16 @@ export default function StoreLayout({
                     key={item.href}
                     href={item.href}
                     onClick={handleMobileClick}
-                    className="px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <Image
+                      src="/icons/right.svg"
+                      alt=""
+                      width={10}
+                      height={10}
+                      className={`h-2.5 w-2.5 transition-transform duration-300 ${isActive ? 'rotate-90' : ''}`}
+                    />
                   </a>
                 )
               }
@@ -336,21 +461,21 @@ export default function StoreLayout({
               <Link
                 href={user ? "/minha-conta" : "/login"}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-primary-500 border border-primary-500 rounded-2xl transition-opacity hover:opacity-80"
               >
-                <User className="h-4 w-4" />
+                <User className="h-4 w-4 text-primary-500" />
                 <span>{user ? "Minha Conta" : "Login"}</span>
               </Link>
               
               <Link
                 href="/cart"
                 onClick={() => setMobileMenuOpen(false)}
-                className="relative flex items-center gap-2 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-neutral-950 bg-primary-500 rounded-2xl transition-opacity hover:opacity-80"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Carrinho</span>
                 {cartItemCount > 0 && (
-                  <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </span>
                 )}

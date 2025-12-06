@@ -35,53 +35,53 @@ export function HomeHero() {
             Materializamos a sua marca em peças exclusivas de MDF e Pinus desde embalagens premium até projetos complexos. Sem pedido mínimo.
           </p>
 
-          {/* Botões */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            {/* Botão Ver Catálogo */}
-            <a
-              href="#catalogo"
-              onClick={(e) => {
-                e.preventDefault()
-                const element = document.getElementById('catalogo')
-                if (element) {
-                  const rect = element.getBoundingClientRect()
-                  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                  const elementTop = rect.top + scrollTop
-                  const isMobile = window.innerWidth < 768
-                  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                  const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                  const targetPosition = elementTop - headerOffset
-                  smoothScrollTo(targetPosition, 1000)
-                }
-              }}
-              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-opacity hover:opacity-90 w-full sm:w-auto"
-            >
-              <Image
-                src="/icons/eye.svg"
-                alt=""
-                width={20}
-                height={20}
-                className="h-4 w-4 sm:h-5 sm:w-5"
-              />
-              <span>Ver catálogo</span>
-            </a>
+              {/* Botões */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                {/* Botão Ver Catálogo */}
+                <a
+                  href="#catalogo"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const element = document.getElementById('catalogo')
+                    if (element) {
+                      const rect = element.getBoundingClientRect()
+                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                      const elementTop = rect.top + scrollTop
+                      const isMobile = window.innerWidth < 768
+                      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+                      const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
+                      const targetPosition = elementTop - headerOffset
+                      smoothScrollTo(targetPosition, 1000)
+                    }
+                  }}
+                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+                >
+                  <Image
+                    src="/icons/eye.svg"
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                  />
+                  <span className="whitespace-nowrap inline-block">Ver catálogo</span>
+                </a>
 
-            {/* Botão Orçar Projeto */}
-            <a
-              href="#beneficios"
-              onClick={handleScrollToBenefits}
-              className="flex items-center justify-center gap-2 sm:gap-[10px] rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-opacity hover:opacity-80 w-full sm:w-auto"
-            >
-              <Image
-                src="/icons/project.svg"
-                alt=""
-                width={20}
-                height={20}
-                className="h-4 w-4 sm:h-5 sm:w-5"
-              />
-              <span>Orçar projeto</span>
-            </a>
-          </div>
+                {/* Botão Orçar Projeto */}
+                <a
+                  href="#beneficios"
+                  onClick={handleScrollToBenefits}
+                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+                >
+                  <Image
+                    src="/icons/project.svg"
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                  />
+                  <span className="whitespace-nowrap inline-block">Orçar projeto</span>
+                </a>
+              </div>
         </div>
 
         {/* Seção Clientes */}

@@ -35,7 +35,7 @@ interface BenefitCardProps {
 
 export function BenefitCard({ index, icon, title, description, lineConfig, cardRef, className = '' }: BenefitCardProps) {
   return (
-    <div ref={cardRef} className={`relative ${className}`}>
+    <div ref={cardRef} className={`relative ${className}`} style={{ zIndex: 50, isolation: 'isolate' }}>
       <div className="p-4 sm:p-6 md:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px] h-full">
         <div className="flex flex-col gap-2">
           <div className="w-4 h-4 flex items-center justify-center">
@@ -66,6 +66,13 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
         width={lineConfig.svgWidth}
         height={lineConfig.svgHeight}
         viewBox={lineConfig.viewBox}
+        style={{ 
+          overflow: 'visible', 
+          position: 'absolute', 
+          zIndex: 9999,
+          isolation: 'isolate'
+        }}
+        data-benefit-line={`line-${index}`}
       >
         {lineConfig.horizontalLine && (
           <line 
@@ -76,6 +83,8 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
             stroke="white"
             strokeWidth="1"
             opacity="0.3"
+            data-line-type="horizontal"
+            className="benefit-line-horizontal"
           />
         )}
         {lineConfig.verticalLine && (
@@ -87,6 +96,8 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
             stroke="white"
             strokeWidth="1"
             opacity="0.3"
+            data-line-type="vertical"
+            className="benefit-line-vertical"
           />
         )}
         {lineConfig.circle && (
@@ -96,6 +107,8 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
             r="4"
             fill="white"
             opacity="0.5"
+            data-circle="true"
+            className="benefit-circle"
           />
         )}
       </svg>

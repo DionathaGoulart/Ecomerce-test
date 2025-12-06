@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Search, Plus, Minus, ShoppingCart, ChevronUp, ChevronDown } from 'lucide-react'
 import { useCart } from '@/hooks'
@@ -12,23 +12,20 @@ import { Card } from '@/components/molecules/Card'
 import { LoadingDots } from '@/components/atoms/LoadingDots'
 import type { Product, CartItem } from '@/types'
 
-const CATEGORIES = [
-  'Bastidores',
-  'Cake Boards',
-  'Cuia',
-  'Plaquinhas',
-  'Tags',
-  'Talheres de Madeira',
-  'Tábuas de Frios',
-] as const
+interface Category {
+  id: string
+  name: string
+  description?: string
+}
 
 interface CatalogCardProps {
   product: Product
   onAddToCart: (productId: string, quantity: number) => void
   cartQuantity: number
+  priority?: boolean
 }
 
-function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
+function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: CatalogCardProps) {
   const quantity = cartQuantity || 0
   const isAdding = quantity > 0
 
@@ -63,6 +60,8 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
               alt={product.title}
               fill
               className="object-cover rounded-lg"
+              loading={priority ? "eager" : "lazy"}
+              priority={priority}
             />
           </div>
         </div>
@@ -126,11 +125,40 @@ function CatalogCard({ product, onAddToCart, cartQuantity }: CatalogCardProps) {
 }
 
 export default function CatalogSection() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
+  const [displayedCount, setDisplayedCount] = useState(6)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
   const { products, isLoading } = useProducts()
   const { cartItems, addItem, removeItem, updateQuantity } = useCart()
+
+  // Buscar categorias do banco de dados
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+          // Sempre definir a primeira categoria como ativa por padrão
+          if (data.length > 0) {
+            setSelectedCategory(data[0].name)
+          }
+        } else {
+          console.error('Erro ao buscar categorias')
+        }
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error)
+      } finally {
+        setLoadingCategories(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   const handleAddToCart = (productId: string, quantity: number) => {
     if (quantity === 0) {
@@ -158,13 +186,48 @@ export default function CatalogSection() {
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description?.toLowerCase().includes(searchQuery.toLowerCase())
     
-    // Por enquanto não temos categoria no produto, então retornamos todos se não houver categoria selecionada
-    // Quando tiver categoria no banco, adicionar filtro aqui
-    return matchesSearch
+    // Filtrar por categoria se uma estiver selecionada
+    const matchesCategory = selectedCategory ? product.category_name === selectedCategory : true
+    
+    return matchesSearch && matchesCategory
   })
 
-  // Limitar a 6 produtos
-  const displayedProducts = filteredProducts.slice(0, 6)
+  // Produtos exibidos (paginação infinita)
+  const displayedProducts = filteredProducts.slice(0, displayedCount)
+  const hasMore = displayedCount < filteredProducts.length
+
+  // Resetar contador quando categoria ou busca mudar
+  useEffect(() => {
+    setDisplayedCount(6)
+  }, [selectedCategory, searchQuery])
+
+  // Observer para carregar mais produtos quando chegar ao final
+  useEffect(() => {
+    if (!hasMore || isLoading) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setDisplayedCount((prev) => Math.min(prev + 6, filteredProducts.length))
+        }
+      },
+      {
+        threshold: 1.0, // Só dispara quando 100% visível
+        rootMargin: '0px',
+      }
+    )
+
+    const currentRef = loadMoreRef.current
+    if (currentRef) {
+      observer.observe(currentRef as Element)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef as Element)
+      }
+    }
+  }, [hasMore, isLoading, filteredProducts.length, displayedCount])
 
   return (
     <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent w-screen -mx-[calc(50vw-50%)]">
@@ -183,7 +246,7 @@ export default function CatalogSection() {
               placeholder="O que você está procurando?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 sm:pl-[76px] pr-4 sm:pr-8 py-4 sm:py-6 text-sm sm:text-base text-white bg-secondary-800 border border-secondary-600 placeholder:text-white/60"
+              className="w-full pl-10 sm:pl-[76px] pr-4 sm:pr-8 py-4 sm:py-6 text-sm sm:text-base text-white bg-secondary-800 border border-secondary-600 placeholder:text-white/60 focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-secondary-600 focus-visible:border-secondary-600"
             />
           </div>
         </div>
@@ -193,45 +256,49 @@ export default function CatalogSection() {
           {/* Sidebar de Categorias */}
           <aside className="w-full lg:w-64 flex-shrink-0">
             <div className="bg-transparent rounded-xl p-4 sm:p-6 lg:pl-0">
-              <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
-                {CATEGORIES.map((category) => {
-                  const isSelected = selectedCategory === category
-                  const isHovered = hoveredCategory === category
-                  const hasAnyHover = hoveredCategory !== null
-                  
-                  // Se há hover em qualquer item, os selecionados ficam como não selecionados
-                  // Se o item está com hover, fica amarelo e 20px
-                  // Caso contrário, usa o estado normal (selecionado ou não)
-                  const getColorClass = () => {
-                    if (isHovered) return 'text-primary-500'
-                    if (hasAnyHover && isSelected) return 'text-white' // Selecionado mas há hover em outro, fica normal
-                    if (isSelected) return 'text-primary-500'
-                    return 'text-white'
-                  }
-                  
-                  const getFontSizeClass = () => {
-                    if (isHovered) return 'text-lg sm:text-xl'
-                    if (hasAnyHover && isSelected) return 'text-sm sm:text-base' // Selecionado mas há hover em outro, fica normal
-                    if (isSelected) return 'text-lg sm:text-xl'
-                    return 'text-sm sm:text-base'
-                  }
-                  
-                  return (
-                    <li key={category} className="flex-shrink-0 lg:flex-shrink">
-                      <button
-                        onClick={() => setSelectedCategory(
-                          selectedCategory === category ? null : category
-                        )}
-                        className={`w-full text-left py-2 px-3 lg:px-0 lg:pr-3 rounded-lg transition-all ${getColorClass()} ${getFontSizeClass()}`}
-                        onMouseEnter={() => setHoveredCategory(category)}
-                        onMouseLeave={() => setHoveredCategory(null)}
-                      >
-                        {category}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
+              {loadingCategories ? (
+                <div className="py-4">
+                  <LoadingDots size="sm" />
+                </div>
+              ) : (
+                <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                  {categories.map((category) => {
+                    const isSelected = selectedCategory === category.name
+                    const isHovered = hoveredCategory === category.name
+                    const hasAnyHover = hoveredCategory !== null
+                    
+                    // Se há hover em qualquer item, os selecionados ficam como não selecionados
+                    // Se o item está com hover, fica amarelo e 20px
+                    // Caso contrário, usa o estado normal (selecionado ou não)
+                    const getColorClass = () => {
+                      if (isHovered) return 'text-primary-500'
+                      if (hasAnyHover && isSelected) return 'text-white' // Selecionado mas há hover em outro, fica normal
+                      if (isSelected) return 'text-primary-500'
+                      return 'text-white'
+                    }
+                    
+                    const getFontSizeClass = () => {
+                      if (isHovered) return 'text-lg sm:text-xl'
+                      if (hasAnyHover && isSelected) return 'text-sm sm:text-base' // Selecionado mas há hover em outro, fica normal
+                      if (isSelected) return 'text-lg sm:text-xl'
+                      return 'text-sm sm:text-base'
+                    }
+                    
+                    return (
+                      <li key={category.id} className="flex-shrink-0 lg:flex-shrink">
+                        <button
+                          onClick={() => setSelectedCategory(category.name)}
+                          className={`w-full text-left py-2 px-3 lg:px-0 lg:pr-3 rounded-lg transition-all ${getColorClass()} ${getFontSizeClass()}`}
+                          onMouseEnter={() => setHoveredCategory(category.name)}
+                          onMouseLeave={() => setHoveredCategory(null)}
+                        >
+                          {category.name}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
           </aside>
 
@@ -246,16 +313,25 @@ export default function CatalogSection() {
                 <p className="text-sm sm:text-base text-neutral-500">Nenhum produto encontrado.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-                {displayedProducts.map((product) => (
-                  <CatalogCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={handleAddToCart}
-                    cartQuantity={getCartQuantity(product.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                  {displayedProducts.map((product, index) => (
+                    <CatalogCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                      cartQuantity={getCartQuantity(product.id)}
+                      priority={index < 6} // Preload das primeiras 6 imagens
+                    />
+                  ))}
+                </div>
+                {/* Elemento para detectar quando carregar mais */}
+                {hasMore && (
+                  <div ref={loadMoreRef} className="flex justify-center py-8">
+                    <LoadingDots size="lg" />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

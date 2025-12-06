@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { canDelete, type UserRole } from '@/lib/utils/permissions'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function DeleteProductButton({ 
   productId,
@@ -10,8 +12,13 @@ export default function DeleteProductButton({
   productId: string
   onDelete?: () => void
 }) {
+  const { user } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  
+  if (!canDelete(user?.role as UserRole)) {
+    return null
+  }
 
   const handleDelete = async () => {
     if (!confirm('Tem certeza que deseja deletar este produto?')) {

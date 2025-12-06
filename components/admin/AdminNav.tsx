@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from './LogoutButton'
 import { Home, Menu, X } from 'lucide-react'
+import { canManageRoles, type UserRole } from '@/lib/utils/permissions'
 
 export default function AdminNav({
   user,
 }: {
-  user: { email?: string | null }
+  user: { email?: string | null; role?: UserRole }
 }) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -19,6 +20,7 @@ export default function AdminNav({
     { href: '/admin/products', label: 'Produtos' },
     { href: '/admin/orders', label: 'Pedidos' },
     { href: '/admin/categories', label: 'Categorias' },
+    ...(canManageRoles(user.role) ? [{ href: '/admin/users', label: 'Cargos' }] : []),
   ]
 
   return (

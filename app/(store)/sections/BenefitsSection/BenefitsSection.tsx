@@ -103,8 +103,8 @@ export function BenefitsSection() {
   useBenefitsAnimation(cardsSectionRef, cardRefs)
 
   return (
-    <div className="relative h-auto md:h-[220vh]">
-      <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-8 xl:pt-12 2xl:pt-16 pb-8 sm:pb-12 md:pb-16 lg:py-52 md:sticky md:top-0">
+    <div className="relative h-auto md:h-[220vh] overflow-visible">
+      <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-32 2xl:pt-40 pb-8 sm:pb-12 md:pb-16 lg:py-52 md:sticky md:top-0 overflow-visible">
         {/* Mobile: Grid 2 colunas */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:hidden">
           {CARDS_DATA.map((card, index) => (
@@ -122,9 +122,9 @@ export function BenefitsSection() {
         </div>
 
         {/* Desktop: Layout original com duas colunas */}
-        <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-start w-full gap-0">
+        <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-start w-full gap-0 overflow-visible relative" style={{ zIndex: 50, isolation: 'isolate' }}>
           {/* Coluna Esquerda - 3 cards */}
-          <div className="flex flex-col gap-10 xl:gap-12 items-start w-auto">
+          <div className="flex flex-col gap-10 xl:gap-12 items-start w-auto overflow-visible relative" style={{ zIndex: 50 }}>
             {CARDS_DATA.slice(0, 3).map((card, index) => (
               <BenefitCard
                 key={index}
@@ -140,7 +140,7 @@ export function BenefitsSection() {
           </div>
 
           {/* Coluna Direita - 3 cards */}
-          <div className="flex flex-col gap-10 xl:gap-12 items-end w-auto">
+          <div className="flex flex-col gap-10 xl:gap-12 items-end w-auto overflow-visible relative" style={{ zIndex: 50 }}>
             {CARDS_DATA.slice(3, 6).map((card, index) => (
               <BenefitCard
                 key={index + 3}

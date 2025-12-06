@@ -4,53 +4,75 @@ export function useBenefitsAnimation(
   cardsSectionRef: RefObject<HTMLElement>,
   cardRefs: RefObject<(HTMLDivElement | null)[]>
 ) {
-  // Inicializa as linhas como invisíveis
+  // Inicializa as linhas como invisíveis para animação
   useEffect(() => {
     const cardsSection = cardsSectionRef.current
     if (!cardsSection) return
 
     const initializeLines = () => {
-      const lines = cardsSection.querySelectorAll('line')
-      const circles = cardsSection.querySelectorAll('circle')
+      if (window.innerWidth < 1024) return
       
-      lines.forEach((line) => {
-        const length = line.getTotalLength()
-        line.style.strokeDasharray = `${length}`
-        line.style.strokeDashoffset = `${length}`
-      })
-      
-      circles.forEach((circle) => {
-        circle.style.opacity = '0'
-      })
+      setTimeout(() => {
+        const svgs = cardsSection.querySelectorAll('svg[data-benefit-line]')
+        
+        svgs.forEach((svg) => {
+          const lines = svg.querySelectorAll('line')
+          const circles = svg.querySelectorAll('circle')
+          
+          lines.forEach((line) => {
+            const lineEl = line as SVGLineElement
+            const length = lineEl.getTotalLength()
+            if (length > 0) {
+              // Inicializa como invisível para animação
+              lineEl.style.strokeDasharray = `${length}`
+              lineEl.style.strokeDashoffset = `${length}`
+              lineEl.style.opacity = '0'
+            }
+          })
+          
+          circles.forEach((circle) => {
+            circle.style.opacity = '0'
+          })
+        })
+      }, 1000)
     }
 
-    setTimeout(initializeLines, 100)
+    initializeLines()
+    
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setTimeout(initializeLines, 500)
+      }
+    }
+    
+    window.addEventListener('resize', handleResize)
+    
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
   }, [cardsSectionRef])
 
-  // Mantém os cards sempre visíveis e anima linhas quando todos estão visíveis
+  // Anima linhas quando a seção estiver visível na tela
   useEffect(() => {
     const cardsSection = cardsSectionRef.current
     if (!cardsSection) return
 
-    cardRefs.current?.forEach((card) => {
-      if (card) {
-        card.style.opacity = '1'
-        card.style.transform = 'translateY(0)'
-      }
-    })
+    if (window.innerWidth < 1024) return
 
-    const allRelativeDivs = Array.from(cardsSection.querySelectorAll('div.relative'))
-    const finalContainers = allRelativeDivs.slice(0, 6)
-
-    if (finalContainers.length !== 6) return
-
-    let visibleCards = new Set<number>()
-    let linesAnimated = false
+    let isAnimated = false
+    let hasAnimated = false
+    let scrollTimeout: NodeJS.Timeout | null = null
 
     const animateLines = () => {
-      if (linesAnimated) return
+      if (hasAnimated) return
+      hasAnimated = true
+
+      const svgs = cardsSection.querySelectorAll('svg[data-benefit-line]')
       
-      const svgs = cardsSection.querySelectorAll('svg')
+      if (svgs.length === 0) {
+        hasAnimated = false
+        return
+      }
       
       svgs.forEach((svg, svgIndex) => {
         const svgLines = svg.querySelectorAll('line')
@@ -75,191 +97,110 @@ export function useBenefitsAnimation(
           }
         })
         
+        // Fade in das linhas
         if (horizontalLine) {
           const hLine = horizontalLine as SVGLineElement
           const hLength = hLine.getTotalLength()
-          hLine.style.strokeDasharray = `${hLength}`
-          hLine.style.strokeDashoffset = `${hLength}`
-          hLine.style.transition = 'stroke-dashoffset 0.4s ease-in-out'
-          
-          setTimeout(() => {
-            hLine.style.strokeDashoffset = '0'
-          }, 30 + (svgIndex * 50))
+          if (hLength > 0) {
+            hLine.style.strokeDasharray = `${hLength}`
+            hLine.style.strokeDashoffset = `${hLength}`
+            hLine.style.opacity = '0'
+            hLine.style.transition = 'opacity 0.6s ease-in-out, stroke-dashoffset 0.6s ease-in-out'
+            
+            setTimeout(() => {
+              hLine.style.opacity = '0.3'
+              hLine.style.strokeDashoffset = '0'
+            }, 50 + (svgIndex * 100))
+          }
         }
         
         if (verticalLine) {
           const vLine = verticalLine as SVGLineElement
           const vLength = vLine.getTotalLength()
-          vLine.style.strokeDasharray = `${vLength}`
-          vLine.style.strokeDashoffset = `${vLength}`
-          vLine.style.transition = 'stroke-dashoffset 0.4s ease-in-out'
-          
-          setTimeout(() => {
-            vLine.style.strokeDashoffset = '0'
-          }, 450 + (svgIndex * 50))
+          if (vLength > 0) {
+            vLine.style.strokeDasharray = `${vLength}`
+            vLine.style.strokeDashoffset = `${vLength}`
+            vLine.style.opacity = '0'
+            vLine.style.transition = 'opacity 0.6s ease-in-out, stroke-dashoffset 0.6s ease-in-out'
+            
+            setTimeout(() => {
+              vLine.style.opacity = '0.3'
+              vLine.style.strokeDashoffset = '0'
+            }, 700 + (svgIndex * 100))
+          }
         }
         
         if (svgCircle) {
           const circleEl = svgCircle as SVGCircleElement
-          circleEl.style.opacity = '0'
-          circleEl.style.transition = 'opacity 0.2s ease-in-out'
+          circleEl.style.transition = 'opacity 0.6s ease-in-out'
           
           setTimeout(() => {
             circleEl.style.opacity = '0.5'
-          }, 900 + (svgIndex * 50))
+          }, 1400 + (svgIndex * 100))
         }
       })
-      
-      linesAnimated = true
     }
 
-    const observers: IntersectionObserver[] = []
+    const hideLines = () => {
+      if (!isAnimated) return
+      isAnimated = false
+      hasAnimated = false
 
-    finalContainers.forEach((card, index) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
-              visibleCards.add(index)
-            } else {
-              visibleCards.delete(index)
-            }
-            
-            if (visibleCards.size === 6) {
-              animateLines()
-            }
-          })
-        },
-        { threshold: 0.8 }
-      )
-
-      observer.observe(card)
-      observers.push(observer)
-    })
-
-    return () => {
-      observers.forEach((observer) => observer.disconnect())
-    }
-  }, [cardsSectionRef, cardRefs])
-
-  // Verifica se todos os cards estão 100% visíveis e controla a visibilidade das linhas
-  useEffect(() => {
-    const cardsSection = cardsSectionRef.current
-    if (!cardsSection) return
-
-    const allRelativeDivs = Array.from(cardsSection.querySelectorAll('div.relative'))
-    const finalContainers = allRelativeDivs.slice(0, 6)
-
-    const lines = cardsSection.querySelectorAll('line')
-    const circles = cardsSection.querySelectorAll('circle')
-
-    if (finalContainers.length !== 6) return
-
-    let visibleCards = new Set<number>()
-
-    const updateLinesVisibility = () => {
-      const allVisible = visibleCards.size === 6
+      const svgs = cardsSection.querySelectorAll('svg[data-benefit-line]')
       
-      if (allVisible) {
-        const svgs = cardsSection.querySelectorAll('svg')
+      svgs.forEach((svg) => {
+        const lines = svg.querySelectorAll('line')
+        const circles = svg.querySelectorAll('circle')
         
-        svgs.forEach((svg) => {
-          const svgLines = svg.querySelectorAll('line')
-          const svgCircle = svg.querySelector('circle')
-          
-          if (svgLines.length === 0) return
-          
-          let horizontalLine: SVGLineElement | null = null
-          let verticalLine: SVGLineElement | null = null
-          
-          svgLines.forEach((line) => {
-            const lineEl = line as SVGLineElement
-            const x1 = parseFloat(lineEl.getAttribute('x1') || '0')
-            const y1 = parseFloat(lineEl.getAttribute('y1') || '0')
-            const x2 = parseFloat(lineEl.getAttribute('x2') || '0')
-            const y2 = parseFloat(lineEl.getAttribute('y2') || '0')
-            
-            if (Math.abs(y1 - y2) < 0.1) {
-              horizontalLine = lineEl
-            } else if (Math.abs(x1 - x2) < 0.1) {
-              verticalLine = lineEl
-            }
-          })
-          
-          if (horizontalLine) {
-            const hLine = horizontalLine as SVGLineElement
-            const hLength = hLine.getTotalLength()
-            hLine.style.strokeDasharray = `${hLength}`
-            hLine.style.strokeDashoffset = `${hLength}`
-            hLine.style.transition = 'stroke-dashoffset 0.6s ease-in-out'
-            
-            setTimeout(() => {
-              hLine.style.strokeDashoffset = '0'
-            }, 30)
-          }
-          
-          if (verticalLine) {
-            const vLine = verticalLine as SVGLineElement
-            const vLength = vLine.getTotalLength()
-            vLine.style.strokeDasharray = `${vLength}`
-            vLine.style.strokeDashoffset = `${vLength}`
-            vLine.style.transition = 'stroke-dashoffset 0.6s ease-in-out'
-            
-            setTimeout(() => {
-              vLine.style.strokeDashoffset = '0'
-            }, 650)
-          }
-          
-          if (svgCircle) {
-            const circleEl = svgCircle as SVGCircleElement
-            circleEl.style.opacity = '0'
-            circleEl.style.transition = 'opacity 0.3s ease-in-out'
-            
-            setTimeout(() => {
-              if (circleEl) {
-                circleEl.style.opacity = '0.5'
-              }
-            }, 1300)
-          }
-        })
-      } else {
         lines.forEach((line) => {
-          const length = line.getTotalLength()
-          line.style.transition = 'stroke-dashoffset 0.3s ease-in-out'
-          line.style.strokeDashoffset = `${length}`
+          const lineEl = line as SVGLineElement
+          lineEl.style.transition = 'opacity 0.4s ease-in-out'
+          lineEl.style.opacity = '0'
         })
         
         circles.forEach((circle) => {
-          circle.style.transition = 'opacity 0.3s ease-in-out'
+          circle.style.transition = 'opacity 0.4s ease-in-out'
           circle.style.opacity = '0'
         })
-      }
+      })
     }
 
-    const observers: IntersectionObserver[] = []
+    const checkVisibility = () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout)
+      }
 
-    finalContainers.forEach((card, index) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio === 1) {
-              visibleCards.add(index)
-            } else {
-              visibleCards.delete(index)
-            }
-            updateLinesVisibility()
-          })
-        },
-        { threshold: 1.0 }
-      )
+      scrollTimeout = setTimeout(() => {
+        const scrollY = window.scrollY || window.pageYOffset
+        
+        // Verifica se o scroll está entre 800px e 2000px
+        const isVisible = scrollY >= 800 && scrollY <= 2000
+        
+        if (isVisible && !isAnimated) {
+          isAnimated = true
+          setTimeout(() => {
+            animateLines()
+          }, 300)
+        } else if (!isVisible && isAnimated) {
+          hideLines()
+        }
+      }, 50)
+    }
 
-      observer.observe(card)
-      observers.push(observer)
-    })
+    // Aguardar renderização completa
+    const initTimeout = setTimeout(() => {
+      window.addEventListener('scroll', checkVisibility, { passive: true })
+      window.addEventListener('resize', checkVisibility, { passive: true })
+      checkVisibility() // Verifica na inicialização
+    }, 2000)
 
     return () => {
-      observers.forEach((observer) => observer.disconnect())
+      clearTimeout(initTimeout)
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout)
+      }
+      window.removeEventListener('scroll', checkVisibility)
+      window.removeEventListener('resize', checkVisibility)
     }
   }, [cardsSectionRef])
 }
-

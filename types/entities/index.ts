@@ -10,6 +10,7 @@ export interface Product {
   description?: string | null
   price_cents: number
   image_url?: string | null
+  category_name?: string | null
   created_at?: string
   updated_at?: string
 }
