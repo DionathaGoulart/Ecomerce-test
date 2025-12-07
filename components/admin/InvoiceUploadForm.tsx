@@ -62,7 +62,7 @@ export default function InvoiceUploadForm({ orderId, currentUrl }: InvoiceUpload
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <Label htmlFor="invoice_url">URL da Nota Fiscal</Label>
+        <Label htmlFor="invoice_url" className="text-white">URL da Nota Fiscal</Label>
         <Input
           id="invoice_url"
           type="url"
@@ -76,7 +76,12 @@ export default function InvoiceUploadForm({ orderId, currentUrl }: InvoiceUpload
           <p className="mt-1 text-sm text-red-600">{error}</p>
         )}
       </div>
-      <Button type="submit" disabled={loading || !url || url === currentUrl} size="sm">
+      <Button 
+        type="submit" 
+        disabled={loading || !url || url === currentUrl} 
+        size="sm"
+        className="text-white bg-primary-500 hover:bg-primary-600"
+      >
         {loading ? 'Salvando...' : currentUrl ? 'Atualizar' : 'Adicionar'}
       </Button>
     </form>
