@@ -203,15 +203,23 @@ export default async function OrderDetailPage({
 
           {order.receipt_url && (
             <div className="rounded-xl border border-header-border bg-header-bg p-4 sm:p-6">
-              <h3 className="mb-2 text-xs sm:text-sm font-medium text-white">Recibo</h3>
-              <a
-                href={order.receipt_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs sm:text-sm text-primary-500 hover:text-primary-400 transition-colors break-all"
-              >
-                Ver Recibo do Stripe →
-              </a>
+              <h3 className="mb-3 sm:mb-4 text-xs sm:text-sm font-medium text-white">Recibo do Stripe</h3>
+              <div className="space-y-2">
+                <p className="text-xs text-white/70 mb-3">
+                  Recibo oficial do pagamento processado pelo Stripe
+                </p>
+                <a
+                  href={order.receipt_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm text-primary-500 hover:text-primary-400 transition-colors break-all underline"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Abrir Recibo do Stripe
+                </a>
+              </div>
             </div>
           )}
 

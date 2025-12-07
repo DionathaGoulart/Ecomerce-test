@@ -13,44 +13,57 @@ export async function POST(request: NextRequest) {
   console.log('🔔 WEBHOOK RECEBIDO DO STRIPE')
   console.log('='.repeat(50) + '\n')
   
-  const body = await request.text()
-  const signature = request.headers.get('stripe-signature')
-  
-  console.log('📋 Signature presente:', !!signature)
-
-  if (!signature) {
-    console.error('❌ Assinatura não fornecida no webhook')
-    return NextResponse.json(
-      { error: 'Assinatura não fornecida' },
-      { status: 400 }
-    )
-  }
-
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.error('❌ STRIPE_WEBHOOK_SECRET não está configurada')
-    return NextResponse.json(
-      { error: 'Webhook secret não configurada' },
-      { status: 500 }
-    )
-  }
-
-  let event: Stripe.Event
-
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    )
-    console.log(`✅ Webhook verificado com sucesso. Tipo: ${event.type}`)
-  } catch (err) {
-    const error = err as Error
-    console.error('❌ Erro ao verificar webhook:', error.message)
-    return NextResponse.json(
-      { error: `Webhook Error: ${error.message}` },
-      { status: 400 }
-    )
-  }
+    // Obter o body como texto raw (importante para verificação de assinatura)
+    const body = await request.text()
+    const signature = request.headers.get('stripe-signature')
+    
+    console.log('📋 Signature presente:', !!signature)
+    console.log('📋 Body length:', body.length)
+    console.log('📋 Body preview:', body.substring(0, 100))
+
+    if (!signature) {
+      console.error('❌ Assinatura não fornecida no webhook')
+      return NextResponse.json(
+        { error: 'Assinatura não fornecida' },
+        { status: 400 }
+      )
+    }
+
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      console.error('❌ STRIPE_WEBHOOK_SECRET não está configurada')
+      return NextResponse.json(
+        { error: 'Webhook secret não configurada' },
+        { status: 500 }
+      )
+    }
+
+    console.log('🔐 Webhook secret configurado:', !!process.env.STRIPE_WEBHOOK_SECRET)
+    console.log('🔐 Webhook secret prefix:', process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10))
+
+    let event: Stripe.Event
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      )
+      console.log(`✅ Webhook verificado com sucesso. Tipo: ${event.type}`)
+    } catch (err) {
+      const error = err as Error
+      console.error('❌ Erro ao verificar webhook:', error.message)
+      console.error('❌ Erro completo:', err)
+      
+      // Log adicional para debug
+      console.error('📋 Signature recebida:', signature?.substring(0, 20) + '...')
+      console.error('📋 Body recebido (primeiros 200 chars):', body.substring(0, 200))
+      
+      return NextResponse.json(
+        { error: `Webhook Error: ${error.message}` },
+        { status: 400 }
+      )
+    }
 
   // Processar evento de pagamento bem-sucedido
   if (event.type === 'checkout.session.completed') {
@@ -124,16 +137,47 @@ export async function POST(request: NextRequest) {
       
       if (paymentIntentId) {
         try {
+          console.log(`📋 Payment Intent ID: ${paymentIntentId}`)
+          
+          // Buscar o PaymentIntent
           const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+          console.log(`📋 Payment Intent status: ${paymentIntent.status}`)
+          
+          // Tentar buscar charges
           const charges = await stripe.charges.list({
             payment_intent: paymentIntentId,
             limit: 1,
           })
-          receiptUrl = charges.data[0]?.receipt_url || undefined
-          console.log(`✅ Recibo URL: ${receiptUrl || 'não disponível'}`)
+          
+          console.log(`📋 Charges encontrados: ${charges.data.length}`)
+          
+          if (charges.data.length > 0) {
+            const charge = charges.data[0]
+            receiptUrl = charge.receipt_url || undefined
+            console.log(`✅ Recibo URL: ${receiptUrl || 'não disponível'}`)
+            
+            // Se não tiver receipt_url, tentar gerar um
+            if (!receiptUrl && charge.id) {
+              try {
+                // Tentar buscar o charge diretamente para obter o receipt_url
+                const chargeDetails = await stripe.charges.retrieve(charge.id)
+                receiptUrl = chargeDetails.receipt_url || undefined
+                console.log(`✅ Recibo URL (detalhes): ${receiptUrl || 'não disponível'}`)
+              } catch (err) {
+                console.warn('⚠️ Erro ao buscar detalhes do charge:', err)
+              }
+            }
+          } else {
+            console.warn('⚠️ Nenhum charge encontrado para o payment intent')
+          }
         } catch (receiptError) {
           console.warn('⚠️ Erro ao buscar recibo:', receiptError)
+          if (receiptError instanceof Error) {
+            console.warn('⚠️ Mensagem:', receiptError.message)
+          }
         }
+      } else {
+        console.warn('⚠️ Payment Intent ID não encontrado na session')
       }
 
       // Atualizar status do pedido
@@ -237,4 +281,11 @@ export async function POST(request: NextRequest) {
 
   console.log(`ℹ️ Evento ${event.type} não processado (não é checkout.session.completed)`)
   return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('❌ Erro geral no webhook:', error)
+    return NextResponse.json(
+      { error: 'Erro ao processar webhook' },
+      { status: 500 }
+    )
+  }
 }
