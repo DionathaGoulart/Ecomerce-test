@@ -67,7 +67,13 @@ export interface Personalization {
 export interface CartItem {
   productId: string
   quantity: number
-  personalizationImageUrl?: string
+  personalizationImageUrl?: string // URL temporária ou permanente
+  personalizationImagePath?: string // Path da imagem temporária para copiar quando criar pedido
+  personalizationImageFile?: {
+    name: string
+    type: string
+    size: number
+  }
   personalizationDescription?: string
 }
 

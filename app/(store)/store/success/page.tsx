@@ -10,25 +10,25 @@ export default async function SuccessPage({
   // mas sem buscar dados do banco
   if (!sessionId) {
     return (
-      <div className="mx-auto max-w-2xl px-6 py-20 sm:px-8 lg:px-12">
-        <div className="rounded-2xl bg-white border border-gray-100 p-12 text-center shadow-sm">
-          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-            <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-full max-w-2xl mx-auto pt-24 sm:pt-32 md:pt-36 lg:pt-40 xl:pt-44 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6">
+        <div className="rounded-2xl border border-header-border bg-header-bg p-8 sm:p-12 text-center">
+          <div className="mb-6 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-success-500/20 border border-success-500/30">
+            <svg className="h-8 w-8 sm:h-10 sm:w-10 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-gray-900">
+          <h1 className="mb-4 text-3xl sm:text-4xl font-semibold tracking-tight text-white">
             Pedido Confirmado!
           </h1>
-          <p className="text-lg text-gray-500 mb-6">
+          <p className="text-base sm:text-lg text-primary-500 mb-6">
             Seu pagamento foi processado com sucesso.
           </p>
-          <p className="text-gray-600 mb-8 leading-relaxed">
+          <p className="text-sm sm:text-base text-neutral-400 mb-8 leading-relaxed">
             Verifique seu email para ver todos os detalhes do pedido.
           </p>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
+            className="inline-flex items-center justify-center rounded-xl bg-primary-500 px-6 sm:px-8 py-3 text-sm sm:text-base font-medium text-neutral-950 hover:opacity-90 transition-opacity"
           >
             Continuar Comprando
           </a>
@@ -46,28 +46,28 @@ export default async function SuccessPage({
     // Verificar se o pagamento foi concluído
     if (session.payment_status === 'paid') {
       return (
-        <div className="mx-auto max-w-2xl px-6 py-20 sm:px-8 lg:px-12">
-          <div className="rounded-2xl bg-white border border-gray-100 p-12 text-center shadow-sm">
-            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-              <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-full max-w-2xl mx-auto pt-24 sm:pt-32 md:pt-36 lg:pt-40 xl:pt-44 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6">
+          <div className="rounded-2xl border border-header-border bg-header-bg p-8 sm:p-12 text-center">
+            <div className="mb-6 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-success-500/20 border border-success-500/30">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="mb-4 text-4xl font-semibold tracking-tight text-gray-900">
+            <h1 className="mb-4 text-3xl sm:text-4xl font-semibold tracking-tight text-white">
               Pedido Confirmado!
             </h1>
-            <p className="text-lg text-gray-500 mb-6">
+            <p className="text-base sm:text-lg text-primary-500 mb-6">
               Seu pagamento foi processado com sucesso.
             </p>
-            <p className="text-gray-600 mb-2 leading-relaxed">
-              Verifique seu email (<strong className="text-gray-900">{session.customer_email || 'o email informado no pedido'}</strong>) para ver todos os detalhes do pedido.
+            <p className="text-sm sm:text-base text-neutral-400 mb-2 leading-relaxed">
+              Verifique seu email (<strong className="text-white">{session.customer_email || 'o email informado no pedido'}</strong>) para ver todos os detalhes do pedido.
             </p>
-            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+            <p className="text-xs sm:text-sm text-neutral-500 mb-8 leading-relaxed">
               O email contém todas as informações, incluindo número do pedido, itens comprados e formas de contato.
             </p>
             <a
               href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
+              className="inline-flex items-center justify-center rounded-xl bg-primary-500 px-6 sm:px-8 py-3 text-sm sm:text-base font-medium text-neutral-950 hover:opacity-90 transition-opacity"
             >
               Continuar Comprando
             </a>
@@ -82,25 +82,25 @@ export default async function SuccessPage({
 
   // Fallback - sempre mostrar mensagem de sucesso
   return (
-    <div className="mx-auto max-w-2xl px-6 py-20 sm:px-8 lg:px-12">
-      <div className="rounded-2xl bg-white border border-gray-100 p-12 text-center shadow-sm">
-        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-          <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="w-full max-w-2xl mx-auto pt-24 sm:pt-32 md:pt-36 lg:pt-40 xl:pt-44 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6">
+      <div className="rounded-2xl border border-header-border bg-header-bg p-8 sm:p-12 text-center">
+        <div className="mb-6 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-success-500/20 border border-success-500/30">
+          <svg className="h-8 w-8 sm:h-10 sm:w-10 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-gray-900">
+        <h1 className="mb-4 text-3xl sm:text-4xl font-semibold tracking-tight text-white">
           Pedido Confirmado!
         </h1>
-        <p className="text-lg text-gray-500 mb-6">
+        <p className="text-base sm:text-lg text-primary-500 mb-6">
           Seu pagamento foi processado com sucesso.
         </p>
-        <p className="text-gray-600 mb-8 leading-relaxed">
+        <p className="text-sm sm:text-base text-neutral-400 mb-8 leading-relaxed">
           Verifique seu email para ver todos os detalhes do pedido.
         </p>
         <a
           href="/"
-          className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm hover:shadow-md"
+          className="inline-flex items-center justify-center rounded-xl bg-primary-500 px-6 sm:px-8 py-3 text-sm sm:text-base font-medium text-neutral-950 hover:opacity-90 transition-opacity"
         >
           Continuar Comprando
         </a>

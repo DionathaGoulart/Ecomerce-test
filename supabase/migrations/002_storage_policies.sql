@@ -1,8 +1,8 @@
 -- Storage policies para o bucket 'personalizations'
--- Permite que usuários anônimos façam upload de imagens de personalização
-
--- IMPORTANTE: Certifique-se de que o bucket 'personalizations' já foi criado
--- antes de executar esta migration
+-- Permite que usuários anônimos e autenticados façam upload de imagens de personalização
+--
+-- IMPORTANTE: Esta migration deve ser executada APÓS a migration 011_create_personalizations_bucket.sql
+-- que cria o bucket 'personalizations'
 
 -- Dropar políticas existentes se já existirem (para permitir re-execução da migration)
 DROP POLICY IF EXISTS "Permitir upload de imagens de personalização" ON storage.objects;

@@ -21,13 +21,21 @@ export const customerSchema = z.object({
 export const cartItemSchema = z.object({
   productId: z.string().uuid('ID do produto inválido'),
   quantity: z.number().int().positive('Quantidade deve ser positiva'),
-  personalizationImageUrl: z.string().url('URL da imagem inválida').optional(),
+  personalizationImageUrl: z.string().optional(), // URL temporária ou permanente
+  personalizationImagePath: z.string().optional(), // Path da imagem temporária para copiar quando criar pedido
+  personalizationImageFile: z.object({
+    name: z.string(),
+    type: z.string(),
+    size: z.number(),
+  }).optional(),
   personalizationDescription: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
 })
 
 export const createOrderSchema = z.object({
   customer: customerSchema,
   items: z.array(cartItemSchema).min(1, 'Carrinho não pode estar vazio'),
+  deliveryType: z.enum(['delivery', 'pickup']),
+  shippingCost: z.number().int().min(0, 'Custo de frete inválido'),
 })
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>

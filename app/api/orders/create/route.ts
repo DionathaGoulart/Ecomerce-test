@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { customer, items } = validation.data
+    const { customer, items, deliveryType, shippingCost } = validation.data
 
     // Verificar autenticação do usuário
     const supabase = await createClient()
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
     }
 
     const productMap = new Map(products.map((p) => [p.id, p]))
-    let totalCents = 0
+    let subtotalCents = 0
 
-    // Validar que todos os produtos existem e calcular total
+    // Validar que todos os produtos existem e calcular subtotal
     for (const item of items) {
       const product = productMap.get(item.productId)
       if (!product) {
@@ -59,8 +59,11 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         )
       }
-      totalCents += product.price_cents * item.quantity
+      subtotalCents += product.price_cents * item.quantity
     }
+    
+    // Total incluindo frete
+    const totalCents = subtotalCents + shippingCost
 
     // Atualizar perfil do usuário com nome se fornecido
     if (customer.name) {
@@ -91,49 +94,52 @@ export async function POST(request: NextRequest) {
       }
     } while (true)
 
-    // Verificar se o endereço já existe salvo
-    const addressForCheck = {
-      street: customer.address.street,
-      number: customer.address.number,
-      city: customer.address.city,
-      state: customer.address.state,
-      zipcode: customer.address.zipcode.replace(/-/g, ''), // Remove formatação
-    }
+    // Salvar endereço apenas se for entrega (não salvar endereço da empresa)
+    if (deliveryType === 'delivery') {
+      // Verificar se o endereço já existe salvo
+      const addressForCheck = {
+        street: customer.address.street,
+        number: customer.address.number,
+        city: customer.address.city,
+        state: customer.address.state,
+        zipcode: customer.address.zipcode.replace(/-/g, ''), // Remove formatação
+      }
 
-    const { data: existingAddresses } = await supabaseAdmin
-      .from('user_addresses')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('street', addressForCheck.street)
-      .eq('number', addressForCheck.number)
-      .eq('city', addressForCheck.city)
-      .eq('state', addressForCheck.state)
-      .eq('zipcode', addressForCheck.zipcode)
-      .limit(1)
-
-    // Se não existe, salvar o endereço automaticamente
-    if (!existingAddresses || existingAddresses.length === 0) {
-      // Verificar se é o primeiro endereço (será o padrão)
-      const { count } = await supabaseAdmin
+      const { data: existingAddresses } = await supabaseAdmin
         .from('user_addresses')
-        .select('*', { count: 'exact', head: true })
+        .select('id')
         .eq('user_id', user.id)
+        .eq('street', addressForCheck.street)
+        .eq('number', addressForCheck.number)
+        .eq('city', addressForCheck.city)
+        .eq('state', addressForCheck.state)
+        .eq('zipcode', addressForCheck.zipcode)
+        .limit(1)
 
-      const isFirstAddress = (count || 0) === 0
+      // Se não existe, salvar o endereço automaticamente
+      if (!existingAddresses || existingAddresses.length === 0) {
+        // Verificar se é o primeiro endereço (será o padrão)
+        const { count } = await supabaseAdmin
+          .from('user_addresses')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
 
-      await supabaseAdmin
-        .from('user_addresses')
-        .insert({
-          user_id: user.id,
-          label: null, // Sem apelido, será preenchido pelo usuário depois se quiser
-          street: addressForCheck.street,
-          number: addressForCheck.number,
-          complement: customer.address.complement || null,
-          city: addressForCheck.city,
-          state: addressForCheck.state,
-          zipcode: addressForCheck.zipcode,
-          is_default: isFirstAddress, // Primeiro endereço é padrão
-        })
+        const isFirstAddress = (count || 0) === 0
+
+        await supabaseAdmin
+          .from('user_addresses')
+          .insert({
+            user_id: user.id,
+            label: null, // Sem apelido, será preenchido pelo usuário depois se quiser
+            street: addressForCheck.street,
+            number: addressForCheck.number,
+            complement: customer.address.complement || null,
+            city: addressForCheck.city,
+            state: addressForCheck.state,
+            zipcode: addressForCheck.zipcode,
+            is_default: isFirstAddress, // Primeiro endereço é padrão
+          })
+      }
     }
 
     // Criar pedido
@@ -145,6 +151,8 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         total_cents: totalCents,
         delivery_address: customer.address,
+        // Salvar tipo de entrega e frete como metadata (se a tabela tiver esses campos)
+        // Se não tiver, podemos adicionar depois ou usar um campo JSON
       })
       .select('id')
       .single()
@@ -156,16 +164,132 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Processar imagens de personalização: copiar temporárias para permanentes
+    const uploadedImageUrls: Record<string, string> = {}
+    
+    for (const item of items) {
+      if (!item.personalizationImageUrl) {
+        continue
+      }
+
+      try {
+        // Se tem path temporário, copiar para permanente
+        if (item.personalizationImagePath) {
+          // Baixar a imagem temporária
+          const { data: tempFileData, error: downloadError } = await supabaseAdmin.storage
+            .from('personalizations')
+            .download(item.personalizationImagePath)
+
+          if (downloadError || !tempFileData) {
+            console.error('Erro ao baixar imagem temporária:', downloadError)
+            continue
+          }
+
+          // Converter para buffer
+          const arrayBuffer = await tempFileData.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          // Gerar nome do arquivo permanente
+          const fileExt = item.personalizationImageFile?.name?.split('.').pop() || 
+            item.personalizationImagePath.split('.').pop() || 'png'
+          const fileName = `${order.id}_${item.productId}_${Date.now()}.${fileExt}`
+          const permanentPath = `personalizations/${fileName}`
+
+          // Detectar content type
+          const contentType = item.personalizationImageFile?.type || 
+            (fileExt === 'png' ? 'image/png' : 
+             fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' : 
+             fileExt === 'webp' ? 'image/webp' : 
+             'image/png')
+
+          // Upload para path permanente
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from('personalizations')
+            .upload(permanentPath, buffer, {
+              contentType,
+              cacheControl: '3600',
+              upsert: false,
+            })
+
+          if (uploadError) {
+            console.error('Erro ao fazer upload da imagem permanente:', uploadError)
+            continue
+          }
+
+          // Criar signed URL válida por 1 ano
+          const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+            .from('personalizations')
+            .createSignedUrl(permanentPath, 60 * 60 * 24 * 365) // 1 ano
+
+          if (signedUrlError || !signedUrlData?.signedUrl) {
+            console.error('Erro ao criar signed URL:', signedUrlError)
+            continue
+          }
+
+          uploadedImageUrls[item.productId] = signedUrlData.signedUrl
+
+          // Deletar imagem temporária
+          await supabaseAdmin.storage
+            .from('personalizations')
+            .remove([item.personalizationImagePath])
+        } else if (item.personalizationImageUrl.startsWith('data:')) {
+          // É base64 (fallback para compatibilidade), fazer upload
+          const base64Data = item.personalizationImageUrl.split(',')[1] || item.personalizationImageUrl
+          const buffer = Buffer.from(base64Data, 'base64')
+          
+          const fileExt = item.personalizationImageFile?.name?.split('.').pop() || 'png'
+          const fileName = `${order.id}_${item.productId}_${Date.now()}.${fileExt}`
+          const filePath = `personalizations/${fileName}`
+          
+          const contentType = item.personalizationImageFile?.type || 
+            (item.personalizationImageUrl.includes('image/png') ? 'image/png' : 
+             item.personalizationImageUrl.includes('image/jpeg') ? 'image/jpeg' : 
+             item.personalizationImageUrl.includes('image/webp') ? 'image/webp' : 
+             'image/png')
+          
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from('personalizations')
+            .upload(filePath, buffer, {
+              contentType,
+              cacheControl: '3600',
+              upsert: false,
+            })
+          
+          if (uploadError) {
+            console.error('Erro ao fazer upload da imagem:', uploadError)
+            continue
+          }
+          
+          const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+            .from('personalizations')
+            .createSignedUrl(filePath, 60 * 60 * 24 * 365)
+          
+          if (signedUrlError || !signedUrlData?.signedUrl) {
+            console.error('Erro ao criar signed URL:', signedUrlError)
+            continue
+          }
+          
+          uploadedImageUrls[item.productId] = signedUrlData.signedUrl
+        } else {
+          // Já é uma URL permanente, usar diretamente
+          uploadedImageUrls[item.productId] = item.personalizationImageUrl
+        }
+      } catch (error) {
+        console.error('Erro ao processar imagem:', error)
+        // Continuar sem a imagem
+      }
+    }
+
     // Criar itens do pedido
     const orderItems = items.map((item) => {
       const product = productMap.get(item.productId)!
       
       // Construir objeto de personalização se houver imagem ou descrição
       let personalization: { imageUrl?: string; description?: string } | null = null
-      if (item.personalizationImageUrl || item.personalizationDescription) {
+      if (uploadedImageUrls[item.productId] || item.personalizationDescription) {
         personalization = {}
-        if (item.personalizationImageUrl) {
-          personalization.imageUrl = item.personalizationImageUrl
+        if (uploadedImageUrls[item.productId]) {
+          personalization.imageUrl = uploadedImageUrls[item.productId]
         }
         if (item.personalizationDescription) {
           personalization.description = item.personalizationDescription
@@ -210,6 +334,20 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
       }
     })
+    
+    // Adicionar frete como item separado se houver
+    if (shippingCost > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'brl',
+          product_data: {
+            name: deliveryType === 'delivery' ? 'Frete' : 'Retirada no Local',
+          },
+          unit_amount: shippingCost,
+        },
+        quantity: 1,
+      })
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

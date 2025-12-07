@@ -66,12 +66,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
    - Execute o arquivo `supabase/migrations/001_initial_schema.sql`
 
 5. Configure o Storage no Supabase:
-   - Acesse o Supabase Dashboard > Storage
-   - Crie um bucket chamado `personalizations`
-   - Configure como **privado** (importante para segurança dos uploads dos clientes)
-   - Execute a migration `supabase/migrations/003_storage_policies.sql` no SQL Editor para configurar as políticas RLS
-   - **Nota**: O código já usa signed URLs para acesso às imagens, então o bucket deve ser privado
-   - **Importante**: Sem a migration 003, você receberá erro "new row violates row-level security policy" ao tentar fazer upload
+   - Execute as migrations na ordem:
+     1. `supabase/migrations/011_create_personalizations_bucket.sql` - Cria o bucket 'personalizations'
+     2. `supabase/migrations/002_storage_policies.sql` - Configura as políticas RLS para o bucket
+   - **Nota**: O bucket será criado como privado automaticamente. As imagens serão acessadas via signed URLs
+   - **Importante**: Sem a migration 002, você receberá erro "new row violates row-level security policy" ao tentar fazer upload
 
 6. Configure o Stripe Webhook:
    - No dashboard do Stripe, vá em Developers > Webhooks

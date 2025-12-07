@@ -176,9 +176,28 @@ export default function CatalogSection() {
     }
   }
 
+  const handleIncreaseQuantity = (productId: string) => {
+    const existingItem = cartItems.find((item) => item.productId === productId)
+    if (existingItem) {
+      // Se já tem imagem de personalização, apenas aumenta a quantidade
+      // Caso contrário, adiciona ao carrinho e o usuário pode personalizar no carrinho
+      updateQuantity(productId, existingItem.quantity + 1)
+    } else {
+      // Adiciona ao carrinho - personalização será feita no carrinho
+      addItem({
+        productId,
+        quantity: 1,
+      })
+    }
+  }
+
   const getCartQuantity = (productId: string): number => {
     const item = cartItems.find((item) => item.productId === productId)
     return item?.quantity || 0
+  }
+
+  const getCartItem = (productId: string): CartItem | undefined => {
+    return cartItems.find((item) => item.productId === productId)
   }
 
   // Filtrar produtos

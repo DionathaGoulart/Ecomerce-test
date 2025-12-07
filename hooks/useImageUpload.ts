@@ -85,12 +85,18 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
     setIsUploading(false)
   }, [])
 
+  const clearImage = useCallback(() => {
+    setImageUrl(null)
+    setUploadError(null)
+  }, [])
+
   return {
     uploadImage,
     isUploading,
     uploadError,
     imageUrl,
     reset,
+    clearImage,
   }
 }
 
