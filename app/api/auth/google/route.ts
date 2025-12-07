@@ -3,11 +3,35 @@ import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
+// Função auxiliar para obter a URL base do app
+function getAppUrl(request: NextRequest): string {
+  // Prioridade: variável de ambiente > header do request > fallback
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL
+  }
+  
+  // Tentar obter do header (útil em produção)
+  const host = request.headers.get('host')
+  const protocol = request.headers.get('x-forwarded-proto') || 'https'
+  
+  if (host) {
+    // Se for localhost, usar http, senão https
+    const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1')
+    return isLocalhost ? `http://${host}` : `${protocol}://${host}`
+  }
+  
+  // Fallback
+  return process.env.NODE_ENV === 'production' 
+    ? 'https://ecomerce-alpha-ten.vercel.app'
+    : 'http://localhost:3000'
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
     const code = searchParams.get('code')
+    const appUrl = getAppUrl(request)
 
     if (code) {
       // Trocar código por sessão
@@ -15,14 +39,14 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login?error=${encodeURIComponent(error.message)}`
+          `${appUrl}/login?error=${encodeURIComponent(error.message)}`
         )
       }
 
       if (data.user) {
         // Redirecionar para página inicial ou minha conta
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/minha-conta`
+          `${appUrl}/minha-conta`
         )
       }
     }
@@ -31,7 +55,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/google`,
+        redirectTo: `${appUrl}/api/auth/google`,
       },
     })
 
