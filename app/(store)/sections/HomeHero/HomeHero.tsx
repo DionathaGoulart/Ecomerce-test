@@ -23,7 +23,7 @@ export function HomeHero() {
 
   return (
     <section id="home" className="min-h-0 md:min-h-screen flex items-start relative z-10">
-      <div className="w-full relative z-10 pt-24 sm:pt-28 md:pt-32 lg:pt-64 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
+      <div className="w-full relative z-10 pt-24 sm:pt-28 md:pt-32 lg:pt-64 xl:pt-32 3xl:pt-40 2xl:pt-64 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
         <div className="max-w-2xl">
           {/* Título */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-[96px] font-semibold text-white mb-3 sm:mb-6 md:mb-8 lg:mb-12 leading-tight sm:leading-none">

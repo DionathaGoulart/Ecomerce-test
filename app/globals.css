@@ -126,3 +126,34 @@ input[type="number"] {
 .loading-dot {
   animation: loading-bounce 1.4s ease-in-out infinite;
 }
+
+/* ClipPath responsivo para SplineBackground */
+.spline-clip-path {
+  clip-path: inset(0 0 50px 0);
+}
+
+@media (min-width: 1280px) and (max-width: 1365px) {
+  .spline-clip-path {
+    clip-path: inset(0 0 10px 0);
+  }
+}
+
+@media (min-width: 1366px) and (max-width: 1535px) {
+  .spline-clip-path {
+    clip-path: inset(0 0 10px 0);
+  }
+}
+
+/* Scale customizado apenas para resoluções específicas - não afeta outras telas */
+@media (min-width: 1280px) and (max-width: 1365px) {
+  .spline-scale-custom {
+    transform: translateY(3rem) scale(1.1) !important;
+  }
+}
+
+@media (min-width: 1366px) and (max-width: 1535px) {
+  .spline-scale-custom {
+    transform: translateY(3.5rem) scale(1.15) !important;
+  }
+}
+

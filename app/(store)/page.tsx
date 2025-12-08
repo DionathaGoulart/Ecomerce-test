@@ -21,7 +21,7 @@ export default function Home() {
     <>
       {/* Container das 3 primeiras seções com Spline de fundo */}
       <div 
-        className="relative -mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-48 2xl:-mx-96" 
+        className="relative -mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-32 3xl:-mx-40 2xl:-mx-96" 
         ref={splineContainerRef}
         style={{ overflowX: 'clip', overflowY: 'visible' }}
       >
@@ -33,7 +33,7 @@ export default function Home() {
         {/* Container principal - conteúdo começa no topo, sem espaço extra */}
         <div 
           ref={containerRef} 
-          className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 m-0 p-0"
+          className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 m-0 p-0"
           style={{ overflow: 'visible' }}
         >
           {/* Seção Home - deve aparecer logo abaixo do header */}

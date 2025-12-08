@@ -21,7 +21,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full" style={{ backgroundColor: '#212121' }}>
-      <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 py-8 sm:py-12 md:py-16">
+      <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 py-8 sm:py-12 md:py-16">
         <div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-12">
           {/* Coluna Esquerda */}
           <div className="flex flex-col">

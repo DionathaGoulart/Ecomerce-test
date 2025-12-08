@@ -26,6 +26,8 @@ export default function StoreLayout({
   const { cartItems } = useCart()
   const [cartItemCount, setCartItemCount] = useState(0)
   const [activeSection, setActiveSection] = useState<string>('home')
+  const [headerVisible, setHeaderVisible] = useState(true)
+  const [isScrolled, setIsScrolled] = useState(false)
   
   // Detectar qual seção está ativa no scroll usando IntersectionObserver
   useEffect(() => {
@@ -166,6 +168,51 @@ export default function StoreLayout({
     }
   }, [refresh])
 
+  // Controlar visibilidade do header nas resoluções menores (1280px-1535px)
+  useEffect(() => {
+    const handleScroll = () => {
+      const width = window.innerWidth
+      const scrollY = window.scrollY
+      
+      // Aplicar apenas nas resoluções xl e 3xl (1280px-1535px)
+      if (width >= 1280 && width < 1536) {
+        if (scrollY > 100) {
+          setIsScrolled(true)
+          setHeaderVisible(false)
+        } else {
+          setIsScrolled(false)
+          setHeaderVisible(true)
+        }
+      } else {
+        // Em outras resoluções, sempre visível
+        setHeaderVisible(true)
+        setIsScrolled(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Verificar estado inicial
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  // Mostrar header ao passar o mouse (apenas nas resoluções menores quando scrolled)
+  const handleMouseEnter = () => {
+    const width = window.innerWidth
+    if (width >= 1280 && width < 1536 && isScrolled) {
+      setHeaderVisible(true)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    const width = window.innerWidth
+    if (width >= 1280 && width < 1536 && isScrolled) {
+      setHeaderVisible(false)
+    }
+  }
+
   const navItems = [
     { href: '/#home', label: 'Home' },
     { href: '/#beneficios', label: 'Benefícios' },
@@ -176,7 +223,13 @@ export default function StoreLayout({
   return (
     <div className="flex min-h-screen flex-col bg-[#060606]">
       {/* Header fixo */}
-      <header className="fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+      <header 
+        className={`fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 transition-opacity duration-300 ease-in-out ${
+          headerVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="rounded-xl sm:rounded-2xl border border-header-border bg-header-bg px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo à esquerda */}
@@ -487,7 +540,7 @@ export default function StoreLayout({
       )}
       
       {/* Main com container padronizado */}
-      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
         {children}
       </main>
       

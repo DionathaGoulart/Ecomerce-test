@@ -192,32 +192,42 @@ export function useBenefitsAnimation(
       scrollTimeout = setTimeout(() => {
         const rect = cardsSection.getBoundingClientRect()
         const windowHeight = window.innerHeight
-        const windowCenter = windowHeight / 2
         
-        // Verifica se a seção está visível na tela (intersecta com o centro da viewport)
-        const isVisible = rect.top < windowCenter && rect.bottom > windowCenter - windowHeight
+        // Verifica se a seção está sticky (fixa no topo)
+        // Quando sticky, a seção fica com top próximo a 0
+        const isSticky = rect.top <= 20 && rect.top >= -20
         
-        if (isVisible && !isAnimated) {
-          animateLines()
-        } else if (!isVisible && isAnimated) {
-          hideLines()
+        // Se estiver sticky, mantém as linhas visíveis
+        if (isSticky) {
+          if (!isAnimated) {
+            animateLines()
+          }
+        } else {
+          // Se não estiver sticky, esconde as linhas imediatamente
+          if (isAnimated) {
+            hideLines()
+          }
         }
-      }, 100)
+      }, 50)
     }
 
     // Usar IntersectionObserver para melhor performance
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !isAnimated) {
-            const timeout = setTimeout(() => {
-              if (entry.isIntersecting) {
-                animateLines()
-              }
-            }, 300)
-            animationTimeouts.push(timeout)
-          } else if (!entry.isIntersecting && isAnimated) {
-            hideLines()
+          const rect = cardsSection.getBoundingClientRect()
+          const isSticky = rect.top <= 20 && rect.top >= -20
+          
+          // Se estiver sticky, sempre mantém as linhas visíveis
+          if (isSticky) {
+            if (!isAnimated) {
+              animateLines()
+            }
+          } else {
+            // Se não estiver sticky, esconde as linhas imediatamente
+            if (isAnimated) {
+              hideLines()
+            }
           }
         })
       },
@@ -226,6 +236,13 @@ export function useBenefitsAnimation(
         rootMargin: '0px'
       }
     )
+
+    // Verificar continuamente se está sticky durante o scroll
+    const scrollHandler = () => {
+      checkVisibility()
+    }
+    
+    window.addEventListener('scroll', scrollHandler, { passive: true })
 
     // Aguardar renderização completa
     const initTimeout = setTimeout(() => {
@@ -237,6 +254,7 @@ export function useBenefitsAnimation(
       clearTimeout(initTimeout)
       clearAllTimeouts()
       observer.disconnect()
+      window.removeEventListener('scroll', scrollHandler)
     }
   }, [cardsSectionRef])
 }
