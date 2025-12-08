@@ -357,7 +357,7 @@ export default function CatalogSection() {
             <div className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6" style={{ marginTop: '64px' }}>
               {/* Texto à esquerda */}
               <p className="text-sm sm:text-base md:text-lg text-white/80 text-center sm:text-left flex-1">
-                Não encontrou o que procurava? Faça um orçamento sob medida
+                Não encontrou o que procurava?<br />Faça um orçamento sob medida
               </p>
               
               {/* Botão à direita */}
