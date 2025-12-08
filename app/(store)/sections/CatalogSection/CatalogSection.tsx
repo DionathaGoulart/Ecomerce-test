@@ -352,6 +352,31 @@ export default function CatalogSection() {
                 )}
               </>
             )}
+
+            {/* Seção de Orçamento - Alinhada com os produtos */}
+            <div className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6" style={{ marginTop: '64px' }}>
+              {/* Texto à esquerda */}
+              <p className="text-sm sm:text-base md:text-lg text-white/80 text-center sm:text-left flex-1">
+                Não encontrou o que procurava? Faça um orçamento sob medida
+              </p>
+              
+              {/* Botão à direita */}
+              <a
+                href={`https://wa.me/5554999851285?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento para um projeto personalizado.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden flex-shrink-0"
+              >
+                <Image
+                  src="/icons/project.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                />
+                <span className="whitespace-nowrap inline-block">Orçar projeto</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

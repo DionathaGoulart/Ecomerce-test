@@ -38,6 +38,7 @@ interface Product {
   description?: string
   price_cents: number
   image_url?: string
+  weight_kg?: number | null
 }
 
 interface ViaCEPResponse {
@@ -116,16 +117,25 @@ export default function CartCheckoutForm() {
   const [loadingShipping, setLoadingShipping] = useState(false)
   const [shippingError, setShippingError] = useState<string | null>(null)
   
-  // Endereço da empresa (Google Brasil)
-  const companyAddress = {
-    street: 'Avenida Brigadeiro Faria Lima',
-    number: '3477',
-    complement: '18º andar',
-    city: 'São Paulo',
-    state: 'SP',
-    zipcode: '04538-133',
-    fullAddress: 'Avenida Brigadeiro Faria Lima, 3477, 18º andar - CEP 04538-133, São Paulo/SP'
-  }
+  // Endereço da empresa (carregado do banco)
+  const [companyAddress, setCompanyAddress] = useState<{
+    street: string
+    number: string
+    complement: string | null
+    city: string
+    state: string
+    zipcode: string
+    fullAddress: string
+  }>({
+    street: '',
+    number: '',
+    complement: null,
+    city: '',
+    state: '',
+    zipcode: '',
+    fullAddress: ''
+  })
+  const [loadingCompanyAddress, setLoadingCompanyAddress] = useState(true)
 
   const {
     register,
@@ -207,6 +217,58 @@ export default function CartCheckoutForm() {
     return () => {
       window.removeEventListener('auth-state-changed', handleAuthChange)
     }
+  }, [])
+
+  // Carregar endereço da empresa
+  useEffect(() => {
+    const fetchCompanyAddress = async () => {
+      try {
+        setLoadingCompanyAddress(true)
+        const response = await fetch('/api/admin/shipping/settings')
+        if (!response.ok) {
+          throw new Error('Erro ao carregar endereço da empresa')
+        }
+
+        const data = await response.json()
+        const formattedZipcode = data.origin_cep?.replace(/(\d{5})(\d{3})/, '$1-$2') || ''
+        
+        // Montar endereço completo
+        const addressParts = []
+        if (data.origin_street) addressParts.push(data.origin_street)
+        if (data.origin_number) addressParts.push(data.origin_number)
+        if (data.origin_complement) addressParts.push(data.origin_complement)
+        
+        const fullAddress = addressParts.length > 0
+          ? `${addressParts.join(', ')}${formattedZipcode ? ` - CEP ${formattedZipcode}` : ''}, ${data.origin_city || ''}/${data.origin_state || ''}`
+          : `${data.origin_city || ''} - ${data.origin_state || ''}${formattedZipcode ? ` | CEP: ${formattedZipcode}` : ''}`
+
+        setCompanyAddress({
+          street: data.origin_street || '',
+          number: data.origin_number || '',
+          complement: data.origin_complement || null,
+          city: data.origin_city || '',
+          state: data.origin_state || '',
+          zipcode: formattedZipcode,
+          fullAddress: fullAddress
+        })
+      } catch (error) {
+        console.error('Erro ao carregar endereço da empresa:', error)
+        // Usar valores padrão em caso de erro
+        setCompanyAddress({
+          street: '',
+          number: '',
+          complement: null,
+          city: '',
+          state: '',
+          zipcode: '',
+          fullAddress: 'Endereço não disponível'
+        })
+      } finally {
+        setLoadingCompanyAddress(false)
+      }
+    }
+
+    fetchCompanyAddress()
   }, [])
 
   // Handler para quando o formulário tem erros de validação
@@ -521,26 +583,39 @@ export default function CartCheckoutForm() {
       return
     }
     
+    // Aguardar carregamento do endereço da empresa
+    if (loadingCompanyAddress) {
+      return
+    }
+    
     setLoadingShipping(true)
     setShippingError(null)
     
     try {
-      // CEP da empresa (origem)
-      const originCEP = unformatCEP(companyAddress.zipcode)
+      // A API agora usa o CEP do banco automaticamente, mas ainda podemos passar para compatibilidade
+      // (a API vai ignorar e usar o do banco)
+      const originCEP = companyAddress.zipcode ? unformatCEP(companyAddress.zipcode) : ''
       
-      // Calcular peso total dos produtos (estimativa: 0.3kg por produto)
+      // Calcular peso total dos produtos usando peso real ou estimativa
       const totalWeight = cartItems.reduce((sum, item) => {
-        return sum + (item.quantity * 0.3)
+        const product = products[item.productId]
+        if (product?.weight_kg) {
+          // Usar peso real do produto
+          return sum + (product.weight_kg * item.quantity)
+        } else {
+          // Se não tem peso definido, usar estimativa de 0.3kg por produto
+          return sum + (item.quantity * 0.3)
+        }
       }, 0) || 0.5 // mínimo 0.5kg
       
       // Chamar API de cálculo de frete
+      // A API usa automaticamente o CEP de origem do banco de dados
       const response = await fetch('/api/shipping/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          cepOrigin: originCEP,
           cepDestination: cleanedCEP,
           weight: totalWeight,
           length: 20, // 20cm
@@ -567,7 +642,7 @@ export default function CartCheckoutForm() {
     } finally {
       setLoadingShipping(false)
     }
-  }, [cartItems, companyAddress.zipcode])
+  }, [cartItems, products, loadingCompanyAddress, companyAddress.zipcode])
   
   // Calcular frete quando CEP mudar e for entrega
   useEffect(() => {
@@ -1079,12 +1154,18 @@ export default function CartCheckoutForm() {
                 </svg>
                 <div className="flex-1">
                   <h5 className="text-sm font-semibold text-white mb-2">Endereço para Retirada</h5>
-                  <p className="text-sm text-neutral-300 leading-relaxed">
-                    {companyAddress.fullAddress}
-                  </p>
-                  <p className="text-xs text-neutral-400 mt-2">
-                    Horário de atendimento: Segunda a Sexta, 9h às 18h
-                  </p>
+                  {loadingCompanyAddress ? (
+                    <p className="text-sm text-neutral-400">Carregando endereço...</p>
+                  ) : (
+                    <>
+                      <p className="text-sm text-neutral-300 leading-relaxed">
+                        {companyAddress.fullAddress || 'Endereço não disponível'}
+                      </p>
+                      <p className="text-xs text-neutral-400 mt-2">
+                        Horário de atendimento: Segunda a Sexta, 9h às 18h
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

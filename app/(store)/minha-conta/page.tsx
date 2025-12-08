@@ -9,9 +9,11 @@ import { Card } from '@/components/molecules/Card'
 import { formatCurrency } from '@/lib/utils'
 import { formatCEP, unformatCEP, capitalizeWords } from '@/lib/utils/formatting'
 import { LogOut, Package, MapPin, Receipt, FileText, Settings, Lock, Eye, EyeOff, Plus, Edit, Trash2, Check } from 'lucide-react'
+import Image from 'next/image'
 import { LoadingDots } from '@/components/atoms/LoadingDots'
 import { Input } from '@/components/atoms/Input'
 import { Label } from '@/components/atoms/Label'
+import { canAccessAdmin } from '@/lib/utils/permissions'
 
 interface Order {
   id: string
@@ -124,9 +126,6 @@ export default function MinhaContaPage() {
           }
         }
       } else if (profile) {
-        console.log('Perfil carregado:', profile)
-        console.log('Role do perfil:', profile.role)
-        console.log('É admin?', profile.role === 'admin')
         setUser({
           id: profile.id,
           email: profile.email,
@@ -399,17 +398,14 @@ export default function MinhaContaPage() {
     return null
   }
 
-  // Debug: mostrar role atual
-  const isAdmin = user?.role === 'admin'
-  console.log('User state atual:', user)
-  console.log('user.role:', user?.role)
-  console.log('isAdmin:', isAdmin)
+  // Verificar se tem acesso ao admin (admin, superadmin ou moderador)
+  const hasAdminAccess = canAccessAdmin(user?.role as any)
 
   return (
     <div className="min-h-screen pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6">
       <div className="mx-auto max-w-4xl space-y-6 sm:space-y-8">
         {/* Botão Admin */}
-        {isAdmin && (
+        {hasAdminAccess && (
           <div className="flex items-center gap-3 pt-6 sm:pt-8">
             <a 
               href="/admin"
@@ -856,6 +852,27 @@ export default function MinhaContaPage() {
 
                     {/* Links de Recibo e Nota Fiscal */}
                     <div className="flex flex-wrap gap-3">
+                      {/* Botão Entrar em Contato */}
+                      <a
+                        href={`https://wa.me/5554999851285?text=${encodeURIComponent(
+                          `Olá! Gostaria de entrar em contato sobre meu pedido.\n\n` +
+                          `📦 Pedido: #${order.order_number}\n` +
+                          `👤 Nome: ${user?.full_name || 'Não informado'}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-primary-400"
+                      >
+                        <Image
+                          src="/icons/zap.svg"
+                          alt="WhatsApp"
+                          width={16}
+                          height={16}
+                          className="h-4 w-4"
+                        />
+                        Entrar em contato
+                      </a>
+                      
                       {order.receipt_url && (
                         <a
                           href={order.receipt_url}

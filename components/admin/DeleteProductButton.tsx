@@ -32,18 +32,28 @@ export default function DeleteProductButton({
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao deletar produto')
+        let errorMessage = 'Erro ao deletar produto'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch (parseError) {
+          // Se não conseguir parsear JSON, usar o status text
+          errorMessage = response.statusText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
+      const result = await response.json()
+      
       if (onDelete) {
         onDelete()
       } else {
         router.refresh()
       }
     } catch (error) {
-      console.error('Erro:', error)
-      alert(error instanceof Error ? error.message : 'Erro ao deletar produto')
+      console.error('Erro ao deletar produto:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao deletar produto. Tente novamente.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }

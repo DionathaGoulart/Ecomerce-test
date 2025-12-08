@@ -11,6 +11,7 @@ export interface Product {
   price_cents: number
   image_url?: string | null
   category_name?: string | null
+  weight_kg?: number | null
   created_at?: string
   updated_at?: string
 }

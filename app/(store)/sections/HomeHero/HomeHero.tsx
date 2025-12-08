@@ -68,8 +68,9 @@ export function HomeHero() {
 
                 {/* Botão Orçar Projeto */}
                 <a
-                  href="#beneficios"
-                  onClick={handleScrollToBenefits}
+                  href={`https://wa.me/5554999851285?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento para um projeto personalizado.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
                 >
                   <Image

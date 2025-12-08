@@ -20,7 +20,7 @@ export default function AdminNav({
     { href: '/admin/products', label: 'Produtos' },
     { href: '/admin/orders', label: 'Pedidos' },
     { href: '/admin/categories', label: 'Categorias' },
-    ...(canManageRoles(user.role) ? [{ href: '/admin/users', label: 'Cargos' }] : []),
+    { href: '/admin/configuracoes', label: 'Configurações' },
   ]
 
   return (

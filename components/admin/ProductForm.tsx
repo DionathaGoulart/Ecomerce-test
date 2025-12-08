@@ -19,6 +19,7 @@ interface ProductFormProps {
     price_cents: number
     image_url?: string | null
     category_id?: string | null
+    weight_kg?: number | null
   }
 }
 
@@ -74,6 +75,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           price_cents: product.price_cents,
           image_url: product.image_url || '',
           category_id: product.category_id || null,
+          weight_kg: product.weight_kg || null,
         }
       : undefined,
   })
@@ -333,6 +335,29 @@ export default function ProductForm({ product }: ProductFormProps) {
         {errors.price_cents && (
           <p className="mt-1 text-xs sm:text-sm text-error-500">
             {errors.price_cents.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="weight_kg" className="text-sm sm:text-base text-white">
+          Peso (kg) - Opcional
+        </Label>
+        <Input
+          id="weight_kg"
+          type="number"
+          step="0.001"
+          {...register('weight_kg', { valueAsNumber: true })}
+          className="mt-1 text-sm sm:text-base bg-header-bg border-header-border text-white placeholder:text-white/50"
+          placeholder="0.300"
+          min={0}
+        />
+        <p className="mt-1 text-xs text-white/70">
+          Peso do produto em quilogramas (usado para cálculo de frete). Ex: 0.3 para 300g
+        </p>
+        {errors.weight_kg && (
+          <p className="mt-1 text-xs sm:text-sm text-error-500">
+            {errors.weight_kg.message}
           </p>
         )}
       </div>

@@ -12,6 +12,7 @@ import { Spinner } from '@/components/atoms/Spinner'
 
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 import { CART_STORAGE_KEY } from '@/lib/constants'
+import Footer from '@/components/store/Footer'
 
 export default function StoreLayout({
   children,
@@ -489,6 +490,9 @@ export default function StoreLayout({
       <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
         {children}
       </main>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

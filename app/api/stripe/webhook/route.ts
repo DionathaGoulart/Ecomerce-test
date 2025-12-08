@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
   console.log('='.repeat(50) + '\n')
   
   try {
-    // Obter o body como texto raw (importante para verificação de assinatura)
-    // No Next.js 14, request.text() já retorna o body raw
-    const body = await request.text()
+    // Obter o body como array buffer primeiro para garantir que não seja modificado
+    const arrayBuffer = await request.arrayBuffer()
+    const body = Buffer.from(arrayBuffer).toString('utf8')
     const signature = request.headers.get('stripe-signature')
     
     console.log('📋 Signature presente:', !!signature)
@@ -46,15 +46,30 @@ export async function POST(request: NextRequest) {
     console.log('🔐 Webhook secret length:', webhookSecret?.length)
     
     // Verificar se o secret começa com whsec_
-    if (!webhookSecret.startsWith('whsec_')) {
-      console.error('❌ Webhook secret não começa com whsec_')
-      console.error('❌ Secret recebido:', webhookSecret.substring(0, 20) + '...')
+    if (!webhookSecret || !webhookSecret.startsWith('whsec_')) {
+      console.error('❌ Webhook secret inválido!')
+      console.error('❌ Secret deve começar com whsec_')
+      console.error('❌ Secret recebido (primeiros 20 chars):', webhookSecret?.substring(0, 20) || 'NÃO CONFIGURADO')
+      console.error('')
+      console.error('📝 COMO CORRIGIR:')
+      console.error('1. Acesse: https://dashboard.stripe.com/webhooks')
+      console.error('2. Clique no webhook: https://ecomerce-alpha-ten.vercel.app/api/stripe/webhook')
+      console.error('3. Na seção "Signing secret", clique em "Reveal"')
+      console.error('4. Copie o secret completo (começa com whsec_)')
+      console.error('5. No Vercel, vá em Settings > Environment Variables')
+      console.error('6. Atualize STRIPE_WEBHOOK_SECRET com o valor correto')
+      console.error('7. Faça um novo deploy')
+      console.error('')
+      return NextResponse.json(
+        { error: 'Webhook secret inválido. Verifique a configuração.' },
+        { status: 500 }
+      )
     }
 
     let event: Stripe.Event
 
     try {
-      // Tentar verificar a assinatura
+      // Tentar verificar a assinatura com o body como string
       event = stripe.webhooks.constructEvent(
         body,
         signature,
@@ -73,15 +88,29 @@ export async function POST(request: NextRequest) {
       console.error('📋 Body recebido (últimos 200 chars):', body.substring(Math.max(0, body.length - 200)))
       console.error('📋 Body é string?', typeof body === 'string')
       console.error('📋 Body tem conteúdo?', body.length > 0)
+      console.error('📋 Body completo (JSON):', body)
       
       // Tentar verificar se o problema é com múltiplos secrets (teste vs produção)
       console.error('⚠️ DICA: Verifique se o STRIPE_WEBHOOK_SECRET no Vercel corresponde ao secret do webhook no Stripe Dashboard')
       console.error('⚠️ DICA: O secret deve começar com whsec_ e ser do webhook de PRODUÇÃO (não teste)')
+      console.error('⚠️ DICA: Se você tem webhooks de teste e produção, use o secret correto para cada um')
       
-      return NextResponse.json(
-        { error: `Webhook Error: ${error.message}` },
-        { status: 400 }
-      )
+      // Tentar também com o body como Buffer (fallback)
+      try {
+        const bodyBuffer = Buffer.from(body, 'utf8')
+        event = stripe.webhooks.constructEvent(
+          bodyBuffer,
+          signature,
+          webhookSecret
+        )
+        console.log(`✅ Webhook verificado com sucesso (usando Buffer). Tipo: ${event.type}`)
+      } catch (bufferErr) {
+        console.error('❌ Também falhou com Buffer:', bufferErr instanceof Error ? bufferErr.message : bufferErr)
+        return NextResponse.json(
+          { error: `Webhook Error: ${error.message}` },
+          { status: 400 }
+        )
+      }
     }
 
   // Processar evento de pagamento bem-sucedido

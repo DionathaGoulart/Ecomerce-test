@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { canAccessAdmin } from '@/lib/utils/permissions'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -52,14 +53,14 @@ export default function AdminLoginPage() {
 
       console.log('✅ Login bem-sucedido! Usuário:', authData.user.email)
       
-      // Verificar se é admin
+      // Verificar se tem acesso ao admin (admin, superadmin ou moderador)
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', authData.user.id)
         .single()
 
-      if (!profile || profile.role !== 'admin') {
+      if (!profile || !canAccessAdmin(profile.role)) {
         await supabase.auth.signOut()
         setError('Acesso negado. Apenas administradores podem acessar esta área.')
         setLoading(false)

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
 interface ShippingRequest {
-  cepOrigin: string
+  cepOrigin?: string // Opcional - a API usa o CEP do banco de dados
   cepDestination: string
   weight: number // em kg
   length: number // em cm
@@ -12,23 +13,23 @@ interface ShippingRequest {
 }
 
 /**
- * Calcula frete usando API dos Correios (CalcPrecoPrazo)
- * A API dos Correios é gratuita mas requer credenciais (usuário e senha)
- * Por enquanto, vamos usar uma implementação simplificada
- * 
- * Para usar a API oficial dos Correios, você precisa:
- * 1. Cadastrar-se no site dos Correios
- * 2. Obter usuário e senha para acesso à API
- * 3. Configurar as variáveis de ambiente
+ * Calcula frete usando configurações do banco de dados
  */
 export async function POST(request: NextRequest) {
   try {
     const body: ShippingRequest = await request.json()
     
-    const { cepOrigin, cepDestination, weight, length, height, width } = body
+    const { cepDestination, weight } = body
 
-    // Validar CEPs
-    const cleanOrigin = cepOrigin.replace(/\D/g, '')
+    // Buscar configurações gerais (incluindo CEP de origem)
+    const { data: settings } = await supabaseAdmin
+      .from('shipping_settings')
+      .select('*')
+      .single()
+
+    // Usar CEP de origem do banco de dados
+    const originCEP = settings?.origin_cep || '01310100'
+    const cleanOrigin = originCEP.replace(/\D/g, '')
     const cleanDestination = cepDestination.replace(/\D/g, '')
     
     if (cleanOrigin.length !== 8 || cleanDestination.length !== 8) {
@@ -40,91 +41,33 @@ export async function POST(request: NextRequest) {
 
     // Valores padrão se não fornecidos
     const finalWeight = weight || 0.5 // 500g padrão
-    const finalLength = length || 20 // 20cm padrão
-    const finalHeight = height || 10 // 10cm padrão
-    const finalWidth = width || 15 // 15cm padrão
 
-    // Tentar usar API dos Correios se tiver credenciais
-    const correiosUser = process.env.CORREIOS_USER
-    const correiosPassword = process.env.CORREIOS_PASSWORD
+    const originState = settings?.origin_state || 'SP'
 
-    if (correiosUser && correiosPassword) {
-      try {
-        // Usar API SOAP dos Correios
-        const soapBody = `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <CalcPrecoPrazo xmlns="http://tempuri.org/">
-      <nCdEmpresa>${correiosUser}</nCdEmpresa>
-      <sDsSenha>${correiosPassword}</sDsSenha>
-      <nCdServico>04014</nCdServico>
-      <sCepOrigem>${cleanOrigin}</sCepOrigem>
-      <sCepDestino>${cleanDestination}</sCepDestino>
-      <nVlPeso>${finalWeight}</nVlPeso>
-      <nCdFormato>1</nCdFormato>
-      <nVlComprimento>${finalLength}</nVlComprimento>
-      <nVlAltura>${finalHeight}</nVlAltura>
-      <nVlLargura>${finalWidth}</nVlLargura>
-      <nVlDiametro>0</nVlDiametro>
-      <sCdMaoPropria>N</sCdMaoPropria>
-      <nVlValorDeclarado>0</nVlValorDeclarado>
-      <sCdAvisoRecebimento>N</sCdAvisoRecebimento>
-    </CalcPrecoPrazo>
-  </soap:Body>
-</soap:Envelope>`
+    // Buscar configurações de frete do banco de dados
+    const { data: configs } = await supabaseAdmin
+      .from('shipping_configs')
+      .select('*')
+      .eq('is_active', true)
+      .order('priority', { ascending: false })
 
-        const response = await fetch('http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
-            'SOAPAction': 'http://tempuri.org/CalcPrecoPrazo',
-          },
-          body: soapBody,
-        })
-
-        if (response.ok) {
-          const xmlText = await response.text()
-          
-          // Parse simples do XML (você pode usar uma biblioteca XML parser se preferir)
-          const valorMatch = xmlText.match(/<Valor>([^<]+)<\/Valor>/)
-          const prazoMatch = xmlText.match(/<PrazoEntrega>([^<]+)<\/PrazoEntrega>/)
-          const erroMatch = xmlText.match(/<Erro>([^<]+)<\/Erro>/)
-          
-          if (erroMatch && erroMatch[1] !== '0') {
-            // Se houver erro, usar cálculo simplificado
-            throw new Error('Erro na API dos Correios')
-          }
-          
-          if (valorMatch && prazoMatch) {
-            const valor = parseFloat(valorMatch[1].replace(',', '.'))
-            const prazo = parseInt(prazoMatch[1])
-            
-            // Converter valor para centavos
-            const valorCents = Math.round(valor * 100)
-            
-            return NextResponse.json({
-              cost: valorCents,
-              days: prazo,
-              service: 'PAC',
-              source: 'correios',
-            })
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao usar API dos Correios:', error)
-        // Continuar com cálculo simplificado
-      }
-    }
-
-    // Cálculo simplificado baseado em distância/região (fallback)
     // Mesmo CEP: frete local
     if (cleanOrigin === cleanDestination) {
-      return NextResponse.json({
-        cost: 1000, // R$ 10,00
-        days: 1,
-        service: 'Local',
-        source: 'estimated',
-      })
+      const sameCepConfig = configs?.find((c) => c.region_type === 'same_cep')
+      if (sameCepConfig) {
+        let cost = sameCepConfig.base_cost_cents
+        // Aplicar multiplicador de peso se necessário
+        if (finalWeight > sameCepConfig.min_weight_kg && sameCepConfig.weight_multiplier > 0) {
+          const extraWeight = finalWeight - sameCepConfig.min_weight_kg
+          cost += Math.round(cost * sameCepConfig.weight_multiplier * extraWeight)
+        }
+        return NextResponse.json({
+          cost,
+          days: sameCepConfig.delivery_days,
+          service: 'Local',
+          source: 'database',
+        })
+      }
     }
 
     // Buscar informações do CEP de destino
@@ -136,31 +79,75 @@ export async function POST(request: NextRequest) {
         throw new Error('CEP não encontrado')
       }
 
-      // CEP origem (empresa) - São Paulo
-      const originState = 'SP'
-      const originCity = 'São Paulo'
+      // Tentar encontrar configuração correspondente
+      let matchedConfig = null
 
-      // Calcular baseado em região
-      let cost = 0
-      let days = 5
+      // Ordenar por prioridade (maior primeiro)
+      const sortedConfigs = (configs || []).sort((a, b) => b.priority - a.priority)
 
-      if (cepData.uf === originState) {
-        if (cleanDestination.startsWith('0')) {
-          // Região metropolitana de SP
-          cost = 1500 // R$ 15,00
-          days = 2
-        } else {
-          // Estado de SP (fora da região metropolitana)
-          cost = 2000 // R$ 20,00
-          days = 3
+      for (const config of sortedConfigs) {
+        let matches = false
+
+        switch (config.region_type) {
+          case 'same_cep':
+            matches = cleanOrigin === cleanDestination
+            break
+          case 'metro_sp':
+            matches =
+              cepData.uf === originState &&
+              config.state_code === originState &&
+              cleanDestination.startsWith(config.cep_prefix || '0')
+            break
+          case 'sp_state':
+            matches = cepData.uf === originState && config.state_code === originState
+            break
+          case 'other_states':
+            matches = cepData.uf !== originState
+            break
+          case 'custom':
+            // Verificar se estado corresponde
+            if (config.state_code) {
+              matches = cepData.uf === config.state_code
+            } else {
+              matches = true // Se não tem estado específico, aceita qualquer um
+            }
+            // Verificar prefixo de CEP se especificado
+            if (config.cep_prefix && matches) {
+              matches = cleanDestination.startsWith(config.cep_prefix)
+            }
+            break
         }
-      } else {
-        // Outros estados
-        cost = 3000 // R$ 30,00
-        days = 5
+
+        if (matches) {
+          matchedConfig = config
+          break
+        }
       }
 
-      // Ajustar baseado no peso (adicionar 10% por kg extra)
+      // Se encontrou configuração, usar ela
+      if (matchedConfig) {
+        let cost = matchedConfig.base_cost_cents
+
+        // Aplicar multiplicador de peso se necessário
+        if (finalWeight > matchedConfig.min_weight_kg && matchedConfig.weight_multiplier > 0) {
+          const extraWeight = finalWeight - matchedConfig.min_weight_kg
+          cost += Math.round(cost * matchedConfig.weight_multiplier * extraWeight)
+        }
+
+        return NextResponse.json({
+          cost,
+          days: matchedConfig.delivery_days,
+          service: matchedConfig.name,
+          source: 'database',
+        })
+      }
+
+      // Se não encontrou configuração, usar valores padrão
+      const defaultCost = settings?.default_cost_cents || 2000
+      const defaultDays = settings?.default_delivery_days || 5
+
+      // Aplicar multiplicador padrão de 10% por kg extra
+      let cost = defaultCost
       if (finalWeight > 1) {
         const extraWeight = finalWeight - 1
         cost += Math.round(cost * 0.1 * extraWeight)
@@ -168,19 +155,22 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         cost,
-        days,
+        days: defaultDays,
         service: 'PAC Estimado',
-        source: 'estimated',
+        source: 'default',
       })
     } catch (error) {
       console.error('Erro ao buscar CEP:', error)
       
       // Valor padrão se não conseguir calcular
+      const defaultCost = settings?.default_cost_cents || 2000
+      const defaultDays = settings?.default_delivery_days || 5
+
       return NextResponse.json({
-        cost: 2000, // R$ 20,00
-        days: 5,
+        cost: defaultCost,
+        days: defaultDays,
         service: 'PAC Estimado',
-        source: 'estimated',
+        source: 'default',
       })
     }
   } catch (error) {
