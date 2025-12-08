@@ -60,17 +60,27 @@ export function useBenefitsAnimation(
     if (window.innerWidth < 1024) return
 
     let isAnimated = false
-    let hasAnimated = false
+    let animationTimeouts: NodeJS.Timeout[] = []
     let scrollTimeout: NodeJS.Timeout | null = null
 
+    const clearAllTimeouts = () => {
+      animationTimeouts.forEach(timeout => clearTimeout(timeout))
+      animationTimeouts = []
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout)
+        scrollTimeout = null
+      }
+    }
+
     const animateLines = () => {
-      if (hasAnimated) return
-      hasAnimated = true
+      if (isAnimated) return
+      isAnimated = true
+      clearAllTimeouts()
 
       const svgs = cardsSection.querySelectorAll('svg[data-benefit-line]')
       
       if (svgs.length === 0) {
-        hasAnimated = false
+        isAnimated = false
         return
       }
       
@@ -107,10 +117,13 @@ export function useBenefitsAnimation(
             hLine.style.opacity = '0'
             hLine.style.transition = 'opacity 0.6s ease-in-out, stroke-dashoffset 0.6s ease-in-out'
             
-            setTimeout(() => {
-              hLine.style.opacity = '0.3'
-              hLine.style.strokeDashoffset = '0'
+            const timeout1 = setTimeout(() => {
+              if (isAnimated) {
+                hLine.style.opacity = '0.3'
+                hLine.style.strokeDashoffset = '0'
+              }
             }, 50 + (svgIndex * 100))
+            animationTimeouts.push(timeout1)
           }
         }
         
@@ -123,10 +136,13 @@ export function useBenefitsAnimation(
             vLine.style.opacity = '0'
             vLine.style.transition = 'opacity 0.6s ease-in-out, stroke-dashoffset 0.6s ease-in-out'
             
-            setTimeout(() => {
-              vLine.style.opacity = '0.3'
-              vLine.style.strokeDashoffset = '0'
+            const timeout2 = setTimeout(() => {
+              if (isAnimated) {
+                vLine.style.opacity = '0.3'
+                vLine.style.strokeDashoffset = '0'
+              }
             }, 700 + (svgIndex * 100))
+            animationTimeouts.push(timeout2)
           }
         }
         
@@ -134,9 +150,12 @@ export function useBenefitsAnimation(
           const circleEl = svgCircle as SVGCircleElement
           circleEl.style.transition = 'opacity 0.6s ease-in-out'
           
-          setTimeout(() => {
-            circleEl.style.opacity = '0.5'
+          const timeout3 = setTimeout(() => {
+            if (isAnimated) {
+              circleEl.style.opacity = '0.5'
+            }
           }, 1400 + (svgIndex * 100))
+          animationTimeouts.push(timeout3)
         }
       })
     }
@@ -144,7 +163,7 @@ export function useBenefitsAnimation(
     const hideLines = () => {
       if (!isAnimated) return
       isAnimated = false
-      hasAnimated = false
+      clearAllTimeouts()
 
       const svgs = cardsSection.querySelectorAll('svg[data-benefit-line]')
       
@@ -171,36 +190,53 @@ export function useBenefitsAnimation(
       }
 
       scrollTimeout = setTimeout(() => {
-        const scrollY = window.scrollY || window.pageYOffset
+        const rect = cardsSection.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const windowCenter = windowHeight / 2
         
-        // Verifica se o scroll está entre 800px e 2000px
-        const isVisible = scrollY >= 800 && scrollY <= 2000
+        // Verifica se a seção está visível na tela (intersecta com o centro da viewport)
+        const isVisible = rect.top < windowCenter && rect.bottom > windowCenter - windowHeight
         
         if (isVisible && !isAnimated) {
-          isAnimated = true
-          setTimeout(() => {
-            animateLines()
-          }, 300)
+          animateLines()
         } else if (!isVisible && isAnimated) {
           hideLines()
         }
-      }, 50)
+      }, 100)
     }
+
+    // Usar IntersectionObserver para melhor performance
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isAnimated) {
+            const timeout = setTimeout(() => {
+              if (entry.isIntersecting) {
+                animateLines()
+              }
+            }, 300)
+            animationTimeouts.push(timeout)
+          } else if (!entry.isIntersecting && isAnimated) {
+            hideLines()
+          }
+        })
+      },
+      {
+        threshold: 0.3,
+        rootMargin: '0px'
+      }
+    )
 
     // Aguardar renderização completa
     const initTimeout = setTimeout(() => {
-      window.addEventListener('scroll', checkVisibility, { passive: true })
-      window.addEventListener('resize', checkVisibility, { passive: true })
+      observer.observe(cardsSection)
       checkVisibility() // Verifica na inicialização
-    }, 2000)
+    }, 1000)
 
     return () => {
       clearTimeout(initTimeout)
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout)
-      }
-      window.removeEventListener('scroll', checkVisibility)
-      window.removeEventListener('resize', checkVisibility)
+      clearAllTimeouts()
+      observer.disconnect()
     }
   }, [cardsSectionRef])
 }
