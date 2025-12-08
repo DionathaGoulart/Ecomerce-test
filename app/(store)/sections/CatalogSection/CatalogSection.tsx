@@ -75,24 +75,24 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
           <span className="text-white opacity-100">{formatCurrency(product.price_cents)}</span> / 1 unid.
         </p>
         
-        <div className="mt-auto">
+        <div className="mt-auto min-h-[40px] sm:min-h-[44px]">
           {!isAdding && quantity === 0 ? (
             <Button
               onClick={handleAddClick}
               variant="primary"
               size="sm"
-              className="w-full text-sm sm:text-base"
+              className="w-full text-sm sm:text-base h-[40px] sm:h-[44px]"
             >
               <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               Adicionar
             </Button>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 h-[40px] sm:h-[44px]">
             <Button
               onClick={handleIncrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5"
+              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full"
               style={{ backgroundColor: '#9AF032' }}
             >
               <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -104,14 +104,14 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
                 const newQuantity = parseInt(e.target.value) || 0
                 onAddToCart(product.id, newQuantity)
               }}
-              className="flex-1 text-center text-sm sm:text-base no-spinner bg-transparent border border-secondary-600 text-white"
+              className="flex-1 text-center text-sm sm:text-base no-spinner bg-transparent border border-secondary-600 text-white h-full"
               min={1}
             />
             <Button
               onClick={handleDecrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5"
+              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full"
               style={{ backgroundColor: '#F03932' }}
             >
               <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -249,8 +249,8 @@ export default function CatalogSection() {
   }, [hasMore, isLoading, filteredProducts.length, displayedCount])
 
   return (
-    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent w-screen -mx-[calc(50vw-50%)]">
-      <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96">
+    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent">
+      <div className="w-full">
         {/* Título */}
         <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words">
           Catálogo
@@ -293,7 +293,7 @@ export default function CatalogSection() {
                       if (isHovered) return 'text-primary-500'
                       if (hasAnyHover && isSelected) return 'text-white' // Selecionado mas há hover em outro, fica normal
                       if (isSelected) return 'text-primary-500'
-                      return 'text-white'
+                      return 'text-white opacity-80'
                     }
                     
                     const getFontSizeClass = () => {

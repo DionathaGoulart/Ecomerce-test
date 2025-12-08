@@ -60,7 +60,11 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                   <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4">
                     {/* Card do Número */}
                     <div className="flex-shrink-0 relative z-10">
-                      <div className="w-10 sm:w-12 md:w-16 lg:w-20 xl:w-24 h-full rounded-lg sm:rounded-xl md:rounded-[16px] bg-primary-500 flex items-center justify-center min-h-[70px] sm:min-h-[80px] md:min-h-[100px]">
+                      <div 
+                        className="step-number-card w-10 sm:w-12 md:w-16 lg:w-20 xl:w-24 h-full rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center min-h-[70px] sm:min-h-[80px] md:min-h-[100px] transition-colors duration-300"
+                        data-step-index={index}
+                        style={{ backgroundColor: '#212121' }}
+                      >
                         <span className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-neutral-950">
                           {etapa.step}
                         </span>
@@ -81,7 +85,11 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     </div>
                     
                     {/* Card de Conteúdo */}
-                    <div className="flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] bg-primary-500 p-2.5 sm:p-3 md:p-4 lg:p-6">
+                    <div 
+                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] p-2.5 sm:p-3 md:p-4 lg:p-6 transition-colors duration-300"
+                      data-step-index={index}
+                      style={{ backgroundColor: '#212121' }}
+                    >
                       <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
                         <div className="flex-shrink-0">
                           <Image
@@ -89,14 +97,14 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                             alt=""
                             width={24}
                             height={24}
-                            className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)' }}
+                            className="step-icon w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)' }}
                           />
                         </div>
-                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-neutral-950">
+                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-white transition-colors duration-300">
                           {etapa.title}
                         </h3>
-                        <p className="text-xs sm:text-sm md:text-base lg:text-[16px] text-neutral-950/80 leading-relaxed">
+                        <p className="text-xs sm:text-sm md:text-base lg:text-[16px] text-white/80 leading-relaxed transition-colors duration-300">
                           {etapa.description}
                         </p>
                       </div>

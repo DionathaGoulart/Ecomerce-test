@@ -24,9 +24,9 @@ export default function Footer() {
       <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-48 2xl:px-96 py-8 sm:py-12 md:py-16">
         <div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-12">
           {/* Coluna Esquerda */}
-          <div className="flex flex-col gap-4 sm:gap-6">
+          <div className="flex flex-col">
             {/* Logo */}
-            <Link href="/" className="flex items-center">
+            <Link href="/" className="flex items-center mb-6">
               <Image
                 src="/Logotipo.svg"
                 alt="Logo"
@@ -38,17 +38,17 @@ export default function Footer() {
             </Link>
             
             {/* CNPJ */}
-            <p className="text-white/80" style={{ fontSize: '12px' }}>
+            <p className="text-white/80 mb-3" style={{ fontSize: '12px' }}>
               Mil ideias - {cnpj}
             </p>
             
             {/* Copyright */}
-            <p className="text-white/60" style={{ fontSize: '12px' }}>
+            <p className="text-white/60 mb-6" style={{ fontSize: '12px' }}>
               2025 © Todos os direitos reservados
             </p>
             
             {/* Redes Sociais */}
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-4">
               <a
                 href={instagramUrl}
                 target="_blank"
@@ -98,13 +98,13 @@ export default function Footer() {
           </div>
 
           {/* Coluna Direita */}
-          <div className="flex flex-col gap-3 sm:gap-4 pt-10 sm:pt-12 md:pt-14">
+          <div className="flex flex-col pt-10 sm:pt-12 md:pt-14">
             {/* Telefone */}
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors"
+              className="text-white/80 hover:text-primary-500 transition-colors mb-3"
               style={{ fontSize: '12px' }}
             >
               {phone}
@@ -113,7 +113,7 @@ export default function Footer() {
             {/* Email */}
             <a
               href={`mailto:${email}`}
-              className="text-white/80 hover:text-primary-500 transition-colors"
+              className="text-white/80 hover:text-primary-500 transition-colors mb-3"
               style={{ fontSize: '12px' }}
             >
               {email}
@@ -124,14 +124,14 @@ export default function Footer() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors"
+              className="text-white/80 hover:text-primary-500 transition-colors mb-6"
               style={{ fontSize: '12px' }}
             >
               {address}
             </a>
             
             {/* Desenvolvido por */}
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-2">
               <span className="text-white/60" style={{ fontSize: '12px' }}>Desenvolvido por</span>
               <a
                 href="https://containner.co/"
