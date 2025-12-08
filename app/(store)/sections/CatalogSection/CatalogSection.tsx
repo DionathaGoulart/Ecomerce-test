@@ -142,13 +142,14 @@ export default function CatalogSection() {
         const response = await fetch('/api/categories')
         if (response.ok) {
           const data = await response.json()
+          console.log('Categorias carregadas:', data)
           setCategories(data)
           // Sempre definir a primeira categoria como ativa por padrão
           if (data.length > 0) {
             setSelectedCategory(data[0].name)
           }
         } else {
-          console.error('Erro ao buscar categorias')
+          console.error('Erro ao buscar categorias:', response.status, response.statusText)
         }
       } catch (error) {
         console.error('Erro ao buscar categorias:', error)
@@ -279,6 +280,8 @@ export default function CatalogSection() {
                 <div className="py-4">
                   <LoadingDots size="sm" />
                 </div>
+              ) : categories.length === 0 ? (
+                <p className="text-sm text-white/60">Nenhuma categoria disponível</p>
               ) : (
                 <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
                   {categories.map((category) => {

@@ -73,24 +73,16 @@ export default function CartCheckoutForm() {
     return cartItemsFromHook.map(item => `${item.productId}:${item.personalizationImageUrl || 'no-image'}`).join('|')
   }, [cartItemsFromHook])
   
-  // Usar useMemo para criar nova referência sempre que cartItemsFromHook ou imageUrlsHash mudar
+  // Usar useMemo para criar nova referência sempre que cartItemsFromHook mudar
   const cartItems = useMemo(() => {
     const items = cartItemsFromHook.map(item => ({ ...item }))
-    console.log('useMemo - cartItemsFromHook mudou, criando nova referência')
-    console.log('Hash das imagens:', imageUrlsHash)
-    console.log('Itens no useMemo:', items.map(item => ({
-      productId: item.productId,
-      hasImage: !!item.personalizationImageUrl,
-      imageUrl: item.personalizationImageUrl?.substring(0, 50),
-    })))
     return items
-  }, [cartItemsFromHook, imageUrlsHash])
+  }, [cartItemsFromHook])
   
   const [refreshKey, setRefreshKey] = useState(0)
   
   // Forçar atualização do refreshKey quando cartItems mudar
   useEffect(() => {
-    console.log('CartItems mudou no useMemo, atualizando refreshKey')
     setRefreshKey(prev => prev + 1)
   }, [cartItems])
   const [products, setProducts] = useState<Record<string, Product>>({})
@@ -273,7 +265,6 @@ export default function CartCheckoutForm() {
 
   // Handler para quando o formulário tem erros de validação
   const onError = (errors: any) => {
-    console.log('Erros de validação:', errors)
     // Scroll para o primeiro erro
     const firstError = Object.keys(errors)[0]
     if (firstError) {
@@ -288,55 +279,19 @@ export default function CartCheckoutForm() {
 
   // Debug: Log quando cartItems mudar e forçar re-render
   useEffect(() => {
-    console.log('CartCheckoutForm - cartItems mudou, quantidade:', cartItems.length)
-    console.log('CartCheckoutForm - cartItems detalhes:', cartItems.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      hasImage: !!item.personalizationImageUrl,
-      hasPath: !!item.personalizationImagePath,
-      imageUrl: item.personalizationImageUrl?.substring(0, 50) + '...',
-    })))
-    
-    // Verificar se há itens sem imagem que deveriam ter
-    cartItems.forEach(item => {
-      if (!item.personalizationImageUrl) {
-        console.warn('Item sem imagem encontrado:', item.productId)
-      } else {
-        console.log('Item COM imagem:', item.productId, 'URL:', item.personalizationImageUrl?.substring(0, 100))
-      }
-    })
-    
     // Forçar atualização do refreshKey para garantir re-render
-    setRefreshKey(prev => {
-      const newKey = prev + 1
-      console.log('Atualizando refreshKey para:', newKey)
-      return newKey
-    })
+    setRefreshKey(prev => prev + 1)
   }, [cartItems])
 
   // Listener para eventos de atualização do carrinho
   useEffect(() => {
     const handleCartUpdate = () => {
-      console.log('Evento cart-updated recebido no CartCheckoutForm')
-      console.log('CartItemsFromHook no momento do evento:', cartItemsFromHook.map(item => ({
-        productId: item.productId,
-        hasImage: !!item.personalizationImageUrl,
-      })))
-      
       // Forçar atualização do refreshKey para garantir re-render
-      setRefreshKey(prev => {
-        const newKey = prev + 1
-        console.log('Atualizando refreshKey (evento) para:', newKey)
-        return newKey
-      })
+      setRefreshKey(prev => prev + 1)
       
       // Pequeno delay para garantir que o estado foi atualizado
       setTimeout(() => {
-        setRefreshKey(prev => {
-          const newKey = prev + 1
-          console.log('Atualizando refreshKey (evento delay) para:', newKey)
-          return newKey
-        })
+        setRefreshKey(prev => prev + 1)
       }, 100)
     }
 
@@ -352,7 +307,8 @@ export default function CartCheckoutForm() {
       // Manter valores existentes que não estão no carrinho (para edição em andamento)
       const merged = { ...prev }
       cartItems.forEach(item => {
-        if (item.personalizationDescription) {
+        // Só atualizar se não houver valor local sendo editado
+        if (item.personalizationDescription && !prev[item.productId]) {
           merged[item.productId] = item.personalizationDescription
         }
       })
@@ -492,11 +448,14 @@ export default function CartCheckoutForm() {
     }
   }
 
-  // Handler para atualizar descrição
+  // Handler para atualizar descrição (apenas no estado local)
   const handleDescriptionChange = (productId: string, description: string) => {
     setPersonalizationDescriptions(prev => ({ ...prev, [productId]: description }))
-    
-    // Atualizar item do carrinho automaticamente
+  }
+
+  // Handler para salvar descrição no carrinho quando sair do campo
+  const handleDescriptionBlur = (productId: string) => {
+    const description = personalizationDescriptions[productId] || ''
     const currentItem = cartItems.find(item => item.productId === productId)
     if (currentItem) {
       addItem({
@@ -664,7 +623,24 @@ export default function CartCheckoutForm() {
   }, [zipcode, deliveryType, calculateShipping])
 
   const onSubmit = async (customerData: CreateOrderInput['customer']) => {
-    console.log('Submetendo formulário com dados:', customerData)
+    
+    // Verificar se todos os produtos do carrinho ainda existem
+    const missingProducts: string[] = []
+    for (const item of cartItems) {
+      if (!products[item.productId]) {
+        missingProducts.push(item.productId)
+      }
+    }
+    
+    if (missingProducts.length > 0) {
+      // Remover produtos inválidos do carrinho
+      for (const productId of missingProducts) {
+        removeItem(productId)
+      }
+      alert(`Alguns produtos não estão mais disponíveis e foram removidos do carrinho. Por favor, revise seu carrinho e tente novamente.`)
+      setLoading(false)
+      return
+    }
     
     // Verificar se está logado
     if (!user) {
@@ -727,18 +703,41 @@ export default function CartCheckoutForm() {
 
     try {
       // Se for retirada, usar endereço da empresa
+      if (deliveryType === 'pickup') {
+        // Verificar se o endereço da empresa está carregado
+        if (!companyAddress.street || !companyAddress.number || !companyAddress.city || !companyAddress.state || !companyAddress.zipcode) {
+          alert('Endereço da empresa não está disponível. Por favor, tente novamente em alguns instantes.')
+          setLoading(false)
+          return
+        }
+      }
+
       const addressData = deliveryType === 'pickup' 
         ? {
             street: companyAddress.street,
             number: companyAddress.number,
-            complement: companyAddress.complement,
+            complement: companyAddress.complement || '',
             city: companyAddress.city,
             state: companyAddress.state,
-            zipcode: unformatCEP(companyAddress.zipcode),
+            zipcode: (() => {
+              const cep = unformatCEP(companyAddress.zipcode) || companyAddress.zipcode.replace(/\D/g, '')
+              // Garantir formato correto: 12345-678 ou 12345678
+              if (cep.length === 8) {
+                return `${cep.slice(0, 5)}-${cep.slice(5)}`
+              }
+              return cep
+            })(),
           }
         : {
             ...finalCustomerData.address,
-            zipcode: unformatCEP(finalCustomerData.address.zipcode), // Remove formatação do CEP
+            zipcode: (() => {
+              const cep = unformatCEP(finalCustomerData.address.zipcode)
+              // Garantir formato correto: 12345-678 ou 12345678
+              if (cep.length === 8) {
+                return `${cep.slice(0, 5)}-${cep.slice(5)}`
+              }
+              return cep
+            })(),
           }
 
       // Formatar dados antes de enviar
@@ -756,7 +755,11 @@ export default function CartCheckoutForm() {
       const validation = createOrderSchema.safeParse(formattedData)
       if (!validation.success) {
         console.error('Erro de validação:', validation.error)
-        alert('Erro de validação. Verifique os campos e tente novamente.')
+        const errorMessages = validation.error.errors.map(err => {
+          const path = err.path.join('.')
+          return `${path}: ${err.message}`
+        }).join('\n')
+        alert(`Erro de validação:\n\n${errorMessages}\n\nVerifique os campos e tente novamente.`)
         setLoading(false)
         return
       }
@@ -783,7 +786,6 @@ export default function CartCheckoutForm() {
         return
       }
 
-      console.log('Pedido criado com sucesso, redirecionando para Stripe...')
       
       // Limpar carrinho
       localStorage.removeItem('cart')
@@ -990,6 +992,7 @@ export default function CartCheckoutForm() {
                           placeholder="Ex: Colocar no centro da caneca"
                           value={personalizationDescriptions[item.productId] || item.personalizationDescription || ''}
                           onChange={(e) => handleDescriptionChange(item.productId, e.target.value)}
+                          onBlur={() => handleDescriptionBlur(item.productId)}
                           maxLength={500}
                           className="text-sm bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-500"
                         />
@@ -1498,7 +1501,6 @@ export default function CartCheckoutForm() {
           }}
           onAdd={() => {
             // Callback após adicionar ao carrinho
-            console.log('Modal onAdd chamado')
             // O hook useCart já atualiza automaticamente
             // Forçar atualização do estado para garantir que a UI seja atualizada
             setPersonalizeModalOpen(false)
@@ -1508,7 +1510,6 @@ export default function CartCheckoutForm() {
             // Pequeno delay para garantir que o estado foi atualizado
             setTimeout(() => {
               setRefreshKey(prev => prev + 1)
-              console.log('CartItems após adicionar:', cartItemsFromHook)
             }, 100)
           }}
           initialQuantity={cartItemsFromHook.find(item => item.productId === selectedProductId)?.quantity || 1}

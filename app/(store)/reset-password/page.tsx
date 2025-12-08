@@ -52,7 +52,6 @@ function ResetPasswordForm() {
         // Não vamos mostrar erro aqui, pois o hash fragment pode ainda estar sendo processado
         // O erro real será mostrado quando o usuário tentar atualizar a senha
         if (sessionError) {
-          console.log('Erro ao verificar sessão:', sessionError)
         }
       } catch (err) {
         console.error('Erro ao verificar sessão:', err)

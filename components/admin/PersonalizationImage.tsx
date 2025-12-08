@@ -16,7 +16,6 @@ export default function PersonalizationImage({
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleImageClick = () => {
-    console.log('Imagem clicada, abrindo modal...')
     setIsModalOpen(true)
   }
 
@@ -69,7 +68,6 @@ export default function PersonalizationImage({
         <ImageModal
           imageUrl={imageUrl}
           onClose={() => {
-            console.log('Fechando modal...')
             setIsModalOpen(false)
           }}
           alt={alt}

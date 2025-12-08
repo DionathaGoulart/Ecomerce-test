@@ -184,7 +184,6 @@ export default function MinhaContaPage() {
       const response = await fetch(`https://viacep.com.br/ws/${cleanedCEP}/json/`)
       const data = await response.json()
 
-      console.log('Dados do CEP recebidos:', data)
 
       if (data.erro) {
         // CEP não encontrado, mas não mostra erro (usuário pode digitar manualmente)
@@ -201,9 +200,6 @@ export default function MinhaContaPage() {
           city: data.localidade ? capitalizeWords(data.localidade) : '',
           state: data.uf ? data.uf.toUpperCase() : '',
         }
-        console.log('Dados recebidos da API:', data)
-        console.log('Formulário antes:', prev)
-        console.log('Formulário depois:', newForm)
         return newForm
       })
     } catch (error) {

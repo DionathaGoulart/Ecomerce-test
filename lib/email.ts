@@ -178,11 +178,6 @@ export async function sendOrderConfirmation({
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
   
   try {
-    console.log(`\n📨 [EMAIL] Iniciando envio de email`)
-    console.log(`📨 [EMAIL] Para: ${to}`)
-    console.log(`📨 [EMAIL] Pedido: #${orderNumber}`)
-    console.log(`📨 [EMAIL] From: ${fromEmail}`)
-    
     const { data, error } = await resend.emails.send({
       from: `E-commerce <${fromEmail}>`,
       to,
@@ -229,8 +224,6 @@ export async function sendOrderConfirmation({
       throw new Error(errorMessage)
     }
 
-    console.log('\n✅ [EMAIL] Email enviado com sucesso!')
-    console.log('✅ [EMAIL] Data:', JSON.stringify(data, null, 2))
     return data
   } catch (error) {
     console.error('\n❌ [EMAIL] Exceção capturada ao enviar email')

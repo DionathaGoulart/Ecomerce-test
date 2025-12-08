@@ -1,14 +1,20 @@
 'use client'
 
 import { useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { 
-  SplineBackground, 
   HomeHero, 
   BenefitsSection, 
   HowItWorksSection,
   CatalogSection
 } from './sections'
 import { useSplineLimit } from '@/hooks/useSplineLimit'
+
+// Carregar SplineBackground dinamicamente para evitar problemas com async/await
+const SplineBackground = dynamic(() => import('./sections/SplineBackground/SplineBackground').then(mod => ({ default: mod.SplineBackground })), {
+  ssr: false,
+  loading: () => <div className="hidden md:block w-full h-full" />
+})
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)

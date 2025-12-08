@@ -8,21 +8,11 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
-  // Logs forçados para garantir que apareçam
-  console.log('\n' + '='.repeat(50))
-  console.log('🔔 WEBHOOK RECEBIDO DO STRIPE')
-  console.log('='.repeat(50) + '\n')
-  
   try {
     // Obter o body como array buffer primeiro para garantir que não seja modificado
     const arrayBuffer = await request.arrayBuffer()
     const body = Buffer.from(arrayBuffer).toString('utf8')
     const signature = request.headers.get('stripe-signature')
-    
-    console.log('📋 Signature presente:', !!signature)
-    console.log('📋 Body length:', body.length)
-    console.log('📋 Body preview (primeiros 100 chars):', body.substring(0, 100))
-    console.log('📋 Body preview (últimos 100 chars):', body.substring(Math.max(0, body.length - 100)))
 
     if (!signature) {
       console.error('❌ Assinatura não fornecida no webhook')
@@ -41,9 +31,6 @@ export async function POST(request: NextRequest) {
     }
 
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-    console.log('🔐 Webhook secret configurado:', !!webhookSecret)
-    console.log('🔐 Webhook secret prefix:', webhookSecret?.substring(0, 10))
-    console.log('🔐 Webhook secret length:', webhookSecret?.length)
     
     // Verificar se o secret começa com whsec_
     if (!webhookSecret || !webhookSecret.startsWith('whsec_')) {
@@ -75,7 +62,6 @@ export async function POST(request: NextRequest) {
         signature,
         webhookSecret
       )
-      console.log(`✅ Webhook verificado com sucesso. Tipo: ${event.type}`)
     } catch (err) {
       const error = err as Error
       console.error('❌ Erro ao verificar webhook:', error.message)
@@ -103,7 +89,6 @@ export async function POST(request: NextRequest) {
           signature,
           webhookSecret
         )
-        console.log(`✅ Webhook verificado com sucesso (usando Buffer). Tipo: ${event.type}`)
       } catch (bufferErr) {
         console.error('❌ Também falhou com Buffer:', bufferErr instanceof Error ? bufferErr.message : bufferErr)
         return NextResponse.json(
@@ -115,21 +100,15 @@ export async function POST(request: NextRequest) {
 
   // Processar evento de pagamento bem-sucedido
   if (event.type === 'checkout.session.completed') {
-    console.log('✅ Evento checkout.session.completed recebido')
     const session = event.data.object as Stripe.Checkout.Session
-    console.log(`📋 Session ID: ${session.id}`)
-    console.log(`📋 Metadata:`, session.metadata)
 
     try {
       // Buscar pedido pelo session_id
-      console.log('🔍 Buscando pedido no banco...')
       const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
         .select('id, order_number, total_cents, user_id')
         .eq('stripe_session_id', session.id)
         .single()
-      
-      console.log('📦 Resultado da busca:', { order, orderError })
 
       if (orderError || !order) {
         console.error('❌ Pedido não encontrado:', orderError)
@@ -140,10 +119,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      console.log(`✅ Pedido encontrado: #${order.order_number}`)
-
       // Buscar dados do usuário
-      console.log('👤 Buscando dados do usuário...')
       const { data: profile, error: profileError } = await supabaseAdmin
         .from('profiles')
         .select('email, full_name')
@@ -157,11 +133,8 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         )
       }
-      
-      console.log(`✅ Perfil encontrado: ${profile.email}`)
 
       // Buscar itens do pedido
-      console.log('🛒 Buscando itens do pedido...')
       const { data: orderItems, error: itemsError } = await supabaseAdmin
         .from('order_items')
         .select(`
@@ -174,22 +147,16 @@ export async function POST(request: NextRequest) {
       
       if (itemsError) {
         console.error('❌ Erro ao buscar itens:', itemsError)
-      } else {
-        console.log(`✅ ${orderItems?.length || 0} itens encontrados`)
       }
 
       // Buscar recibo do Stripe
-      console.log('💰 Buscando recibo do Stripe...')
       const paymentIntentId = session.payment_intent as string
       let receiptUrl: string | undefined
       
       if (paymentIntentId) {
         try {
-          console.log(`📋 Payment Intent ID: ${paymentIntentId}`)
-          
           // Buscar o PaymentIntent
           const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
-          console.log(`📋 Payment Intent status: ${paymentIntent.status}`)
           
           // Tentar buscar charges
           const charges = await stripe.charges.list({
@@ -197,12 +164,9 @@ export async function POST(request: NextRequest) {
             limit: 1,
           })
           
-          console.log(`📋 Charges encontrados: ${charges.data.length}`)
-          
           if (charges.data.length > 0) {
             const charge = charges.data[0]
             receiptUrl = charge.receipt_url || undefined
-            console.log(`✅ Recibo URL: ${receiptUrl || 'não disponível'}`)
             
             // Se não tiver receipt_url, tentar gerar um
             if (!receiptUrl && charge.id) {
@@ -210,7 +174,6 @@ export async function POST(request: NextRequest) {
                 // Tentar buscar o charge diretamente para obter o receipt_url
                 const chargeDetails = await stripe.charges.retrieve(charge.id)
                 receiptUrl = chargeDetails.receipt_url || undefined
-                console.log(`✅ Recibo URL (detalhes): ${receiptUrl || 'não disponível'}`)
               } catch (err) {
                 console.warn('⚠️ Erro ao buscar detalhes do charge:', err)
               }
@@ -229,7 +192,6 @@ export async function POST(request: NextRequest) {
       }
 
       // Atualizar status do pedido
-      console.log('📝 Atualizando status do pedido para "paid"...')
       const { error: updateError } = await supabaseAdmin
         .from('orders')
         .update({
@@ -240,8 +202,6 @@ export async function POST(request: NextRequest) {
       
       if (updateError) {
         console.error('❌ Erro ao atualizar pedido:', updateError)
-      } else {
-        console.log('✅ Pedido atualizado com sucesso')
       }
 
       // Enviar email de confirmação
@@ -263,15 +223,7 @@ export async function POST(request: NextRequest) {
         })
 
         try {
-          console.log('\n' + '📧'.repeat(20))
-          console.log('📧 INICIANDO ENVIO DE EMAIL')
-          console.log('📧'.repeat(20))
-          console.log(`📧 Para: ${profile.email}`)
-          console.log(`📧 Pedido: #${order.order_number}`)
-          console.log(`📧 Itens: ${emailItems.length}`)
-          console.log(`📧 RESEND_API_KEY configurada: ${!!process.env.RESEND_API_KEY}`)
-          
-          const emailResult = await sendOrderConfirmation({
+          await sendOrderConfirmation({
             to: profile.email,
             orderNumber: order.order_number,
             customerName: profile.full_name || 'Cliente',
@@ -280,12 +232,6 @@ export async function POST(request: NextRequest) {
             receiptUrl,
             totalCents: order.total_cents,
           })
-          
-          console.log('\n' + '✅'.repeat(20))
-          console.log('✅ EMAIL ENVIADO COM SUCESSO!')
-          console.log('✅'.repeat(20))
-          console.log('✅ Resultado:', JSON.stringify(emailResult, null, 2))
-          console.log('\n')
         } catch (emailError) {
           console.error('\n' + '❌'.repeat(20))
           console.error('❌ ERRO AO ENVIAR EMAIL')
@@ -312,7 +258,6 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      console.log('✅ Webhook processado com sucesso')
       return NextResponse.json({ received: true })
     } catch (error) {
       console.error('❌ Erro ao processar webhook:', error)
@@ -327,7 +272,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  console.log(`ℹ️ Evento ${event.type} não processado (não é checkout.session.completed)`)
   return NextResponse.json({ received: true })
   } catch (error) {
     console.error('❌ Erro geral no webhook:', error)

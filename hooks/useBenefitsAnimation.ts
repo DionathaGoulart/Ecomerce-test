@@ -246,7 +246,7 @@ export function useBenefitsAnimation(
 
     // Aguardar renderização completa
     const initTimeout = setTimeout(() => {
-      observer.observe(cardsSection)
+      observer.observe(cardsSection as Element)
       checkVisibility() // Verifica na inicialização
     }, 1000)
 

@@ -29,7 +29,6 @@ export default function AdminLoginPage() {
     setError(null)
 
     try {
-      console.log('🔐 Tentando fazer login com:', data.email)
       
       const supabase = createClient()
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -51,7 +50,6 @@ export default function AdminLoginPage() {
         return
       }
 
-      console.log('✅ Login bem-sucedido! Usuário:', authData.user.email)
       
       // Verificar se tem acesso ao admin (admin, superadmin ou moderador)
       const { data: profile } = await supabase
@@ -69,7 +67,6 @@ export default function AdminLoginPage() {
       
       // Verificar se a sessão foi salva
       const { data: sessionData } = await supabase.auth.getSession()
-      console.log('📋 Sessão após login:', sessionData?.session ? 'OK' : 'Não encontrada')
       
       if (!sessionData?.session) {
         console.error('❌ Sessão não foi criada')
@@ -78,7 +75,6 @@ export default function AdminLoginPage() {
         return
       }
       
-      console.log('✅ Sessão confirmada! Redirecionando para /admin...')
       
       // Redirecionar para admin
       window.location.href = '/admin'

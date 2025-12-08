@@ -24,7 +24,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
               style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               unoptimized
             />
@@ -37,7 +37,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
               style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               unoptimized
             />
@@ -50,7 +50,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] w-auto h-auto object-contain mr-5 sm:mr-10"
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
               style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               unoptimized
             />

@@ -27,7 +27,6 @@ export function useAuth() {
     // Debounce: evitar verificações muito frequentes
     const now = Date.now()
     if (now - lastCheckTimeRef.current < DEBOUNCE_MS) {
-      console.log('Verificação ignorada por debounce')
       return
     }
     lastCheckTimeRef.current = now
