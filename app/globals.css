@@ -49,6 +49,15 @@ input[type="number"] {
   /* O Spline será limitado pelo container pai via JavaScript */
 }
 
+/* Torna o background do Spline transparente */
+.spline-background canvas {
+  background: transparent !important;
+}
+
+.spline-background > div > div > div canvas {
+  background: transparent !important;
+}
+
 /* Animação do carousel agora é controlada via JavaScript para loop perfeito */
 
 /* Efeito de fade out lateral para carousel usando mask-image */
