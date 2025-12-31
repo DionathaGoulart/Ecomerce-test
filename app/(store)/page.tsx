@@ -13,7 +13,7 @@ import { useSplineLimit } from '@/hooks/useSplineLimit'
 // Carregar SplineBackground dinamicamente para evitar problemas com async/await
 const SplineBackground = dynamic(() => import('./sections/SplineBackground/SplineBackground').then(mod => ({ default: mod.SplineBackground })), {
   ssr: false,
-  loading: () => <div className="hidden md:block w-full h-full" />
+  loading: () => <div className="w-full h-full" />
 })
 
 export default function Home() {
@@ -32,7 +32,7 @@ export default function Home() {
         style={{ overflowX: 'clip', overflowY: 'visible' }}
       >
         {/* Spline de fundo - absolute para não empurrar conteúdo */}
-        <div className="absolute inset-0 z-0 hidden md:block" style={{ zIndex: 0, isolation: 'isolate' }}>
+        <div className="absolute inset-0 z-0" style={{ zIndex: 0, isolation: 'isolate' }}>
           <SplineBackground />
         </div>
 
@@ -42,7 +42,10 @@ export default function Home() {
           className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 m-0 p-0"
           style={{ overflow: 'visible' }}
         >
-          {/* Seção Home - deve aparecer logo abaixo do header */}
+          {/* Espaço vazio no mobile para o Spline aparecer primeiro */}
+          <div className="h-[215vh] md:hidden"></div>
+          
+          {/* Seção Home */}
           <HomeHero />
 
           {/* Seção de Benefícios */}
