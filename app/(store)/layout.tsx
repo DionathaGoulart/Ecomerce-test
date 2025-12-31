@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Logo from '@/components/store/Logo'
-import { ShoppingCart, User, Menu, X } from 'lucide-react'
+import { ShoppingCart, User, Home, Package } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { Spinner } from '@/components/atoms/Spinner'
@@ -21,7 +21,6 @@ export default function StoreLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, loading, refresh } = useAuth()
   const { cartItems } = useCart()
   const [cartItemCount, setCartItemCount] = useState(0)
@@ -222,9 +221,9 @@ export default function StoreLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-[#060606]">
-      {/* Header fixo */}
+      {/* Header fixo - Escondido no mobile */}
       <header 
-        className={`fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 transition-opacity duration-300 ease-in-out ${
+        className={`hidden md:block fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 transition-opacity duration-300 ease-in-out ${
           headerVisible ? 'opacity-100' : 'opacity-0'
         }`}
         onMouseEnter={handleMouseEnter}
@@ -236,15 +235,6 @@ export default function StoreLayout({
             <Link href="/" className="flex items-center flex-shrink-0">
               <Logo />
             </Link>
-
-            {/* Botão Menu Mobile */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center p-2 text-white"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
 
             {/* Nav no meio (Desktop) */}
             <nav className="hidden md:flex items-center gap-2 lg:gap-4">
@@ -393,157 +383,79 @@ export default function StoreLayout({
         </div>
       </header>
 
-      {/* Menu Mobile */}
-      {mobileMenuOpen && (
-        <div className="fixed top-[73px] left-0 right-0 z-30 md:hidden bg-header-bg border-t border-header-border">
-          <nav className="flex flex-col p-4 gap-2">
-            {navItems.map((item) => {
-              const sectionId = item.href.replace('/#', '')
-              const isActive = activeSection === sectionId
-              
-              const handleMobileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                setMobileMenuOpen(false)
-                if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona' || item.href === '/#catalogo') {
-                  e.preventDefault()
-                  
-                  // Se não estiver na página home, navegar primeiro
-                  if (pathname !== '/') {
-                    router.push('/')
-                    // Aguardar a navegação e depois fazer scroll
-                    setTimeout(() => {
-                      const section = document.getElementById(sectionId)
-                      if (section) {
-                        if (sectionId === 'beneficios') {
-                          const rect = section.getBoundingClientRect()
-                          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                          const elementTop = rect.top + scrollTop
-                          const targetPosition = elementTop - 100
-                          smoothScrollTo(targetPosition, 1000)
-                        } else if (sectionId === 'catalogo') {
-                          // Para catálogo, usar getBoundingClientRect porque está em container separado
-                          const rect = section.getBoundingClientRect()
-                          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                          const elementTop = rect.top + scrollTop
-                          const isMobile = window.innerWidth < 768
-                          const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                          const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                          const targetPosition = elementTop - headerOffset
-                          smoothScrollTo(targetPosition, 1000)
-                        } else {
-                          const isMobile = window.innerWidth < 768
-                          const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                          const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                          const elementPosition = section.offsetTop
-                          const targetPosition = elementPosition - headerOffset
-                          smoothScrollTo(targetPosition, 1000)
-                        }
-                      }
-                    }, pathname !== '/' ? 500 : 200)
-                  } else {
-                    // Já está na home, fazer scroll direto
-                    const section = document.getElementById(sectionId)
-                    if (section) {
-                      if (sectionId === 'beneficios') {
-                        // Para benefícios, a seção está dentro de um container sticky
-                        // Pega a posição exata usando getBoundingClientRect
-                        const rect = section.getBoundingClientRect()
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                        const elementTop = rect.top + scrollTop
-                        
-                        // Scroll até a seção, descontando apenas um pequeno offset
-                        const targetPosition = elementTop - 100
-                        
-                        smoothScrollTo(targetPosition, 1000)
-                      } else if (sectionId === 'catalogo') {
-                        // Para catálogo, usar getBoundingClientRect porque está em container separado
-                        const rect = section.getBoundingClientRect()
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                        const elementTop = rect.top + scrollTop
-                        const isMobile = window.innerWidth < 768
-                        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                        const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                        const targetPosition = elementTop - headerOffset
-                        smoothScrollTo(targetPosition, 1000)
-                      } else {
-                        // Para home e comofunciona, usa o método padrão
-                        const isMobile = window.innerWidth < 768
-                        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                        const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                        const elementPosition = section.offsetTop
-                        const targetPosition = elementPosition - headerOffset
-                        smoothScrollTo(targetPosition, 1000)
-                      }
-                    }
-                  }
-                }
-              }
-              
-              if (item.href.startsWith('/#')) {
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={handleMobileClick}
-                    className="flex items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <span>{item.label}</span>
-                    <Image
-                      src="/icons/right.svg"
-                      alt=""
-                      width={10}
-                      height={10}
-                      className={`h-2.5 w-2.5 transition-transform duration-300 ${isActive ? 'rotate-90' : ''}`}
-                    />
-                  </a>
-                )
-              }
-              
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-3 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  {item.label}
-                </Link>
-              )
-            })}
-            
-            {/* Botões de Ação no Mobile */}
-            <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
-              <Link
-                href={user ? "/minha-conta" : "/login"}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-primary-500 border border-primary-500 rounded-2xl transition-opacity hover:opacity-80"
-              >
-                <User className="h-4 w-4 text-primary-500" />
-                <span>{user ? "Minha Conta" : "Login"}</span>
-              </Link>
-              
-              <Link
-                href="/cart"
-                onClick={() => setMobileMenuOpen(false)}
-                className="relative flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-neutral-950 bg-primary-500 rounded-2xl transition-opacity hover:opacity-80"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                <span>Carrinho</span>
-                {cartItemCount > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
-                    {cartItemCount > 99 ? '99+' : cartItemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
-      
-      {/* Main com container padronizado */}
-      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
+      {/* Main com container padronizado - padding bottom no mobile para navbar fixa */}
+      <main className="flex-1 relative px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 pb-20 md:pb-0">
         {children}
       </main>
       
+      {/* Navbar Mobile Fixa na Parte Inferior */}
+      <nav className="md:hidden fixed bottom-2 left-4 right-4 z-50">
+        <div className="rounded-xl border border-header-border bg-header-bg px-3 py-2">
+          <div className="flex items-center justify-around">
+            {/* Ícone Início */}
+            <a
+              href="/#home"
+              onClick={(e) => {
+                if (pathname === '/') {
+                  e.preventDefault()
+                  const section = document.getElementById('home')
+                  if (section) {
+                    smoothScrollTo(0, 1000)
+                  }
+                }
+              }}
+              className="flex items-center justify-center p-2"
+            >
+              <Home className="h-6 w-6" style={{ color: '#E9EF33' }} />
+            </a>
+
+            {/* Ícone Catálogo */}
+            <a
+              href="/#catalogo"
+              onClick={(e) => {
+                e.preventDefault()
+                if (pathname !== '/') {
+                  router.push('/#catalogo')
+                } else {
+                  const section = document.getElementById('catalogo')
+                  if (section) {
+                    const rect = section.getBoundingClientRect()
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                    const elementTop = rect.top + scrollTop
+                    const targetPosition = elementTop - 80
+                    smoothScrollTo(targetPosition, 1000)
+                  }
+                }
+              }}
+              className="flex items-center justify-center p-2"
+            >
+              <Package className="h-6 w-6" style={{ color: '#E9EF33' }} />
+            </a>
+
+            {/* Ícone Carrinho */}
+            <Link
+              href="/cart"
+              className="relative flex items-center justify-center p-2"
+            >
+              <ShoppingCart className="h-6 w-6" style={{ color: '#E9EF33' }} />
+              {cartItemCount > 0 && (
+                <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                  {cartItemCount > 99 ? '99+' : cartItemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Ícone Conta */}
+            <Link
+              href={user ? "/minha-conta" : "/login"}
+              className="flex items-center justify-center p-2"
+            >
+              <User className="h-6 w-6" style={{ color: '#E9EF33' }} />
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Footer */}
       <Footer />
     </div>
