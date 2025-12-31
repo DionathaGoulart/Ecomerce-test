@@ -8,8 +8,8 @@ export function ClientCarousel() {
 
   return (
     <div className="mt-4 sm:mt-8 md:mt-12 lg:mt-16 w-full">
-      <div className="max-w-2xl mb-2 sm:mb-3 md:mb-4">
-        <p className="text-xs sm:text-sm md:text-base text-white">Conheça nossos clientes:</p>
+      <div className="max-w-2xl mb-2 sm:mb-3 md:mb-4 mx-auto md:mx-0">
+        <p className="text-[14px] sm:text-sm md:text-base text-white text-center md:text-left" style={{ opacity: 0.8 }}>Conheça nossos clientes:</p>
       </div>
       
       {/* Carousel */}
