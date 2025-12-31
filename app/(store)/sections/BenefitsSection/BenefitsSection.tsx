@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { BenefitCard, LineConfig } from './BenefitCard'
 import { useBenefitsAnimation } from '@/hooks/useBenefitsAnimation'
 
@@ -99,26 +99,149 @@ const CARDS_DATA: BenefitCardData[] = [
 export function BenefitsSection() {
   const cardsSectionRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const carousel1Ref = useRef<HTMLDivElement>(null)
+  const carousel2Ref = useRef<HTMLDivElement>(null)
 
   useBenefitsAnimation(cardsSectionRef, cardRefs)
+
+  // Função para animar carrossel
+  const animateCarousel = (carousel: HTMLDivElement, cardWidth: number, gap: number, startPosition: number = 0, speed: number = 0.3) => {
+    let animationId: number
+    let position = startPosition
+    const totalWidth = (3 * cardWidth) + (2 * gap) // 3 cards + 2 gaps
+
+    const animate = () => {
+      position += speed
+      
+      // Quando chega ao final, volta ao início (loop infinito)
+      if (position >= totalWidth) {
+        position = 0
+      }
+      
+      carousel.style.transform = `translateX(-${position}px)`
+      animationId = requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
+    }
+  }
+
+  // Carrosséis automáticos no mobile
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768
+    if (!isMobile) return
+
+    const carousel1 = carousel1Ref.current
+    const carousel2 = carousel2Ref.current
+    if (!carousel1 || !carousel2) return
+
+    const cardWidth = 242 // Largura máxima do card no mobile
+    const gap = 12
+    const totalWidth = (3 * cardWidth) + (2 * gap)
+
+    // Dessincronizar completamente: velocidades diferentes e posições iniciais diferentes
+    // Carrossel 1: velocidade normal, começa do início
+    // Carrossel 2: velocidade mais rápida, começa em posição aleatória para criar caos
+    const speed1 = 0.3
+    const speed2 = 0.5 // Mais rápido
+    const startPosition2 = (totalWidth * 0.7) // Começa em 70% do caminho
+
+    const cleanup1 = animateCarousel(carousel1, cardWidth, gap, 0, speed1)
+    const cleanup2 = animateCarousel(carousel2, cardWidth, gap, startPosition2, speed2)
+
+    return () => {
+      cleanup1()
+      cleanup2()
+    }
+  }, [])
 
   return (
     <div className="relative h-auto md:h-[220vh] xl:h-[320vh] 3xl:h-[300vh] 2xl:h-[220vh] overflow-visible">
       <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-8 3xl:pt-12 2xl:pt-40 pb-8 sm:pb-12 md:pb-16 lg:py-52 xl:py-28 3xl:py-32 2xl:py-52 md:sticky md:top-0 overflow-visible">
-        {/* Mobile: Grid 2 colunas */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:hidden">
-          {CARDS_DATA.map((card, index) => (
-            <BenefitCard
-              key={index}
-              index={index}
-              icon={card.icon}
-              title={card.title}
-              description={card.description}
-              lineConfig={card.lineConfig}
-              cardRef={(el) => { cardRefs.current[index] = el }}
-              className="w-full"
-            />
-          ))}
+        {/* Mobile: 2 Carrosséis horizontais automáticos com 3 itens cada */}
+        <div className="lg:hidden space-y-4">
+          {/* Carrossel 1 - Primeiros 3 cards */}
+          <div className="overflow-hidden">
+            <div 
+              ref={carousel1Ref}
+              className="flex items-stretch"
+              style={{ 
+                gap: '12px',
+                width: 'max-content'
+              }}
+            >
+              {/* Primeira sequência (3 cards) */}
+              {CARDS_DATA.slice(0, 3).map((card, index) => (
+                <BenefitCard
+                  key={`carousel1-first-${index}`}
+                  index={index}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={(el) => { cardRefs.current[index] = el }}
+                  className=""
+                />
+              ))}
+              {/* Segunda sequência (duplicada para loop infinito) */}
+              {CARDS_DATA.slice(0, 3).map((card, index) => (
+                <BenefitCard
+                  key={`carousel1-second-${index}`}
+                  index={index}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={() => {}}
+                  className=""
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Carrossel 2 - Últimos 3 cards */}
+          <div className="overflow-hidden">
+            <div 
+              ref={carousel2Ref}
+              className="flex items-stretch"
+              style={{ 
+                gap: '12px',
+                width: 'max-content'
+              }}
+            >
+              {/* Primeira sequência (3 cards) */}
+              {CARDS_DATA.slice(3, 6).map((card, index) => (
+                <BenefitCard
+                  key={`carousel2-first-${index}`}
+                  index={index + 3}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={(el) => { cardRefs.current[index + 3] = el }}
+                  className=""
+                />
+              ))}
+              {/* Segunda sequência (duplicada para loop infinito) */}
+              {CARDS_DATA.slice(3, 6).map((card, index) => (
+                <BenefitCard
+                  key={`carousel2-second-${index}`}
+                  index={index + 3}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={() => {}}
+                  className=""
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Desktop: Layout original com duas colunas */}

@@ -36,8 +36,8 @@ interface BenefitCardProps {
 export function BenefitCard({ index, icon, title, description, lineConfig, cardRef, className = '' }: BenefitCardProps) {
   return (
     <div ref={cardRef} className={`relative ${className}`} style={{ zIndex: 50, isolation: 'isolate' }}>
-      <div className="p-4 sm:p-6 md:p-8 xl:p-5 3xl:p-6 2xl:p-8 bg-white/5 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/10 w-full sm:w-[273px] xl:w-[240px] 3xl:w-[250px] 2xl:w-[273px] h-full">
-        <div className="flex flex-col gap-2">
+      <div className="p-8 sm:p-6 md:p-8 xl:p-5 3xl:p-6 2xl:p-8 bg-[#212121] md:bg-white/5 rounded-xl sm:rounded-2xl md:backdrop-blur-sm border border-white/10 w-full max-w-[242px] sm:w-[273px] xl:w-[240px] 3xl:w-[250px] 2xl:w-[273px] h-full max-h-[186px] md:max-h-none flex-shrink-0 flex flex-col">
+        <div className="flex flex-col gap-2 flex-1">
           <div className="w-4 h-4 flex items-center justify-center">
             <Image
               src={icon}
@@ -47,7 +47,7 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
               className="w-4 h-4"
             />
           </div>
-          <h3 className="text-xl sm:text-2xl md:text-[32px] xl:text-2xl 3xl:text-[28px] 2xl:text-[32px] font-semibold text-white leading-tight">
+          <h3 className="text-[24px] sm:text-2xl md:text-[32px] xl:text-2xl 3xl:text-[28px] 2xl:text-[32px] font-semibold text-white leading-tight">
             {title.split('\n').map((line, i) => (
               <span key={i}>
                 {line}
@@ -55,7 +55,7 @@ export function BenefitCard({ index, icon, title, description, lineConfig, cardR
               </span>
             ))}
           </h3>
-          <p className="text-[10px] sm:text-[11px] md:text-[12px] xl:text-[10px] 3xl:text-[11px] 2xl:text-[12px] text-white/80 leading-tight">
+          <p className="text-[12px] sm:text-[11px] md:text-[12px] xl:text-[10px] 3xl:text-[11px] 2xl:text-[12px] text-white/80 leading-tight">
             {description}
           </p>
         </div>
