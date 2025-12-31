@@ -19,7 +19,7 @@ const STEPS: Step[] = [
   {
     step: 2,
     icon: '/icons/step2.svg',
-    title: 'Defina Quantidade e Arte',
+    title: 'Defina os Detalhes',
     description: 'Selecione quantas unidades precisa e faça o upload do arquivo (logo ou desenho) que será gravado na peça.'
   },
   {
