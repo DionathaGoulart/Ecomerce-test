@@ -2,6 +2,81 @@ import { useRef, useEffect } from 'react'
 import { BenefitCard, LineConfig } from './BenefitCard'
 import { useBenefitsAnimation } from '@/hooks/useBenefitsAnimation'
 
+// Hook customizado baseado no useCarouselAnimation, mas com duração e posição inicial customizáveis
+function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0) {
+  const carouselRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel) return
+
+    const isMobile = window.innerWidth < 768
+    if (!isMobile) return
+
+    const initAnimation = () => {
+      requestAnimationFrame(() => {
+        const carouselWidth = carousel.scrollWidth
+        const sequenceWidth = carouselWidth / 3
+        const speed = sequenceWidth / duration
+
+        let startTime: number | null = null
+        let lastPosition = 0
+        let animationFrameId: number
+
+        const animate = (timestamp: number) => {
+          if (!startTime) {
+            // Inicializar startTime considerando a posição inicial
+            startTime = timestamp - (startPosition / speed)
+          }
+          
+          const elapsed = timestamp - startTime
+          const totalDistance = elapsed * speed
+          
+          // Calcular posição atual usando módulo
+          let currentPosition = -(totalDistance % sequenceWidth)
+          
+          // Quando chegar muito perto do final da primeira sequência (dentro de 2px),
+          // resetar para 0 de forma imperceptível
+          // Como temos 3 sequências idênticas, quando a primeira sair, a segunda estará
+          // na mesma posição visual, tornando o reset imperceptível
+          if (Math.abs(currentPosition + sequenceWidth) < 2 || currentPosition > 0) {
+            currentPosition = 0
+            // Ajustar o startTime para manter a continuidade da animação
+            const cycles = Math.floor(totalDistance / sequenceWidth)
+            const remainder = totalDistance - (cycles * sequenceWidth)
+            startTime = timestamp - (remainder / speed)
+          }
+
+          // Atualizar transform apenas se houver mudança significativa
+          if (Math.abs(currentPosition - lastPosition) > 0.01) {
+            carousel.style.transform = `translate3d(${currentPosition}px, 0, 0)`
+            lastPosition = currentPosition
+          }
+
+          animationFrameId = requestAnimationFrame(animate)
+        }
+
+        animationFrameId = requestAnimationFrame(animate)
+        
+        // Cleanup
+        return () => {
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId)
+          }
+        }
+      })
+    }
+
+    const timeoutId = setTimeout(initAnimation, 100)
+    
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [duration, startPosition])
+
+  return carouselRef
+}
+
 export interface BenefitCardData {
   icon: string
   title: string
@@ -99,74 +174,34 @@ const CARDS_DATA: BenefitCardData[] = [
 export function BenefitsSection() {
   const cardsSectionRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const carousel1Ref = useRef<HTMLDivElement>(null)
-  const carousel2Ref = useRef<HTMLDivElement>(null)
 
   useBenefitsAnimation(cardsSectionRef, cardRefs)
 
-  // Função para animar carrossel
-  const animateCarousel = (carousel: HTMLDivElement, cardWidth: number, gap: number, startPosition: number = 0, speed: number = 0.3) => {
-    let animationId: number
-    let position = startPosition
-    const totalWidth = (3 * cardWidth) + (2 * gap) // 3 cards + 2 gaps
+  // Calcular posição inicial do carrossel 2 para dessincronização
+  const cardWidth = 242
+  const gap = 12
+  const totalWidth = (3 * cardWidth) + (2 * gap)
+  const startPosition2 = totalWidth * 0.7
 
-    const animate = () => {
-      position += speed
-      
-      // Quando chega ao final, volta ao início (loop infinito)
-      if (position >= totalWidth) {
-        position = 0
-      }
-      
-      carousel.style.transform = `translateX(-${position}px)`
-      animationId = requestAnimationFrame(animate)
-    }
-
-    animate()
-
-    return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-      }
-    }
-  }
-
-  // Carrosséis automáticos no mobile
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768
-    if (!isMobile) return
-
-    const carousel1 = carousel1Ref.current
-    const carousel2 = carousel2Ref.current
-    if (!carousel1 || !carousel2) return
-
-    const cardWidth = 242 // Largura máxima do card no mobile
-    const gap = 12
-    const totalWidth = (3 * cardWidth) + (2 * gap)
-
-    // Dessincronizar completamente: velocidades diferentes e posições iniciais diferentes
-    // Carrossel 1: velocidade normal, começa do início
-    // Carrossel 2: velocidade mais rápida, começa em posição aleatória para criar caos
-    const speed1 = 0.3
-    const speed2 = 0.5 // Mais rápido
-    const startPosition2 = (totalWidth * 0.7) // Começa em 70% do caminho
-
-    const cleanup1 = animateCarousel(carousel1, cardWidth, gap, 0, speed1)
-    const cleanup2 = animateCarousel(carousel2, cardWidth, gap, startPosition2, speed2)
-
-    return () => {
-      cleanup1()
-      cleanup2()
-    }
-  }, [])
+  // Usar hooks baseados no useCarouselAnimation que funciona perfeitamente
+  const carousel1Ref = useBenefitsCarousel(40000, 0) // 40 segundos, começa do início
+  const carousel2Ref = useBenefitsCarousel(30000, startPosition2) // 30 segundos, começa em 70%
 
   return (
     <div className="relative h-auto md:h-[220vh] xl:h-[320vh] 3xl:h-[300vh] 2xl:h-[220vh] overflow-visible">
       <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-8 3xl:pt-12 2xl:pt-40 pb-8 sm:pb-12 md:pb-16 lg:py-52 xl:py-28 3xl:py-32 2xl:py-52 md:sticky md:top-0 overflow-visible">
         {/* Mobile: 2 Carrosséis horizontais automáticos com 3 itens cada */}
-        <div className="lg:hidden space-y-4">
+        <div className="lg:hidden space-y-4 -mx-4 sm:-mx-6">
+          {/* Título Mobile */}
+          <div className="px-4 sm:px-6 pb-4">
+            <h2 className="text-[48px] font-semibold text-left">
+              <span style={{ color: '#FFFFFF' }}>Inúmeros</span>{' '}
+              <span style={{ color: '#E9EF33' }}>Benefícios</span>
+            </h2>
+          </div>
+          
           {/* Carrossel 1 - Primeiros 3 cards */}
-          <div className="overflow-hidden">
+          <div className="overflow-hidden px-4 sm:px-6">
             <div 
               ref={carousel1Ref}
               className="flex items-stretch"
@@ -192,6 +227,19 @@ export function BenefitsSection() {
               {CARDS_DATA.slice(0, 3).map((card, index) => (
                 <BenefitCard
                   key={`carousel1-second-${index}`}
+                  index={index}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={() => {}}
+                  className=""
+                />
+              ))}
+              {/* Terceira sequência (para loop infinito fluido) */}
+              {CARDS_DATA.slice(0, 3).map((card, index) => (
+                <BenefitCard
+                  key={`carousel1-third-${index}`}
                   index={index}
                   icon={card.icon}
                   title={card.title}
@@ -231,6 +279,19 @@ export function BenefitsSection() {
               {CARDS_DATA.slice(3, 6).map((card, index) => (
                 <BenefitCard
                   key={`carousel2-second-${index}`}
+                  index={index + 3}
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  lineConfig={card.lineConfig}
+                  cardRef={() => {}}
+                  className=""
+                />
+              ))}
+              {/* Terceira sequência (para loop infinito fluido) */}
+              {CARDS_DATA.slice(3, 6).map((card, index) => (
+                <BenefitCard
+                  key={`carousel2-third-${index}`}
                   index={index + 3}
                   icon={card.icon}
                   title={card.title}
