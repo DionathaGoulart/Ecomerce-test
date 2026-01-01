@@ -47,7 +47,15 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
 
   return (
     <section id="comofunciona" ref={sectionRef as React.RefObject<HTMLElement>} className="w-full py-8 sm:py-12 md:py-16 lg:py-24 xl:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-0 sm:px-4 md:px-6">
+        {/* Título Mobile */}
+        <div className="lg:hidden mb-6">
+          <h2 className="text-[48px] font-semibold text-left">
+            <span style={{ color: '#FFFFFF' }}>Como</span>{' '}
+            <span style={{ color: '#E9EF33' }}>Funciona?</span>
+          </h2>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Coluna Esquerda - Vazia */}
           <div className="hidden lg:block"></div>
@@ -61,18 +69,25 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     {/* Card do Número */}
                     <div className="flex-shrink-0 relative z-10">
                       <div 
-                        className="step-number-card w-10 sm:w-12 md:w-16 lg:w-20 xl:w-24 h-full rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center min-h-[70px] sm:min-h-[80px] md:min-h-[100px] transition-colors duration-300"
+                        className="step-number-card rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center transition-colors duration-300"
+                        style={{ 
+                          backgroundColor: '#212121',
+                          paddingLeft: '32px',
+                          paddingRight: '32px',
+                          paddingTop: '90px',
+                          paddingBottom: '90px',
+                          height: '100%'
+                        }}
                         data-step-index={index}
-                        style={{ backgroundColor: '#212121' }}
                       >
-                        <span className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-neutral-950">
+                        <span className="text-[32px] sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-neutral-950">
                           {etapa.step}
                         </span>
                       </div>
                       
                       {/* Linha vertical conectando etapas */}
                       {index < array.length - 1 && (
-                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden h-[120px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]">
+                        <div className="absolute left-1/2 top-full w-0.5 -translate-x-1/2 overflow-hidden h-[80px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]">
                           {/* Linha cinza de fundo */}
                           <div className="absolute inset-0 bg-header-border" />
                           {/* Linha verde que vai crescendo */}
@@ -86,25 +101,29 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     
                     {/* Card de Conteúdo */}
                     <div 
-                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] p-2.5 sm:p-3 md:p-4 lg:p-6 transition-colors duration-300"
+                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] transition-colors duration-300"
                       data-step-index={index}
-                      style={{ backgroundColor: '#212121' }}
+                      style={{ 
+                        backgroundColor: '#212121',
+                        padding: '32px',
+                        height: '100%'
+                      }}
                     >
-                      <div className="flex flex-col gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+                      <div className="flex flex-col gap-2 sm:gap-2 md:gap-3 lg:gap-4">
                         <div className="flex-shrink-0">
                           <Image
                             src={etapa.icon}
                             alt=""
-                            width={24}
-                            height={24}
-                            className="step-icon w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300"
+                            width={32}
+                            height={32}
+                            className="step-icon w-8 h-8 sm:w-8 sm:h-8 md:w-10 md:h-10 transition-all duration-300"
                             style={{ filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)' }}
                           />
                         </div>
-                        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-white transition-colors duration-300">
+                        <h3 className="text-[24px] sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-white transition-colors duration-300">
                           {etapa.title}
                         </h3>
-                        <p className="text-xs sm:text-sm md:text-base lg:text-[16px] text-white/80 leading-relaxed transition-colors duration-300">
+                        <p className="text-[12px] sm:text-sm md:text-base lg:text-[16px] text-white/80 leading-relaxed transition-colors duration-300">
                           {etapa.description}
                         </p>
                       </div>
@@ -113,7 +132,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                   
                   {/* Espaço entre etapas */}
                   {index < array.length - 1 && (
-                    <div className="h-[120px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]" />
+                    <div className="h-[80px] sm:h-[180px] md:h-[250px] lg:h-[400px] xl:h-[600px]" />
                   )}
                 </div>
               )
