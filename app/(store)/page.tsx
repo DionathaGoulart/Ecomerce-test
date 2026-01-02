@@ -57,7 +57,7 @@ export default function Home() {
       </div>
 
       {/* Seção Catálogo - Separada, sem Spline de fundo */}
-      <div className="relative z-30 bg-transparent overflow-x-hidden">
+      <div className="relative z-30 bg-transparent overflow-x-visible md:overflow-x-hidden">
         <CatalogSection />
       </div>
     </>
