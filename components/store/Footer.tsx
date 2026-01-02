@@ -21,10 +21,10 @@ export default function Footer() {
 
   return (
     <footer className="w-full" style={{ backgroundColor: '#212121' }}>
-      <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 py-8 sm:py-12 md:py-16">
-        <div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-12">
-          {/* Coluna Esquerda */}
-          <div className="flex flex-col">
+      <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 py-8 pb-24 sm:pb-12 md:py-16">
+        <div className="flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-start gap-8 lg:gap-12">
+          {/* Mobile: Ordem reorganizada */}
+          <div className="flex flex-col items-center lg:items-start w-full lg:w-auto">
             {/* Logo */}
             <Link href="/" className="flex items-center mb-6">
               <Image
@@ -37,18 +37,39 @@ export default function Footer() {
               />
             </Link>
             
-            {/* CNPJ */}
-            <p className="text-white/80 mb-3" style={{ fontSize: '12px' }}>
-              Mil ideias - {cnpj}
-            </p>
+            {/* Telefone */}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/80 hover:text-primary-500 transition-colors mb-3 text-center lg:text-left"
+              style={{ fontSize: '12px' }}
+            >
+              {phone}
+            </a>
             
-            {/* Copyright */}
-            <p className="text-white/60 mb-6" style={{ fontSize: '12px' }}>
-              2025 © Todos os direitos reservados
-            </p>
+            {/* Email */}
+            <a
+              href={`mailto:${email}`}
+              className="text-white/80 hover:text-primary-500 transition-colors mb-3 text-center lg:text-left"
+              style={{ fontSize: '12px' }}
+            >
+              {email}
+            </a>
+            
+            {/* Endereço com link para Google Maps */}
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/80 hover:text-primary-500 transition-colors mb-6 text-center lg:text-left"
+              style={{ fontSize: '12px' }}
+            >
+              {address}
+            </a>
             
             {/* Redes Sociais */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 mb-6">
               <a
                 href={instagramUrl}
                 target="_blank"
@@ -95,40 +116,6 @@ export default function Footer() {
                 />
               </a>
             </div>
-          </div>
-
-          {/* Coluna Direita */}
-          <div className="flex flex-col pt-10 sm:pt-12 md:pt-14">
-            {/* Telefone */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors mb-3"
-              style={{ fontSize: '12px' }}
-            >
-              {phone}
-            </a>
-            
-            {/* Email */}
-            <a
-              href={`mailto:${email}`}
-              className="text-white/80 hover:text-primary-500 transition-colors mb-3"
-              style={{ fontSize: '12px' }}
-            >
-              {email}
-            </a>
-            
-            {/* Endereço com link para Google Maps */}
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors mb-6"
-              style={{ fontSize: '12px' }}
-            >
-              {address}
-            </a>
             
             {/* Desenvolvido por */}
             <div className="flex items-center gap-2">
@@ -148,6 +135,19 @@ export default function Footer() {
                 />
               </a>
             </div>
+          </div>
+
+          {/* Desktop: Coluna Direita (oculta no mobile) */}
+          <div className="hidden lg:flex flex-col pt-10 sm:pt-12 md:pt-14 items-start">
+            {/* CNPJ */}
+            <p className="text-white/80 mb-3" style={{ fontSize: '12px' }}>
+              Mil ideias - {cnpj}
+            </p>
+            
+            {/* Copyright */}
+            <p className="text-white/60 mb-6" style={{ fontSize: '12px' }}>
+              2025 © Todos os direitos reservados
+            </p>
           </div>
         </div>
       </div>
