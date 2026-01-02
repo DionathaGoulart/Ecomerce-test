@@ -389,35 +389,18 @@ export default function StoreLayout({
       </main>
       
       {/* Navbar Mobile Fixa na Parte Inferior */}
-      <nav className="md:hidden fixed bottom-2 left-4 right-4 z-50">
-        <div className="rounded-xl border border-header-border bg-header-bg px-3 py-2">
+      <nav className="md:hidden fixed bottom-2 left-0 right-0 z-50">
+        <div className="rounded-xl border border-header-border bg-header-bg px-3 py-2 mx-4">
           <div className="flex items-center justify-around">
             {/* Ícone Início */}
             <a
               href="/#home"
               onClick={(e) => {
-                if (pathname === '/') {
-                  e.preventDefault()
-                  const section = document.getElementById('home')
-                  if (section) {
-                    smoothScrollTo(0, 1000)
-                  }
-                }
-              }}
-              className="flex items-center justify-center p-2"
-            >
-              <Home className="h-6 w-6" style={{ color: '#E9EF33' }} />
-            </a>
-
-            {/* Ícone Catálogo */}
-            <a
-              href="/#catalogo"
-              onClick={(e) => {
                 e.preventDefault()
                 if (pathname !== '/') {
-                  router.push('/#catalogo')
+                  router.push('/#home')
                 } else {
-                  const section = document.getElementById('catalogo')
+                  const section = document.getElementById('home')
                   if (section) {
                     const rect = section.getBoundingClientRect()
                     const scrollTop = window.pageYOffset || document.documentElement.scrollTop
@@ -427,35 +410,86 @@ export default function StoreLayout({
                   }
                 }
               }}
-              className="flex items-center justify-center p-2"
+              className="flex flex-col items-center justify-center p-2"
             >
-              <Package className="h-6 w-6" style={{ color: '#E9EF33' }} />
+              <Image
+                src="/icons/navhouse.svg"
+                alt="Início"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <span className="text-[10px] text-white/80 mt-1">Início</span>
+            </a>
+
+            {/* Ícone Catálogo */}
+            <a
+              href="/#catalogo"
+              onClick={(e) => {
+                e.preventDefault()
+                if (pathname !== '/') {
+                  router.push('/#catalogo')
+                  } else {
+                  const section = document.getElementById('catalogo')
+                    if (section) {
+                        const rect = section.getBoundingClientRect()
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                        const elementTop = rect.top + scrollTop
+                    const targetPosition = elementTop - 80
+                        smoothScrollTo(targetPosition, 1000)
+                      }
+                    }
+              }}
+              className="flex flex-col items-center justify-center p-2"
+                  >
+              <Image
+                src="/icons/navcatalogo.svg"
+                alt="Catálogo"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <span className="text-[10px] text-white/80 mt-1">Catálogo</span>
             </a>
 
             {/* Ícone Carrinho */}
-            <Link
-              href="/cart"
-              className="relative flex items-center justify-center p-2"
-            >
-              <ShoppingCart className="h-6 w-6" style={{ color: '#E9EF33' }} />
-              {cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
-                  {cartItemCount > 99 ? '99+' : cartItemCount}
-                </span>
-              )}
-            </Link>
+              <Link
+                href="/cart"
+              className="relative flex flex-col items-center justify-center p-2"
+              >
+              <Image
+                src="/icons/navcart.svg"
+                alt="Carrinho"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <span className="text-[10px] text-white/80 mt-1">Carrinho</span>
+                {cartItemCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
+              </Link>
 
             {/* Ícone Conta */}
             <Link
               href={user ? "/minha-conta" : "/login"}
-              className="flex items-center justify-center p-2"
+              className="flex flex-col items-center justify-center p-2"
             >
-              <User className="h-6 w-6" style={{ color: '#E9EF33' }} />
+              <Image
+                src="/icons/navconta.svg"
+                alt="Conta"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+              <span className="text-[10px] text-white/80 mt-1">Conta</span>
             </Link>
-          </div>
+            </div>
         </div>
       </nav>
-
+      
       {/* Footer */}
       <Footer />
     </div>
