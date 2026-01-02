@@ -54,14 +54,14 @@ export function HomeHero() {
                       smoothScrollTo(targetPosition, 1000)
                     }
                   }}
-                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
                 >
                   <Image
                     src="/icons/eye.svg"
                     alt=""
                     width={20}
                     height={20}
-                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
                   />
                   <span className="whitespace-nowrap inline-block">Ver catálogo</span>
                 </a>
@@ -71,14 +71,14 @@ export function HomeHero() {
                   href={`https://wa.me/5554999851285?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento para um projeto personalizado.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+                  className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
                 >
                   <Image
                     src="/icons/project.svg"
                     alt=""
                     width={20}
                     height={20}
-                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                    className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
                   />
                   <span className="whitespace-nowrap inline-block">Orçar projeto</span>
                 </a>
