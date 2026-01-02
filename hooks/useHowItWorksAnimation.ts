@@ -52,7 +52,12 @@ export function useHowItWorksAnimation(sectionRef: RefObject<HTMLElement>) {
             // Atualizar texto e ícone do card de conteúdo para preto quando verde
             const textElements = cardEl.querySelectorAll('h3, p')
             textElements.forEach((el) => {
-              ;(el as HTMLElement).style.color = '#0a0a0a'
+              const htmlEl = el as HTMLElement
+              if (el.tagName === 'P') {
+                htmlEl.style.color = 'rgba(10, 10, 10, 0.7)'
+              } else {
+                htmlEl.style.color = '#0a0a0a'
+              }
             })
             const icon = cardEl.querySelector('.step-icon')
             if (icon) {
