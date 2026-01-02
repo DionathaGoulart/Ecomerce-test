@@ -132,8 +132,26 @@ export default function CatalogSection() {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
   const [displayedCount, setDisplayedCount] = useState(6)
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const asideRef = useRef<HTMLElement>(null)
   const { products, isLoading } = useProducts()
   const { cartItems, addItem, removeItem, updateQuantity } = useCart()
+
+  // Ajustar largura do aside no mobile
+  useEffect(() => {
+    const updateAsideWidth = () => {
+      if (asideRef.current && window.innerWidth < 768) {
+        asideRef.current.style.width = '100vw'
+        asideRef.current.style.marginLeft = 'calc(-50vw + 50%)'
+      } else if (asideRef.current) {
+        asideRef.current.style.width = ''
+        asideRef.current.style.marginLeft = ''
+      }
+    }
+    
+    updateAsideWidth()
+    window.addEventListener('resize', updateAsideWidth)
+    return () => window.removeEventListener('resize', updateAsideWidth)
+  }, [])
 
   // Buscar categorias do banco de dados
   useEffect(() => {
@@ -250,15 +268,15 @@ export default function CatalogSection() {
   }, [hasMore, isLoading, filteredProducts.length, displayedCount])
 
   return (
-    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent">
-      <div className="w-full">
+    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
+      <div className="w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
         {/* Título */}
-        <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words">
+        <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words px-4 sm:px-6 md:px-0">
           Catálogo
         </h2>
 
         {/* Barra de Pesquisa */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 sm:mb-8 px-4 sm:px-6 md:px-0">
           <div className="relative w-full">
             <Search className="absolute top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-primary-500 left-4 sm:left-8" />
             <Input
@@ -274,8 +292,11 @@ export default function CatalogSection() {
         {/* Layout: Sidebar + Catálogo */}
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Sidebar de Categorias */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
-            <div className="bg-transparent rounded-xl p-4 sm:p-6 lg:pl-0">
+          <aside 
+            ref={asideRef}
+            className="w-full lg:w-64 flex-shrink-0 relative"
+          >
+            <div className="bg-transparent rounded-xl p-0 sm:p-6 lg:pl-0 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 md:px-0">
               {loadingCategories ? (
                 <div className="py-4">
                   <LoadingDots size="sm" />
@@ -283,36 +304,43 @@ export default function CatalogSection() {
               ) : categories.length === 0 ? (
                 <p className="text-sm text-white/60">Nenhuma categoria disponível</p>
               ) : (
-                <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 justify-start lg:justify-start items-center lg:items-stretch scrollbar-hide carousel-fade" style={{ WebkitOverflowScrolling: 'touch' }}>
                   {categories.map((category) => {
                     const isSelected = selectedCategory === category.name
                     const isHovered = hoveredCategory === category.name
                     const hasAnyHover = hoveredCategory !== null
                     
-                    // Se há hover em qualquer item, os selecionados ficam como não selecionados
-                    // Se o item está com hover, fica amarelo e 20px
-                    // Caso contrário, usa o estado normal (selecionado ou não)
+                    // No mobile, não considerar hover (não existe hover em touch)
+                    // Usar apenas classes CSS para desktop (lg:)
                     const getColorClass = () => {
-                      if (isHovered) return 'text-primary-500'
-                      if (hasAnyHover && isSelected) return 'text-white' // Selecionado mas há hover em outro, fica normal
+                      // No mobile, apenas mostrar selecionado ou não
                       if (isSelected) return 'text-primary-500'
                       return 'text-white opacity-80'
                     }
                     
                     const getFontSizeClass = () => {
-                      if (isHovered) return 'text-lg sm:text-xl'
-                      if (hasAnyHover && isSelected) return 'text-sm sm:text-base' // Selecionado mas há hover em outro, fica normal
+                      // No mobile, apenas mostrar selecionado ou não
                       if (isSelected) return 'text-lg sm:text-xl'
                       return 'text-sm sm:text-base'
                     }
                     
                     return (
-                      <li key={category.id} className="flex-shrink-0 lg:flex-shrink">
+                      <li key={category.id} className="flex-shrink-0">
                         <button
                           onClick={() => setSelectedCategory(category.name)}
-                          className={`w-full text-left py-2 px-3 lg:px-0 lg:pr-3 rounded-lg transition-all ${getColorClass()} ${getFontSizeClass()}`}
-                          onMouseEnter={() => setHoveredCategory(category.name)}
-                          onMouseLeave={() => setHoveredCategory(null)}
+                          className={`text-center lg:text-left py-2 px-3 lg:px-0 lg:pr-3 lg:w-full rounded-lg transition-all whitespace-nowrap ${getColorClass()} ${getFontSizeClass()}`}
+                          onMouseEnter={(e) => {
+                            // Apenas no desktop (lg:)
+                            if (window.innerWidth >= 1024) {
+                              setHoveredCategory(category.name)
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            // Apenas no desktop (lg:)
+                            if (window.innerWidth >= 1024) {
+                              setHoveredCategory(null)
+                            }
+                          }}
                         >
                           {category.name}
                         </button>
@@ -325,7 +353,7 @@ export default function CatalogSection() {
           </aside>
 
           {/* Catálogo de Produtos */}
-          <div className="flex-1">
+          <div className="flex-1 px-0 sm:px-6 md:px-0">
             {isLoading ? (
               <div className="text-center py-12">
                 <LoadingDots size="lg" />
@@ -357,9 +385,9 @@ export default function CatalogSection() {
             )}
 
             {/* Seção de Orçamento - Alinhada com os produtos */}
-            <div className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6" style={{ marginTop: '64px' }}>
+            <div className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6" style={{ marginTop: '64px' }}>
               {/* Texto à esquerda */}
-              <p className="text-sm sm:text-base md:text-lg text-white/80 text-center sm:text-left flex-1">
+              <p className="text-sm sm:text-base md:text-lg text-white/80 text-left flex-1">
                 Não encontrou o que procurava?<br />Faça um orçamento sob medida
               </p>
               
@@ -368,14 +396,14 @@ export default function CatalogSection() {
                 href={`https://wa.me/5554999851285?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento para um projeto personalizado.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-sm sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:pl-[50px] sm:hover:pl-[55px] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden flex-shrink-0"
+                className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent pl-[50px] sm:pl-[55px] md:pl-[50px] pr-5 sm:pr-6 md:pr-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] w-auto overflow-hidden flex-shrink-0"
               >
                 <Image
                   src="/icons/project.svg"
                   alt=""
                   width={20}
                   height={20}
-                  className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                  className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-100 translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
                 />
                 <span className="whitespace-nowrap inline-block">Orçar projeto</span>
               </a>
