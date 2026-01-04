@@ -77,16 +77,17 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                 <div key={etapa.step} className="relative w-full">
                   <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4">
                     {/* Card do Número */}
-                    <div className="flex-shrink-0 relative z-10">
+                    <div className="flex-shrink-0 relative z-10 flex">
                       <div 
-                        className="step-number-card rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center transition-colors duration-300"
+                        className="step-number-card rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center transition-colors duration-300 w-full"
                         style={{ 
                           backgroundColor: '#212121',
                           paddingLeft: '32px',
                           paddingRight: '32px',
                           paddingTop: '90px',
                           paddingBottom: '90px',
-                          height: '100%'
+                          alignSelf: 'stretch',
+                          minHeight: '100%'
                         }}
                         data-step-index={index}
                       >
@@ -111,15 +112,16 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     
                     {/* Card de Conteúdo */}
                     <div 
-                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] transition-colors duration-300"
+                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] transition-colors duration-300 flex"
                       data-step-index={index}
                       style={{ 
                         backgroundColor: '#212121',
                         padding: '32px',
-                        height: '100%'
+                        alignSelf: 'stretch',
+                        minHeight: '100%'
                       }}
                     >
-                      <div className="flex flex-col gap-2 sm:gap-2 md:gap-3 lg:gap-4">
+                      <div className="flex flex-col gap-2 sm:gap-2 md:gap-3 lg:gap-4 w-full">
                         <div className="flex-shrink-0">
                           <Image
                             src={etapa.icon}
