@@ -91,7 +91,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                         }}
                         data-step-index={index}
                       >
-                        <span className="text-[32px] sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-neutral-950">
+                        <span className="text-[32px] sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-white lg:text-neutral-950">
                           {etapa.step}
                         </span>
                       </div>

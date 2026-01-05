@@ -59,6 +59,7 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
               src={product.image_url}
               alt={product.title}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover rounded-lg"
               loading={priority ? "eager" : "lazy"}
               priority={priority}
@@ -268,7 +269,7 @@ export default function CatalogSection() {
   }, [hasMore, isLoading, filteredProducts.length, displayedCount])
 
   return (
-    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
+    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent mt-32 md:mt-0" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
       <div className="w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
         {/* Título */}
         <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words px-4 sm:px-6 md:px-0">
@@ -296,7 +297,7 @@ export default function CatalogSection() {
             ref={asideRef}
             className="w-full lg:w-64 flex-shrink-0 relative"
           >
-            <div className="bg-transparent rounded-xl p-0 sm:p-6 lg:pl-0 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 md:px-0">
+            <div className="bg-transparent rounded-xl px-4 sm:px-6 lg:px-0">
               {loadingCategories ? (
                 <div className="py-4">
                   <LoadingDots size="sm" />
@@ -308,38 +309,27 @@ export default function CatalogSection() {
                   {categories.map((category) => {
                     const isSelected = selectedCategory === category.name
                     const isHovered = hoveredCategory === category.name
-                    const hasAnyHover = hoveredCategory !== null
-                    
-                    // No mobile, não considerar hover (não existe hover em touch)
-                    // Usar apenas classes CSS para desktop (lg:)
-                    const getColorClass = () => {
-                      // No mobile, apenas mostrar selecionado ou não
-                      if (isSelected) return 'text-primary-500'
-                      return 'text-white opacity-80'
-                    }
-                    
-                    const getFontSizeClass = () => {
-                      // No mobile, apenas mostrar selecionado ou não
-                      if (isSelected) return 'text-lg sm:text-xl'
-                      return 'text-sm sm:text-base'
-                    }
                     
                     return (
                       <li key={category.id} className="flex-shrink-0">
                         <button
                           onClick={() => setSelectedCategory(category.name)}
-                          className={`text-center lg:text-left py-2 px-3 lg:px-0 lg:pr-3 lg:w-full rounded-lg transition-all whitespace-nowrap ${getColorClass()} ${getFontSizeClass()}`}
-                          onMouseEnter={(e) => {
-                            // Apenas no desktop (lg:)
-                            if (window.innerWidth >= 1024) {
-                              setHoveredCategory(category.name)
-                            }
+                          className={`text-center lg:text-left py-2 px-3 lg:px-0 lg:pr-3 lg:w-full rounded-lg transition-all whitespace-nowrap ${
+                            // Mobile: apenas selecionado
+                            isSelected 
+                              ? 'text-primary-500 text-lg sm:text-xl' 
+                              : 'text-white opacity-80 text-sm sm:text-base'
+                          } ${
+                            // Desktop: hover e selecionado
+                            isHovered || isSelected
+                              ? 'lg:text-primary-500 lg:text-xl'
+                              : 'lg:text-white lg:opacity-80 lg:text-base'
+                          }`}
+                          onMouseEnter={() => {
+                            setHoveredCategory(category.name)
                           }}
-                          onMouseLeave={(e) => {
-                            // Apenas no desktop (lg:)
-                            if (window.innerWidth >= 1024) {
-                              setHoveredCategory(null)
-                            }
+                          onMouseLeave={() => {
+                            setHoveredCategory(null)
                           }}
                         >
                           {category.name}

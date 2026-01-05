@@ -3,7 +3,11 @@ import Image from 'next/image'
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 import { ClientCarousel } from '../ClientCarousel/ClientCarousel'
 
-export function HomeHero() {
+interface HomeHeroProps {
+  sectionRef?: React.RefObject<HTMLElement>
+}
+
+export function HomeHero({ sectionRef }: HomeHeroProps = {}) {
   const handleScrollToBenefits = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     const element = document.getElementById('beneficios')
@@ -22,7 +26,7 @@ export function HomeHero() {
   }
 
   return (
-    <section id="home" className="min-h-0 md:min-h-screen flex items-start relative z-10">
+    <section id="home" ref={sectionRef as React.RefObject<HTMLElement>} className="min-h-0 md:min-h-screen flex items-start relative z-10">
       <div className="w-full relative z-10 pt-24 sm:pt-28 md:pt-32 lg:pt-64 xl:pt-32 3xl:pt-40 2xl:pt-56 pb-12 sm:pb-16 md:pb-20 lg:pb-24">
         <div className="max-w-2xl mx-auto md:mx-0">
           {/* Título */}

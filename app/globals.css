@@ -103,20 +103,8 @@ input[type="number"] {
 
 @media (min-width: 1024px) {
   .carousel-fade {
-    mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 8%,
-      black 92%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 8%,
-      black 92%,
-      transparent 100%
-    );
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }
 
@@ -164,5 +152,44 @@ input[type="number"] {
   .spline-scale-custom {
     transform: translateY(3.5rem) scale(1.15) !important;
   }
+}
+
+/* Classes para animação dos cards "Como Funciona" */
+.step-card-green {
+  background-color: #E9EF33 !important;
+}
+
+.step-card-green h3,
+.step-card-green p {
+  color: #0a0a0a !important;
+}
+
+.step-card-green .step-icon {
+  filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+}
+
+.step-card-green span {
+  color: #0a0a0a !important;
+}
+
+/* Estado cinza dos cards */
+.step-card-gray {
+  background-color: #212121 !important;
+}
+
+.step-card-gray h3 {
+  color: #ffffff !important;
+}
+
+.step-card-gray p {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.step-card-gray .step-icon {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) !important;
+}
+
+.step-card-gray span {
+  color: #ffffff !important;
 }
 
