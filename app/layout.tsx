@@ -35,6 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const metadata: Metadata = {
     title: seo.site_title || 'E-commerce Personalizados',
     description: seo.site_description || 'Produtos personalizados com qualidade',
+    icons: {
+      icon: '/Logotipo.svg',
+      shortcut: '/Logotipo.svg',
+      apple: '/Logotipo.svg',
+    },
     openGraph: {
       title: seo.og_title || seo.site_title || 'E-commerce Personalizados',
       description: seo.og_description || seo.site_description || 'Produtos personalizados com qualidade',
