@@ -53,3 +53,7 @@ export const VALIDATION = {
   DESCRIPTION_MAX_LENGTH: 500,
 } as const
 
+// Steps (Como Funciona)
+export { STEPS } from './steps'
+export type { Step } from './steps'
+

@@ -2,13 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import Logo from './Logo'
 
 export default function Footer() {
   const email = 'milideiasgravacoes@gmail.com'
   const phone = '(54) 99985-1285'
-  const address = 'R. Buarque de Macedo, 1432 - São Francisco, Garibaldi - RS, 95720-000'
-  const cnpj = '10300135013050130'
+  const address = 'R. Buarque de Macedo, 1432 - São Francisco, Garibaldi/RS'
   
   // Link para Google Maps
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
@@ -20,30 +18,19 @@ export default function Footer() {
   const facebookUrl = 'https://facebook.com' // Atualizar com o link real
 
   return (
-    <footer className="w-full" style={{ backgroundColor: '#212121' }}>
+    <footer className="w-full bg-header">
       <div className="w-full max-w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 py-8 pb-24 sm:pb-12 md:py-16">
-        <div className="flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-start gap-8 lg:gap-12">
-          {/* Mobile: Ordem reorganizada */}
-          <div className="flex flex-col items-center lg:items-start w-full lg:w-auto">
-            {/* Logo */}
-            <Link href="/" className="flex items-center mb-6">
-              <Image
-                src="/Logotipo.svg"
-                alt="Logo"
-                width={169}
-                height={61}
-                className="h-10 sm:h-12 md:h-14 w-auto"
-                priority
-              />
-            </Link>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-[248px]">
+          {/* Coluna 1: Contato */}
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-white/70 font-semibold mb-8 text-[16px]">Contato</h3>
             
             {/* Telefone */}
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors mb-3 text-center lg:text-left"
-              style={{ fontSize: '12px' }}
+              className="text-white/70 hover:text-primary-500 transition-colors mb-3 text-center md:text-left text-[12px]"
             >
               {phone}
             </a>
@@ -51,8 +38,7 @@ export default function Footer() {
             {/* Email */}
             <a
               href={`mailto:${email}`}
-              className="text-white/80 hover:text-primary-500 transition-colors mb-3 text-center lg:text-left"
-              style={{ fontSize: '12px' }}
+              className="text-white/70 hover:text-primary-500 transition-colors mb-3 text-center md:text-left text-[12px]"
             >
               {email}
             </a>
@@ -62,19 +48,18 @@ export default function Footer() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-primary-500 transition-colors mb-6 text-center lg:text-left"
-              style={{ fontSize: '12px' }}
+              className="text-white/70 hover:text-primary-500 transition-colors mb-4 text-center md:text-left text-[12px] whitespace-nowrap"
             >
               {address}
             </a>
             
             {/* Redes Sociais */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4">
               <a
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/80 hover:text-primary-500 transition-colors"
+                className="text-white/70 hover:text-primary-500 transition-colors"
                 aria-label="Instagram"
               >
                 <Image
@@ -89,7 +74,7 @@ export default function Footer() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/80 hover:text-primary-500 transition-colors"
+                className="text-white/70 hover:text-primary-500 transition-colors"
                 aria-label="WhatsApp"
               >
                 <Image
@@ -104,7 +89,7 @@ export default function Footer() {
                 href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/80 hover:text-primary-500 transition-colors"
+                className="text-white/70 hover:text-primary-500 transition-colors"
                 aria-label="Facebook"
               >
                 <Image
@@ -116,10 +101,60 @@ export default function Footer() {
                 />
               </a>
             </div>
+          </div>
+
+          {/* Coluna 2: Política e Termos */}
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-white/70 font-semibold mb-8 text-[16px]">Política e Termos</h3>
+            
+            <Link
+              href="/politica-de-privacidade"
+              className="text-white/70 hover:text-primary-500 transition-colors mb-3 text-center md:text-left text-[12px]"
+            >
+              Política de Privacidade
+            </Link>
+            
+            <Link
+              href="/politica-de-devolucao"
+              className="text-white/70 hover:text-primary-500 transition-colors mb-3 text-center md:text-left text-[12px]"
+            >
+              Política de Devolução
+            </Link>
+            
+            <Link
+              href="/politica-de-cookies"
+              className="text-white/70 hover:text-primary-500 transition-colors mb-3 text-center md:text-left text-[12px]"
+            >
+              Política de Cookies
+            </Link>
+            
+            <Link
+              href="/termos-de-uso"
+              className="text-white/70 hover:text-primary-500 transition-colors text-center md:text-left text-[12px]"
+            >
+              Termos de Uso
+            </Link>
+          </div>
+
+          {/* Coluna 3: Informações */}
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-white/70 font-semibold mb-8 text-[16px]">Informações</h3>
+            
+            <p className="text-white/70 mb-3 text-center md:text-left text-[12px]">
+              Fabiano Luis Contini
+            </p>
+            
+            <p className="text-white/70 mb-3 text-center md:text-left text-[12px]">
+              31.377.960/0001-07
+            </p>
+            
+            <p className="text-white/70 mb-4 text-center md:text-left text-[12px]">
+              2026 © Todos os direitos reservados
+            </p>
             
             {/* Desenvolvido por */}
             <div className="flex items-center gap-2">
-              <span className="text-white/60" style={{ fontSize: '12px' }}>Desenvolvido por</span>
+              <span className="text-white/70 text-[12px]">Desenvolvido por</span>
               <a
                 href="https://containner.co/"
                 target="_blank"
@@ -135,19 +170,6 @@ export default function Footer() {
                 />
               </a>
             </div>
-          </div>
-
-          {/* Desktop: Coluna Direita (oculta no mobile) */}
-          <div className="hidden lg:flex flex-col pt-10 sm:pt-12 md:pt-14 items-start">
-            {/* CNPJ */}
-            <p className="text-white/80 mb-3" style={{ fontSize: '12px' }}>
-              Mil ideias - {cnpj}
-            </p>
-            
-            {/* Copyright */}
-            <p className="text-white/60 mb-6" style={{ fontSize: '12px' }}>
-              2025 © Todos os direitos reservados
-            </p>
           </div>
         </div>
       </div>

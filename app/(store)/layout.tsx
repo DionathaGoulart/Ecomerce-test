@@ -13,6 +13,7 @@ import { Spinner } from '@/components/atoms/Spinner'
 import { smoothScrollTo } from '@/lib/utils/smoothScroll'
 import { CART_STORAGE_KEY } from '@/lib/constants'
 import Footer from '@/components/store/Footer'
+import { Preloader } from '@/components/store/Preloader'
 
 export default function StoreLayout({
   children,
@@ -35,7 +36,7 @@ export default function StoreLayout({
       return
     }
     
-    const sections = ['home', 'beneficios', 'comofunciona', 'catalogo']
+    const sections = ['home', 'beneficios', 'comofunciona']
     const observers: IntersectionObserver[] = []
     let scrollHandler: (() => void) | null = null
     
@@ -214,13 +215,13 @@ export default function StoreLayout({
 
   const navItems = [
     { href: '/#home', label: 'Home' },
-    { href: '/#beneficios', label: 'Benefícios' },
-    { href: '/#comofunciona', label: 'Como Funciona' },
-    { href: '/#catalogo', label: 'Catálogo' },
+    { href: '/catalogo', label: 'Catálogo' },
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#060606]">
+    <>
+      <Preloader />
+      <div className="flex min-h-screen flex-col bg-neutral-950">
       {/* Header fixo - Escondido no mobile */}
       <header 
         className={`hidden md:block fixed top-2 sm:top-header-top left-0 right-0 z-40 px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96 transition-opacity duration-300 ease-in-out ${
@@ -230,45 +231,29 @@ export default function StoreLayout({
         onMouseLeave={handleMouseLeave}
       >
         <div className="rounded-xl sm:rounded-2xl border border-header-border bg-header-bg px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            {/* Logo à esquerda */}
-            <Link href="/" className="flex items-center flex-shrink-0">
-              <Logo />
-            </Link>
+          <div className="flex items-center justify-between gap-2 sm:gap-4 h-full">
+            {/* Logo e Nav à esquerda */}
+            <div className="hidden md:flex items-center">
+              <Link href="/" className="flex items-center flex-shrink-0 -mt-3">
+                <Logo />
+              </Link>
 
-            {/* Nav no meio (Desktop) */}
-            <nav className="hidden md:flex items-center gap-2 lg:gap-4">
-              {navItems.map((item) => {
-                const sectionId = item.href.replace('/#', '')
-                const isActive = activeSection === sectionId
-                
-                const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (item.href === '/#home' || item.href === '/#beneficios' || item.href === '/#comofunciona' || item.href === '/#catalogo') {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    
-                    const scrollToSection = () => {
-                      // Aguardar um pouco para garantir que o DOM está pronto
-                      setTimeout(() => {
-                        const section = document.getElementById(sectionId)
-                        if (section) {
-                          if (sectionId === 'beneficios') {
-                            const rect = section.getBoundingClientRect()
-                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                            const elementTop = rect.top + scrollTop
-                            const targetPosition = elementTop + 100
-                            smoothScrollTo(targetPosition, 1000)
-                          } else if (sectionId === 'catalogo') {
-                            // Para catálogo, usar getBoundingClientRect porque está em container separado
-                            const rect = section.getBoundingClientRect()
-                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                            const elementTop = rect.top + scrollTop
-                            const isMobile = window.innerWidth < 768
-                            const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                            const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                            const targetPosition = elementTop - headerOffset
-                            smoothScrollTo(targetPosition, 1000)
-                          } else {
+              {/* Nav ao lado do logo - 68px de espaço */}
+              <nav className="flex items-center ml-[68px] gap-4 lg:gap-6">
+                {navItems.map((item) => {
+                  const sectionId = item.href.replace('/#', '')
+                  const isActive = activeSection === sectionId || (item.href === '/catalogo' && pathname === '/catalogo')
+                  
+                  // Para Home, fazer scroll suave
+                  if (item.href === '/#home') {
+                    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      
+                      const scrollToSection = () => {
+                        setTimeout(() => {
+                          const section = document.getElementById('home')
+                          if (section) {
                             const isMobile = window.innerWidth < 768
                             const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
                             const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
@@ -276,85 +261,47 @@ export default function StoreLayout({
                             const targetPosition = elementPosition - headerOffset
                             smoothScrollTo(targetPosition, 1000)
                           }
-                        } else {
-                          // Se não encontrou a seção, tentar novamente após mais tempo
-                          setTimeout(() => {
-                            const retrySection = document.getElementById(sectionId)
-                            if (retrySection) {
-                              if (sectionId === 'catalogo') {
-                                // Para catálogo, usar getBoundingClientRect
-                                const rect = retrySection.getBoundingClientRect()
-                                const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                                const elementTop = rect.top + scrollTop
-                                const isMobile = window.innerWidth < 768
-                                const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                                const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                                const targetPosition = elementTop - headerOffset
-                                smoothScrollTo(targetPosition, 1000)
-                              } else {
-                                const isMobile = window.innerWidth < 768
-                                const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
-                                const headerOffset = isMobile ? 80 : isTablet ? 100 : 120
-                                const elementPosition = retrySection.offsetTop
-                                const targetPosition = elementPosition - headerOffset
-                                smoothScrollTo(targetPosition, 1000)
-                              }
-                            }
-                          }, 300)
-                        }
-                      }, pathname !== '/' ? 500 : 200)
+                        }, pathname !== '/' ? 500 : 200)
+                      }
+                      
+                      if (pathname !== '/') {
+                        router.push('/')
+                        scrollToSection()
+                      } else {
+                        scrollToSection()
+                      }
                     }
                     
-                    // Se não estiver na página home, navegar primeiro
-                    if (pathname !== '/') {
-                      router.push('/')
-                      scrollToSection()
-                    } else {
-                      // Já está na home, fazer scroll direto
-                      scrollToSection()
-                    }
+                    return (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={handleClick}
+                        className={`text-[10px] sm:text-xs font-medium text-white transition-opacity hover:opacity-80 ${isActive ? 'opacity-100' : ''}`}
+                      >
+                        {item.label}
+                      </a>
+                    )
                   }
-                }
-                
-                // Para âncoras, usa <a> ao invés de Link para garantir scroll suave
-                if (item.href.startsWith('/#')) {
+                  
+                  // Para outras rotas, usar Link normal
                   return (
-                    <a
+                    <Link
                       key={item.href}
                       href={item.href}
-                      onClick={handleClick}
-                      className="group flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 lg:px-5 py-2 sm:py-2.5 lg:py-3.5 text-[10px] sm:text-xs font-medium text-white transition-opacity hover:opacity-80"
+                      className={`text-[10px] sm:text-xs font-medium text-white transition-opacity hover:opacity-80 ${isActive ? 'opacity-100' : ''}`}
                     >
-                      <span>{item.label}</span>
-                      <Image
-                        src="/icons/right.svg"
-                        alt=""
-                        width={10}
-                        height={10}
-                        className={`h-2.5 w-2.5 transition-transform duration-300 ${isActive ? 'rotate-90' : 'group-hover:rotate-90'}`}
-                      />
-                    </a>
+                      {item.label}
+                    </Link>
                   )
-                }
-                
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-1.5 px-5 py-3.5 text-xs font-medium text-white transition-opacity hover:opacity-80"
-                  >
-                    <span>{item.label}</span>
-                    <Image
-                      src="/icons/right.svg"
-                      alt=""
-                      width={10}
-                      height={10}
-                      className="h-2.5 w-2.5 transition-transform duration-300 group-hover:rotate-90"
-                    />
-                  </Link>
-                )
-              })}
-            </nav>
+                })}
+              </nav>
+            </div>
+
+            {/* Logo apenas no mobile */}
+            <Link href="/" className="md:hidden flex items-center flex-shrink-0">
+              <Logo />
+            </Link>
 
             {/* Botões à direita (Desktop) */}
             <div className="hidden md:flex items-center gap-1.5 sm:gap-2 lg:gap-3 min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] justify-end">
@@ -423,25 +370,10 @@ export default function StoreLayout({
             </a>
 
             {/* Ícone Catálogo */}
-            <a
-              href="/#catalogo"
-              onClick={(e) => {
-                e.preventDefault()
-                if (pathname !== '/') {
-                  router.push('/#catalogo')
-                  } else {
-                  const section = document.getElementById('catalogo')
-                    if (section) {
-                        const rect = section.getBoundingClientRect()
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                        const elementTop = rect.top + scrollTop
-                    const targetPosition = elementTop - 80
-                        smoothScrollTo(targetPosition, 1000)
-                      }
-                    }
-              }}
+            <Link
+              href="/catalogo"
               className="flex flex-col items-center justify-center p-2"
-                  >
+            >
               <Image
                 src="/icons/navcatalogo.svg"
                 alt="Catálogo"
@@ -450,7 +382,7 @@ export default function StoreLayout({
                 className="h-6 w-6"
               />
               <span className="text-[10px] text-white/80 mt-1">Catálogo</span>
-            </a>
+            </Link>
 
             {/* Ícone Carrinho */}
               <Link
@@ -490,8 +422,7 @@ export default function StoreLayout({
         </div>
       </nav>
       
-      {/* Footer */}
-      <Footer />
     </div>
+    </>
   )
 }

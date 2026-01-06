@@ -193,3 +193,136 @@ input[type="number"] {
   color: #ffffff !important;
 }
 
+/* Classes utilitárias para substituir estilos inline */
+@layer utilities {
+  /* Z-index e isolation */
+  .z-50-isolate {
+    z-index: 50;
+    isolation: isolate;
+  }
+  
+  .z-0-isolate {
+    z-index: 0;
+    isolation: isolate;
+  }
+  
+  /* Opacidade */
+  .opacity-80 {
+    opacity: 0.8;
+  }
+  
+  /* Transformações 3D para performance */
+  .transform-3d {
+    transform: translateZ(0);
+  }
+  
+  .transform-3d-backface {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Background colors */
+  .bg-header {
+    background-color: #212121;
+  }
+  
+  /* Text colors */
+  .text-primary-yellow {
+    color: #E9EF33;
+  }
+  
+  .text-white-custom {
+    color: #FFFFFF;
+  }
+  
+  /* Filter para ícones brancos */
+  .filter-white {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  }
+  
+  /* Full width viewport */
+  .full-vw {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+  }
+  
+  /* Touch scrolling */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Font sizes */
+  .text-xs-custom {
+    font-size: 12px;
+  }
+  
+  /* Animation delays para loading dots */
+  .animation-delay-0 {
+    animation-delay: 0ms;
+  }
+  
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  /* Background transparent para Spline */
+  .bg-transparent-spline {
+    background: transparent;
+  }
+  
+  /* Position fixed full */
+  .fixed-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  /* Max height viewport */
+  .max-h-vh-85 {
+    max-height: 85vh;
+  }
+  
+  /* Gap customizado */
+  .gap-12-custom {
+    gap: 12px;
+  }
+  
+  /* Width max-content */
+  .w-max-content {
+    width: max-content;
+  }
+  
+  /* Margin top customizado */
+  .mt-64-custom {
+    margin-top: 64px;
+  }
+  
+  /* Padding customizado para step cards */
+  .p-step-card {
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+  
+  /* Background colors para botões */
+  .bg-green-light {
+    background-color: #9AF032;
+  }
+  
+  .bg-red-error {
+    background-color: #F03932;
+  }
+  
+  /* Height 0 para animação */
+  .h-0-animated {
+    height: 0%;
+  }
+}
+

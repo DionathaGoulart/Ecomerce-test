@@ -47,7 +47,7 @@ export default function WhatsAppButton({
     <Button
       onClick={handleClick}
       variant="default"
-      className="bg-[#25D366] hover:bg-[#20BD5A] text-white"
+      className="bg-whatsapp hover:bg-whatsapp-hover text-white"
     >
       <svg
         className="mr-2 h-5 w-5"

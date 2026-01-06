@@ -9,13 +9,13 @@ export function ClientCarousel() {
   return (
     <div className="mt-4 sm:mt-8 md:mt-12 lg:mt-16 w-full">
       <div className="max-w-2xl mb-2 sm:mb-3 md:mb-4 mx-auto md:mx-0">
-        <p className="text-[14px] sm:text-sm md:text-base text-white text-center md:text-left" style={{ opacity: 0.8 }}>Conheça nossos clientes:</p>
+        <p className="text-[14px] sm:text-sm md:text-base text-white text-center md:text-left opacity-80">Conheça nossos clientes:</p>
       </div>
       
       {/* Carousel */}
       <div className="carousel-fade relative max-w-xl overflow-hidden bg-transparent">
         {/* Container do carousel */}
-        <div ref={carouselRef} className="flex w-max" style={{ transform: 'translateZ(0)' }}>
+        <div ref={carouselRef} className="flex w-max transform-3d">
           {/* Primeira sequência */}
           {CLIENT_IMAGES.map((img, idx) => (
             <Image
@@ -24,8 +24,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
-              style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10 transform-3d-backface"
               unoptimized
             />
           ))}
@@ -37,8 +36,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
-              style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10 transform-3d-backface"
               unoptimized
             />
           ))}
@@ -50,8 +48,7 @@ export function ClientCarousel() {
               alt=""
               width={80}
               height={60}
-              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10"
-              style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+              className="flex-shrink-0 max-w-[60px] sm:max-w-[80px] max-h-[45px] sm:max-h-[60px] object-contain mr-5 sm:mr-10 transform-3d-backface"
               unoptimized
             />
           ))}

@@ -16,24 +16,21 @@ export function LoadingDots({ className, size = 'md' }: LoadingDotsProps) {
     <div className={cn('flex items-center gap-1.5', className)}>
       <span
         className={cn(
-          'loading-dot rounded-full bg-primary-500',
+          'loading-dot rounded-full bg-primary-500 animation-delay-0',
           sizeClasses[size]
         )}
-        style={{ animationDelay: '0ms' }}
       />
       <span
         className={cn(
-          'loading-dot rounded-full bg-primary-500',
+          'loading-dot rounded-full bg-primary-500 animation-delay-200',
           sizeClasses[size]
         )}
-        style={{ animationDelay: '200ms' }}
       />
       <span
         className={cn(
-          'loading-dot rounded-full bg-primary-500',
+          'loading-dot rounded-full bg-primary-500 animation-delay-400',
           sizeClasses[size]
         )}
-        style={{ animationDelay: '400ms' }}
       />
     </div>
   )

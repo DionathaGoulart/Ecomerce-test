@@ -52,8 +52,7 @@ export default function ImageModal({ imageUrl, onClose, alt = 'Imagem' }: ImageM
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 p-4"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+      className="fixed-full z-[9999] flex items-center justify-center bg-black bg-opacity-90 p-4"
       onClick={onClose}
     >
       <div
@@ -89,8 +88,7 @@ export default function ImageModal({ imageUrl, onClose, alt = 'Imagem' }: ImageM
             alt={alt}
             width={1200}
             height={800}
-            className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-2xl"
-            style={{ maxHeight: '85vh', width: 'auto', height: 'auto' }}
+            className="max-h-vh-85 max-w-full rounded-lg object-contain shadow-2xl w-auto h-auto"
             unoptimized
           />
         </div>

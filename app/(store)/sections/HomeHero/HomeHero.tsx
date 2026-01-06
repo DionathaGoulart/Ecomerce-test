@@ -35,7 +35,7 @@ export function HomeHero({ sectionRef }: HomeHeroProps = {}) {
           </h1>
 
           {/* Texto */}
-          <p className="text-[14px] sm:text-base md:text-base lg:text-base text-white mb-4 sm:mb-8 md:mb-12 lg:mb-16 leading-relaxed max-w-full sm:max-w-[35rem] text-center md:text-left" style={{ opacity: 0.8 }}>
+          <p className="text-[14px] sm:text-base md:text-base lg:text-base text-white mb-4 sm:mb-8 md:mb-12 lg:mb-16 leading-relaxed max-w-full sm:max-w-[35rem] text-center md:text-left opacity-80">
             Materializamos a sua marca em peças exclusivas de MDF e Pinus desde embalagens premium até projetos complexos. Sem pedido mínimo.
           </p>
 

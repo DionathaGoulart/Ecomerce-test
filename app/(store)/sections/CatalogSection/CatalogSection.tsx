@@ -93,8 +93,7 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
               onClick={handleIncrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full"
-              style={{ backgroundColor: '#9AF032' }}
+              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-green-light"
             >
               <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
@@ -112,8 +111,7 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
               onClick={handleDecrease}
               variant="outline"
               size="sm"
-              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full"
-              style={{ backgroundColor: '#F03932' }}
+              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-red-error"
             >
               <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
@@ -269,7 +267,7 @@ export default function CatalogSection() {
   }, [hasMore, isLoading, filteredProducts.length, displayedCount])
 
   return (
-    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent mt-32 md:mt-0" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
+    <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent mt-32 md:pt-24 full-vw">
       <div className="w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
         {/* Título */}
         <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words px-4 sm:px-6 md:px-0">
@@ -305,7 +303,7 @@ export default function CatalogSection() {
               ) : categories.length === 0 ? (
                 <p className="text-sm text-white/60">Nenhuma categoria disponível</p>
               ) : (
-                <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 justify-start lg:justify-start items-center lg:items-stretch scrollbar-hide carousel-fade" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <ul className="flex flex-row lg:flex-col gap-2 sm:gap-0 sm:space-y-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 justify-start lg:justify-start items-center lg:items-stretch scrollbar-hide carousel-fade touch-scroll">
                   {categories.map((category) => {
                     const isSelected = selectedCategory === category.name
                     const isHovered = hoveredCategory === category.name
@@ -375,7 +373,7 @@ export default function CatalogSection() {
             )}
 
             {/* Seção de Orçamento - Alinhada com os produtos */}
-            <div className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6" style={{ marginTop: '64px' }}>
+            <div className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 mt-64-custom">
               {/* Texto à esquerda */}
               <p className="text-sm sm:text-base md:text-lg text-white/80 text-left flex-1">
                 Não encontrou o que procurava?<br />Faça um orçamento sob medida

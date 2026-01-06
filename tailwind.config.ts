@@ -119,6 +119,10 @@ const config: Config = {
         'body-bg': '#0A0A0A',
         'green-light': '#9AF032',
         'red-error': '#F03932',
+        'whatsapp': {
+          DEFAULT: '#25D366',
+          hover: '#20BD5A',
+        },
       },
       fontFamily: {
         sans: ['Instrument Sans', 'system-ui', 'sans-serif'],

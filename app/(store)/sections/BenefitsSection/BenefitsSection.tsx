@@ -110,8 +110,8 @@ const CARDS_DATA: BenefitCardData[] = [
       svgHeight: 200,
       viewBox: '0 0 310 200',
       position: 'left',
-      horizontalLine: { x1: 0, y1: 100, x2: 260, y2: 100 },
-      circle: { cx: 260, cy: 100 }
+      horizontalLine: { x1: 0, y1: 100, x2: 280, y2: 100 },
+      circle: { cx: 280, cy: 100 }
     }
   },
   {
@@ -123,9 +123,9 @@ const CARDS_DATA: BenefitCardData[] = [
       svgHeight: 200,
       viewBox: '0 0 300 200',
       position: 'left',
-      horizontalLine: { x1: 0, y1: 100, x2: 240, y2: 100 },
-      verticalLine: { x1: 240, y1: 100, x2: 240, y2: 35 },
-      circle: { cx: 240, cy: 35 }
+      horizontalLine: { x1: 0, y1: 100, x2: 260, y2: 100 },
+      verticalLine: { x1: 260, y1: 100, x2: 260, y2: 35 },
+      circle: { cx: 260, cy: 35 }
     }
   },
   {
@@ -151,9 +151,9 @@ const CARDS_DATA: BenefitCardData[] = [
       svgHeight: 200,
       viewBox: '0 0 220 200',
       position: 'right',
-      horizontalLine: { x1: 220, y1: 100, x2: 110, y2: 100 },
-      verticalLine: { x1: 110, y1: 100, x2: 110, y2: 30 },
-      circle: { cx: 110, cy: 30 }
+      horizontalLine: { x1: 220, y1: 100, x2: 90, y2: 100 },
+      verticalLine: { x1: 90, y1: 100, x2: 90, y2: 30 },
+      circle: { cx: 90, cy: 30 }
     }
   },
   {
@@ -165,8 +165,8 @@ const CARDS_DATA: BenefitCardData[] = [
       svgHeight: 200,
       viewBox: '0 0 300 200',
       position: 'right',
-      horizontalLine: { x1: 300, y1: 100, x2: 60, y2: 100 },
-      circle: { cx: 60, cy: 100 }
+      horizontalLine: { x1: 300, y1: 100, x2: 40, y2: 100 },
+      circle: { cx: 40, cy: 100 }
     }
   }
 ]
@@ -195,8 +195,8 @@ export function BenefitsSection() {
           {/* Título Mobile */}
           <div className="px-4 sm:px-6 pb-4">
             <h2 className="text-[48px] font-semibold text-left">
-              <span style={{ color: '#FFFFFF' }}>Inúmeros</span>{' '}
-              <span style={{ color: '#E9EF33' }}>Benefícios</span>
+              <span className="text-white-custom">Inúmeros</span>{' '}
+              <span className="text-primary-yellow">Benefícios</span>
             </h2>
           </div>
           
@@ -204,11 +204,7 @@ export function BenefitsSection() {
           <div className="overflow-hidden px-4 sm:px-6">
             <div 
               ref={carousel1Ref}
-              className="flex items-stretch"
-              style={{ 
-                gap: '12px',
-                width: 'max-content'
-              }}
+              className="flex items-stretch gap-12-custom w-max-content"
             >
               {/* Primeira sequência (3 cards) */}
               {CARDS_DATA.slice(0, 3).map((card, index) => (
@@ -256,11 +252,7 @@ export function BenefitsSection() {
           <div className="overflow-hidden">
             <div 
               ref={carousel2Ref}
-              className="flex items-stretch"
-              style={{ 
-                gap: '12px',
-                width: 'max-content'
-              }}
+              className="flex items-stretch gap-12-custom w-max-content"
             >
               {/* Primeira sequência (3 cards) */}
               {CARDS_DATA.slice(3, 6).map((card, index) => (
@@ -306,9 +298,9 @@ export function BenefitsSection() {
         </div>
 
         {/* Desktop: Layout original com duas colunas */}
-        <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-start w-full gap-0 overflow-visible relative" style={{ zIndex: 50, isolation: 'isolate' }}>
+        <div className="hidden lg:flex lg:flex-row lg:justify-between lg:items-start w-full gap-0 overflow-visible relative z-50-isolate">
           {/* Coluna Esquerda - 3 cards */}
-          <div className="flex flex-col gap-10 xl:gap-6 3xl:gap-8 2xl:gap-12 items-start w-auto overflow-visible relative" style={{ zIndex: 50 }}>
+          <div className="flex flex-col gap-10 xl:gap-6 3xl:gap-8 2xl:gap-12 items-start w-auto overflow-visible relative z-50">
             {CARDS_DATA.slice(0, 3).map((card, index) => (
               <BenefitCard
                 key={index}
@@ -324,7 +316,7 @@ export function BenefitsSection() {
           </div>
 
           {/* Coluna Direita - 3 cards */}
-          <div className="flex flex-col gap-10 xl:gap-6 3xl:gap-8 2xl:gap-12 items-end w-auto overflow-visible relative" style={{ zIndex: 50 }}>
+          <div className="flex flex-col gap-10 xl:gap-6 3xl:gap-8 2xl:gap-12 items-end w-auto overflow-visible relative z-50">
             {CARDS_DATA.slice(3, 6).map((card, index) => (
               <BenefitCard
                 key={index + 3}

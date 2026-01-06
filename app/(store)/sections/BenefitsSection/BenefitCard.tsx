@@ -35,8 +35,8 @@ interface BenefitCardProps {
 
 export function BenefitCard({ index, icon, title, description, lineConfig, cardRef, className = '' }: BenefitCardProps) {
   return (
-    <div ref={cardRef} className={`relative ${className}`} style={{ zIndex: 50, isolation: 'isolate' }}>
-      <div className="p-8 sm:p-6 md:p-8 xl:p-5 3xl:p-6 2xl:p-8 bg-[#212121] md:bg-white/5 rounded-xl sm:rounded-2xl md:backdrop-blur-sm border border-white/10 w-full max-w-[242px] sm:w-[273px] xl:w-[240px] 3xl:w-[250px] 2xl:w-[273px] h-full max-h-[186px] md:max-h-none flex-shrink-0 flex flex-col">
+    <div ref={cardRef} className={`relative z-50-isolate ${className}`}>
+      <div className="p-8 sm:p-6 md:p-8 xl:p-5 3xl:p-6 2xl:p-8 bg-secondary-800 md:bg-white/5 rounded-xl sm:rounded-2xl md:backdrop-blur-sm border border-white/10 w-full max-w-[242px] sm:w-[273px] xl:w-[240px] 3xl:w-[250px] 2xl:w-[273px] h-full max-h-[186px] md:max-h-none flex-shrink-0 flex flex-col">
         <div className="flex flex-col gap-2 flex-1">
           <div className="w-4 h-4 flex items-center justify-center">
             <Image

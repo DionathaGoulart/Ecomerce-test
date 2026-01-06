@@ -8,10 +8,10 @@ import { useState, useEffect, useRef, startTransition, useMemo } from 'react'
 // Os avisos não afetam a funcionalidade e podem ser ignorados
 function SplineRenderer({ 
   scene, 
-  isMobile 
+  isMobile
 }: { 
   scene: string
-  isMobile: boolean 
+  isMobile: boolean
 }) {
   const [SplineComponent, setSplineComponent] = useState<React.ComponentType<any> | null>(null)
   const [shouldRender, setShouldRender] = useState(false)
@@ -52,6 +52,7 @@ function SplineRenderer({
   if (!shouldRender || !SplineComponent) {
     return null
   }
+
 
   return (
     <SplineComponent 
@@ -131,8 +132,7 @@ export function SplineBackground() {
   return (
     <div 
       ref={containerRef}
-      className="spline-background sticky top-0 w-full z-0 pointer-events-none m-0 p-0 h-[calc(100vh-50px)] md:h-[calc(100vh-50px)] xl:h-[calc(100vh-20px)] 3xl:h-[calc(100vh-20px)] spline-clip-path" 
-      style={{ zIndex: 0 }}
+      className="spline-background sticky top-0 w-full z-0 pointer-events-none m-0 p-0 h-[calc(100vh-50px)] md:h-[calc(100vh-50px)] xl:h-[calc(100vh-20px)] 3xl:h-[calc(100vh-20px)] spline-clip-path"
     >
       <div className="w-full h-full px-4 sm:px-8 md:px-16 lg:px-24 xl:px-32 3xl:px-40">
         <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 xl:translate-y-12 3xl:translate-y-14 2xl:translate-y-24 scale-[1.15] sm:scale-[1.3] md:scale-[1.5] lg:scale-[1.5] xl:scale-[1.5] 2xl:scale-[1.5] spline-scale-custom">
