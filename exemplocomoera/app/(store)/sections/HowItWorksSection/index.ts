@@ -1,0 +1,2 @@
+export { HowItWorksSection } from './HowItWorksSection'
+

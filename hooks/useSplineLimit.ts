@@ -160,6 +160,7 @@ export function useSplineLimit(
       
       const isMobile = window.innerWidth < 768
       const targetSection = isMobile && homeSection ? homeSection : comofuncionaSection
+      if (!targetSection) return
       const targetSectionRect = targetSection.getBoundingClientRect()
       
       // No mobile, só precisa que a seção Home esteja renderizada
