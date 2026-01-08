@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ChevronUp, ChevronDown, Trash2, Image as ImageIcon, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { Input } from '@/components/atoms/Input'
+import Footer from '@/components/store/Footer'
 
 interface Product {
   id: string
@@ -157,34 +158,39 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60">
-        <h1 className="text-[96px] font-bold text-white mb-8">Carrinho</h1>
-        <div className="flex flex-col items-start justify-start py-12">
-          <p className="text-white/70 text-[16px] font-normal">Seu carrinho ainda está vazio.</p>
-          <p className="text-white/70 text-[16px] font-normal mb-8">Que tal conhecer nossos produtos?</p>
+      <div className="flex flex-col min-h-screen">
+        <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60 flex-1">
+          <h1 className="text-[96px] font-bold text-white">Carrinho</h1>
+          <div className="flex flex-col items-start justify-start py-12">
+            <p className="text-white/70 text-[16px] font-normal">Seu carrinho ainda está vazio.</p>
+            <p className="text-white/70 text-[16px] font-normal mb-16">Que tal conhecer nossos produtos?</p>
 
-          <Link
-            href="/catalogo"
-            className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
-          >
-            <Image
-              src="/icons/eye.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
-            />
-            <span className="whitespace-nowrap inline-block">Ver catálogo</span>
-          </Link>
+            <Link
+              href="/catalogo"
+              className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+            >
+              <Image
+                src="/icons/eye.svg"
+                alt=""
+                width={20}
+                height={20}
+                className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+              />
+              <span className="whitespace-nowrap inline-block">Ver catálogo</span>
+            </Link>
+          </div>
+        </div>
+        <div className="-mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-32 3xl:-mx-40 2xl:-mx-96 mt-auto -mb-20 md:mb-0">
+          <Footer />
         </div>
       </div>
     )
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <div className="hidden md:block h-60"></div>
-      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-0 pt-32 md:pt-0">
+      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-32 pt-32 md:pt-0 flex-1">
         <h1 className="text-[96px] font-bold text-white mb-12">Carrinho</h1>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -371,6 +377,9 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </>
+      <div className="-mx-4 sm:-mx-6 md:-mx-12 lg:-mx-24 xl:-mx-32 3xl:-mx-40 2xl:-mx-96 mt-auto -mb-20 md:mb-0">
+        <Footer />
+      </div>
+    </div>
   )
 }
