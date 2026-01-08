@@ -1,8 +1,18 @@
 'use client'
 
-export default function LoginPage() {
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
+
+function LoginContent() {
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect')
+
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google'
+    const url = new URL('/api/auth/google', window.location.origin)
+    if (redirect) {
+      url.searchParams.set('redirect', redirect)
+    }
+    window.location.href = url.toString()
   }
 
   return (
@@ -47,6 +57,14 @@ export default function LoginPage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-neutral-950"></div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
 
