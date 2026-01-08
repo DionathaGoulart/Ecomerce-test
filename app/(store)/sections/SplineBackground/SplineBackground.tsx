@@ -6,10 +6,10 @@ import { useState, useEffect, useRef, startTransition, useMemo } from 'react'
 // Nota: O componente Spline usa async/await internamente, o que causa avisos do React
 // Isso é uma limitação conhecida da biblioteca @splinetool/react-spline
 // Os avisos não afetam a funcionalidade e podem ser ignorados
-function SplineRenderer({ 
-  scene, 
+function SplineRenderer({
+  scene,
   isMobile
-}: { 
+}: {
   scene: string
   isMobile: boolean
 }) {
@@ -26,7 +26,7 @@ function SplineRenderer({
         // Usa o alias configurado no webpack para resolver o módulo corretamente
         const splineModule = await import('@splinetool/react-spline/next')
         const Spline = splineModule.default || splineModule
-        
+
         if (mountedRef.current && Spline) {
           startTransition(() => {
             setSplineComponent(() => Spline)
@@ -55,7 +55,7 @@ function SplineRenderer({
 
 
   return (
-    <SplineComponent 
+    <SplineComponent
       scene={scene}
       style={{ background: 'transparent' }}
     />
@@ -75,7 +75,7 @@ export function SplineBackground() {
   useEffect(() => {
     // Garante que o componente está montado no cliente
     setIsMounted(true)
-    
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768) // md breakpoint do Tailwind
     }
@@ -130,7 +130,7 @@ export function SplineBackground() {
   }, [isMounted])
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="spline-background sticky top-0 w-full z-0 pointer-events-none m-0 p-0 h-[calc(100vh-50px)] md:h-[calc(100vh-50px)] xl:h-[calc(100vh-20px)] 3xl:h-[calc(100vh-20px)] spline-clip-path"
     >
@@ -138,7 +138,7 @@ export function SplineBackground() {
         <div className="w-full h-full translate-y-8 sm:translate-y-16 md:translate-y-24 xl:translate-y-12 3xl:translate-y-14 2xl:translate-y-24 scale-[1.15] sm:scale-[1.3] md:scale-[1.5] lg:scale-[1.5] xl:scale-[1.5] 2xl:scale-[1.5] spline-scale-custom">
           <div className="w-full h-full rounded-2xl overflow-hidden [&_canvas]:bg-transparent">
             {shouldRenderSpline && isMounted && hasDimensions && (
-              <SplineRenderer 
+              <SplineRenderer
                 scene={isMobile ? mobileScene : desktopScene}
                 isMobile={isMobile}
               />

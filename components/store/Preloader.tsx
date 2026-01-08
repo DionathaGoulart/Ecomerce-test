@@ -88,7 +88,7 @@ export function Preloader() {
 
     // Inicia verificações
     checkDocument()
-    
+
     // Verifica Spline após um pequeno delay para dar tempo do DOM renderizar
     const splineCheckTimeout = setTimeout(checkSpline, 50)
 
