@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/hooks/useCart'
 import { formatCurrency } from '@/lib/utils'
@@ -103,7 +104,7 @@ export default function CartPage() {
       }
 
       const data = await response.json()
-      
+
       // Atualizar item do carrinho automaticamente quando a imagem for carregada
       const currentItem = cartItems.find(item => item.productId === productId)
       if (currentItem) {
@@ -114,7 +115,7 @@ export default function CartPage() {
           personalizationImagePath: data.path,
           personalizationDescription: currentItem.personalizationDescription,
         })
-        
+
         setUploadErrors(prev => {
           const updated = { ...prev }
           delete updated[productId]
@@ -125,9 +126,9 @@ export default function CartPage() {
       }
     } catch (err) {
       console.error('Erro ao fazer upload:', err)
-      setUploadErrors(prev => ({ 
-        ...prev, 
-        [productId]: err instanceof Error ? err.message : 'Erro ao fazer upload da imagem' 
+      setUploadErrors(prev => ({
+        ...prev,
+        [productId]: err instanceof Error ? err.message : 'Erro ao fazer upload da imagem'
       }))
     } finally {
       setUploadingImages(prev => ({ ...prev, [productId]: false }))
@@ -146,7 +147,7 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-7xl mx-auto pt-[128px] px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
+      <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60">
         <div className="text-center py-12">
           <p className="text-white/70">Carregando...</p>
         </div>
@@ -156,10 +157,25 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="w-full max-w-7xl mx-auto pt-[128px] px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
+      <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60">
         <h1 className="text-[96px] font-bold text-white mb-8">Carrinho</h1>
-        <div className="text-center py-12">
-          <p className="text-white/70 text-[24px]">Seu carrinho está vazio.</p>
+        <div className="flex flex-col items-start justify-start py-12">
+          <p className="text-white/70 text-[16px] font-normal">Seu carrinho ainda está vazio.</p>
+          <p className="text-white/70 text-[16px] font-normal mb-8">Que tal conhecer nossos produtos?</p>
+
+          <Link
+            href="/catalogo"
+            className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+          >
+            <Image
+              src="/icons/eye.svg"
+              alt=""
+              width={20}
+              height={20}
+              className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+            />
+            <span className="whitespace-nowrap inline-block">Ver catálogo</span>
+          </Link>
         </div>
       </div>
     )
@@ -167,8 +183,8 @@ export default function CartPage() {
 
   return (
     <>
-      <div style={{ height: '128px' }} className="hidden md:block"></div>
-      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-0">
+      <div className="hidden md:block h-60"></div>
+      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-0 pt-32 md:pt-0">
         <h1 className="text-[96px] font-bold text-white mb-12">Carrinho</h1>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
