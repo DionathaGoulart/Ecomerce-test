@@ -3,7 +3,7 @@ import { BenefitCard, LineConfig } from './BenefitCard'
 import { useBenefitsAnimation } from '@/hooks/useBenefitsAnimation'
 
 // Hook customizado baseado no useCarouselAnimation, mas com duração e posição inicial customizáveis
-function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0) {
+function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0, direction: 'left' | 'right' = 'left') {
   const carouselRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -28,23 +28,38 @@ function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0
             // Inicializar startTime considerando a posição inicial
             startTime = timestamp - (startPosition / speed)
           }
-          
+
           const elapsed = timestamp - startTime
           const totalDistance = elapsed * speed
-          
-          // Calcular posição atual usando módulo
-          let currentPosition = -(totalDistance % sequenceWidth)
-          
-          // Quando chegar muito perto do final da primeira sequência (dentro de 2px),
-          // resetar para 0 de forma imperceptível
-          // Como temos 3 sequências idênticas, quando a primeira sair, a segunda estará
-          // na mesma posição visual, tornando o reset imperceptível
-          if (Math.abs(currentPosition + sequenceWidth) < 2 || currentPosition > 0) {
-            currentPosition = 0
-            // Ajustar o startTime para manter a continuidade da animação
-            const cycles = Math.floor(totalDistance / sequenceWidth)
-            const remainder = totalDistance - (cycles * sequenceWidth)
-            startTime = timestamp - (remainder / speed)
+
+          // Calcular posição atual
+          let currentPosition
+
+          if (direction === 'left') {
+            // Movimento para esquerda: 0 -> -sequenceWidth
+            currentPosition = -(totalDistance % sequenceWidth)
+
+            // Reset quando completa o ciclo
+            if (Math.abs(currentPosition + sequenceWidth) < 2 || currentPosition > 0) {
+              currentPosition = 0
+              // Ajustar o startTime para manter a continuidade
+              const cycles = Math.floor(totalDistance / sequenceWidth)
+              const remainder = totalDistance - (cycles * sequenceWidth)
+              startTime = timestamp - (remainder / speed)
+            }
+          } else {
+            // Movimento para direita: -sequenceWidth -> 0
+            const remainder = totalDistance % sequenceWidth
+            currentPosition = -sequenceWidth + remainder
+
+            // Reset quando completa o ciclo (chega em 0)
+            if (currentPosition > -2) {
+              currentPosition = -sequenceWidth
+              // Ajustar o startTime para manter a continuidade
+              const cycles = Math.floor(totalDistance / sequenceWidth)
+              const newRemainder = totalDistance - (cycles * sequenceWidth)
+              startTime = timestamp - (newRemainder / speed)
+            }
           }
 
           // Atualizar transform apenas se houver mudança significativa
@@ -57,7 +72,7 @@ function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0
         }
 
         animationFrameId = requestAnimationFrame(animate)
-        
+
         // Cleanup
         return () => {
           if (animationFrameId) {
@@ -68,11 +83,11 @@ function useBenefitsCarousel(duration: number = 30000, startPosition: number = 0
     }
 
     const timeoutId = setTimeout(initAnimation, 100)
-    
+
     return () => {
       clearTimeout(timeoutId)
     }
-  }, [duration, startPosition])
+  }, [duration, startPosition, direction])
 
   return carouselRef
 }
@@ -184,12 +199,12 @@ export function BenefitsSection() {
   const startPosition2 = totalWidth * 0.7
 
   // Usar hooks baseados no useCarouselAnimation que funciona perfeitamente
-  const carousel1Ref = useBenefitsCarousel(40000, 0) // 40 segundos, começa do início
-  const carousel2Ref = useBenefitsCarousel(30000, startPosition2) // 30 segundos, começa em 70%
+  const carousel1Ref = useBenefitsCarousel(40000, 0, 'left') // 40 segundos, começa do início, esquerda
+  const carousel2Ref = useBenefitsCarousel(30000, startPosition2, 'right') // 30 segundos, começa offset, direita
 
   return (
     <div className="relative h-auto md:h-[220vh] xl:h-[320vh] 3xl:h-[300vh] 2xl:h-[220vh] overflow-visible">
-      <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-8 3xl:pt-12 2xl:pt-40 pb-8 sm:pb-12 md:pb-16 lg:py-52 xl:py-28 3xl:py-32 2xl:py-52 md:sticky md:top-0 overflow-visible">
+      <section id="beneficios" ref={cardsSectionRef} className="w-full pt-8 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-8 3xl:pt-12 2xl:pt-40 pb-12 sm:pb-12 md:pb-16 lg:py-52 xl:py-28 3xl:py-32 2xl:py-52 md:sticky md:top-0 overflow-visible">
         {/* Mobile: 2 Carrosséis horizontais automáticos com 3 itens cada */}
         <div className="lg:hidden space-y-4 -mx-4 sm:-mx-6">
           {/* Título Mobile */}
@@ -199,10 +214,10 @@ export function BenefitsSection() {
               <span className="text-primary-yellow">Benefícios</span>
             </h2>
           </div>
-          
+
           {/* Carrossel 1 - Primeiros 3 cards */}
           <div className="overflow-hidden px-4 sm:px-6">
-            <div 
+            <div
               ref={carousel1Ref}
               className="flex items-stretch gap-12-custom w-max-content"
             >
@@ -228,7 +243,7 @@ export function BenefitsSection() {
                   title={card.title}
                   description={card.description}
                   lineConfig={card.lineConfig}
-                  cardRef={() => {}}
+                  cardRef={() => { }}
                   className=""
                 />
               ))}
@@ -241,7 +256,7 @@ export function BenefitsSection() {
                   title={card.title}
                   description={card.description}
                   lineConfig={card.lineConfig}
-                  cardRef={() => {}}
+                  cardRef={() => { }}
                   className=""
                 />
               ))}
@@ -250,7 +265,7 @@ export function BenefitsSection() {
 
           {/* Carrossel 2 - Últimos 3 cards */}
           <div className="overflow-hidden">
-            <div 
+            <div
               ref={carousel2Ref}
               className="flex items-stretch gap-12-custom w-max-content"
             >
@@ -276,7 +291,7 @@ export function BenefitsSection() {
                   title={card.title}
                   description={card.description}
                   lineConfig={card.lineConfig}
-                  cardRef={() => {}}
+                  cardRef={() => { }}
                   className=""
                 />
               ))}
@@ -289,7 +304,7 @@ export function BenefitsSection() {
                   title={card.title}
                   description={card.description}
                   lineConfig={card.lineConfig}
-                  cardRef={() => {}}
+                  cardRef={() => { }}
                   className=""
                 />
               ))}
