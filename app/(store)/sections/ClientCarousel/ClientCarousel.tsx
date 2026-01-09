@@ -8,10 +8,10 @@ export function ClientCarousel() {
 
   return (
     <div className="mt-4 sm:mt-8 md:mt-12 lg:mt-16 w-full">
-      <div className="max-w-2xl mb-2 sm:mb-3 md:mb-4 mx-auto md:mx-0">
+      <div className="max-w-2xl mb-4 sm:mb-3 md:mb-4 mx-auto md:mx-0">
         <p className="text-[14px] sm:text-sm md:text-base text-white text-center md:text-left opacity-80">Conheça nossos clientes:</p>
       </div>
-      
+
       {/* Carousel */}
       <div className="carousel-fade relative max-w-xl overflow-hidden bg-transparent">
         {/* Container do carousel */}
