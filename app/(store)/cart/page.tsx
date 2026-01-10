@@ -146,9 +146,14 @@ export default function CartPage() {
   const voucherCents = 0 // Voucher será implementado depois
   const totalCents = subtotalCents + shippingCents - voucherCents
 
+  // Verificar se todos os itens têm imagens
+  const allImagesUploaded = cartItems.every(item =>
+    item.personalizationImageUrl || tempImageUrls[item.productId]
+  )
+
   if (loading) {
     return (
-      <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60">
+      <div className="w-full max-w-7xl mx-auto pt-24 md:pt-60">
         <div className="text-center py-12">
           <p className="text-white/70">Carregando...</p>
         </div>
@@ -159,22 +164,22 @@ export default function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="flex flex-col min-h-screen">
-        <div className="w-full max-w-7xl mx-auto pt-32 md:pt-60 flex-1">
-          <h1 className="text-[96px] font-bold text-white">Carrinho</h1>
+        <div className="w-full max-w-7xl mx-auto pt-24 md:pt-60 flex-1">
+          <h1 className="text-5xl md:text-8xl font-bold text-white">Carrinho</h1>
           <div className="flex flex-col items-start justify-start py-12">
-            <p className="text-white/70 text-[16px] font-normal">Seu carrinho ainda está vazio.</p>
-            <p className="text-white/70 text-[16px] font-normal mb-16">Que tal conhecer nossos produtos?</p>
+            <p className="text-white/70 text-base font-normal">Seu carrinho ainda está vazio.</p>
+            <p className="text-white/70 text-base font-normal mb-16">Que tal conhecer nossos produtos?</p>
 
             <Link
               href="/catalogo"
-              className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 px-5 sm:px-6 md:px-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-[50px] w-full sm:w-auto overflow-hidden"
+              className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] bg-primary-500 pl-12 pr-5 sm:pl-12 sm:pr-6 md:px-5 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base font-medium text-neutral-950 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] md:hover:pl-12 w-full sm:w-auto overflow-hidden"
             >
               <Image
                 src="/icons/eye.svg"
                 alt=""
                 width={20}
                 height={20}
-                className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-0 -translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-100 translate-x-0 md:opacity-0 md:-translate-x-[15px] md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
               />
               <span className="whitespace-nowrap inline-block">Ver catálogo</span>
             </Link>
@@ -190,8 +195,8 @@ export default function CartPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="hidden md:block h-60"></div>
-      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-32 pt-32 md:pt-0 flex-1">
-        <h1 className="text-[96px] font-bold text-white mb-12">Carrinho</h1>
+      <div className="w-full max-w-[1400px] mx-auto pb-20 md:pb-32 pt-24 md:pt-0 flex-1">
+        <h1 className="text-5xl md:text-8xl font-bold text-white mb-12">Carrinho</h1>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Lista de itens */}
@@ -203,21 +208,21 @@ export default function CartPage() {
               return (
                 <div
                   key={item.productId}
-                  className="relative bg-[#212121] border border-[#3D3D3D] rounded-2xl p-8"
+                  className="relative bg-[#212121] border border-[#3D3D3D] rounded-2xl p-4 sm:p-6 md:p-8"
                 >
                   {/* Ícone de lixeira no canto superior direito */}
                   <button
                     onClick={() => handleRemove(item.productId)}
-                    className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 md:top-6 md:right-6 text-white/70 hover:text-white transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
 
-                  <div className="flex gap-8 items-start">
+                  <div className="grid grid-cols-[100px_1fr] md:grid-cols-[10rem_1fr] gap-x-4 gap-y-4 md:gap-8 items-start">
                     {/* Imagem à esquerda */}
                     {product.image_url && (
-                      <div className="flex-shrink-0">
-                        <div className="w-[160px] aspect-square">
+                      <div className="flex-shrink-0 col-start-1 row-start-1 row-span-2 md:row-span-4">
+                        <div className="w-[100px] md:w-40 aspect-square">
                           <Image
                             src={product.image_url}
                             alt={product.title}
@@ -229,15 +234,15 @@ export default function CartPage() {
                       </div>
                     )}
 
-                    {/* Informações à direita */}
-                    <div className="flex-1 min-w-0 flex flex-col">
+                    {/* Informações à direita - Usando contents para participar do grid pai */}
+                    <div className="contents">
                       {/* Nome do produto */}
-                      <h3 className="text-[24px] font-bold text-white mb-4">
+                      <h3 className="text-lg md:text-2xl font-bold text-white mb-0 md:mb-4 col-start-2 md:col-start-2 self-start pr-8 md:pr-0">
                         {product.title}
                       </h3>
 
                       {/* Controles de quantidade */}
-                      <div className="flex items-center gap-2 h-[40px] sm:h-[44px] mb-6">
+                      <div className="flex items-center gap-2 h-10 sm:h-11 mb-0 md:mb-6 col-start-2 md:col-start-2 self-start">
                         <Button
                           onClick={() => handleIncrease(item.productId)}
                           variant="outline"
@@ -275,12 +280,12 @@ export default function CartPage() {
                       </div>
 
                       {/* Valor */}
-                      <p className="text-[24px] font-normal text-white mb-6">
+                      <p className="text-xl md:text-2xl font-normal text-white mb-0 md:mb-6 col-start-1 col-span-2 md:col-start-2 md:col-span-1">
                         {formatCurrency(product.price_cents * item.quantity)}
                       </p>
 
                       {/* Card para adicionar arte */}
-                      <div>
+                      <div className="col-start-1 col-span-2 md:col-start-2 md:col-span-1">
                         <input
                           type="file"
                           accept="image/*"
@@ -367,11 +372,19 @@ export default function CartPage() {
               </div>
 
               <button
-                onClick={() => router.push('/checkout')}
-                className="w-full bg-primary-500 hover:bg-primary-600 text-[#121212] font-medium py-5 px-6 rounded-2xl transition-colors flex items-center justify-center gap-3 mt-6"
+                onClick={() => {
+                  if (allImagesUploaded) {
+                    router.push('/checkout')
+                  }
+                }}
+                disabled={!allImagesUploaded}
+                className={`w-full font-medium py-5 px-6 rounded-2xl transition-colors flex items-center justify-center gap-3 mt-6 ${allImagesUploaded
+                  ? 'bg-primary-500 hover:bg-primary-600 text-[#121212]'
+                  : 'bg-neutral-800 text-white/50 cursor-not-allowed'
+                  }`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                Continuar a Compra
+                {allImagesUploaded ? 'Continuar a Compra' : 'Adicione as artes para continuar'}
               </button>
             </div>
           </div>

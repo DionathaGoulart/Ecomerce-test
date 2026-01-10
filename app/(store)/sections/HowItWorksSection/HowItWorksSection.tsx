@@ -17,7 +17,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
       <div className="max-w-7xl mx-auto px-0 sm:px-4 md:px-6">
         {/* Título Mobile */}
         <div className="lg:hidden mb-6">
-          <h2 className="text-[48px] font-semibold text-left">
+          <h2 className="text-5xl font-semibold text-left">
             <span className="text-white-custom">Como</span>{' '}
             <span className="text-primary-yellow">Funciona?</span>
           </h2>
@@ -36,7 +36,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                     {/* Card do Número */}
                     <div className="flex-shrink-0 relative z-10 flex">
                       <div
-                        className="step-number-card rounded-lg sm:rounded-xl md:rounded-[16px] flex items-center justify-center transition-colors duration-300 w-full"
+                        className="step-number-card rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center transition-colors duration-300 w-full"
                         style={{
                           backgroundColor: '#212121',
                           paddingLeft: '32px',
@@ -48,7 +48,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                         }}
                         data-step-index={index}
                       >
-                        <span className="text-[32px] sm:text-2xl md:text-3xl lg:text-[32px] font-semibold text-white lg:text-neutral-950">
+                        <span className="text-4xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white lg:text-neutral-950">
                           {etapa.step}
                         </span>
                       </div>
@@ -69,7 +69,7 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
 
                     {/* Card de Conteúdo */}
                     <div
-                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-[16px] transition-colors duration-300 flex"
+                      className="step-content-card flex-1 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-300 flex"
                       data-step-index={index}
                       style={{
                         backgroundColor: '#212121',
@@ -89,11 +89,11 @@ export function HowItWorksSection({ sectionRef: externalRef }: HowItWorksSection
                             style={{ filter: 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)' }}
                           />
                         </div>
-                        <h3 className="text-[24px] sm:text-xl md:text-2xl lg:text-3xl xl:text-[32px] font-semibold text-white transition-colors duration-300">
+                        <h3 className="text-2xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold text-white transition-colors duration-300">
                           <span className="lg:hidden">{etapa.titleMobile || etapa.title}</span>
                           <span className="hidden lg:inline">{etapa.title}</span>
                         </h3>
-                        <p className="text-[12px] sm:text-sm md:text-base lg:text-[16px] text-white/80 leading-relaxed transition-colors duration-300 max-w-[85%] lg:max-w-full">
+                        <p className="text-xs sm:text-sm md:text-base lg:text-base text-white/80 leading-relaxed transition-colors duration-300 max-w-[85%] lg:max-w-full">
                           <span className="lg:hidden">{etapa.descriptionMobile || etapa.description}</span>
                           <span className="hidden lg:inline">{etapa.description}</span>
                         </p>
