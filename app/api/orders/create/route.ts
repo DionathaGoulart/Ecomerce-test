@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     // Validar dados de entrada
     const validation = createOrderSchema.safeParse(body)
     if (!validation.success) {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       }
       subtotalCents += product.price_cents * item.quantity
     }
-    
+
     // Total incluindo frete
     const totalCents = subtotalCents + shippingCost
 
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         .select('id')
         .eq('order_number', orderNumber)
         .single()
-      
+
       if (!existing) break
       attempts++
       if (attempts > 10) {
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       .insert({
         order_number: orderNumber,
         user_id: user.id,
-        status: 'pending',
+        status: 'checkout',
         total_cents: totalCents,
         delivery_address: customer.address,
         // Salvar tipo de entrega e frete como metadata (se a tabela tiver esses campos)
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
 
     // Processar imagens de personalização: copiar temporárias para permanentes
     const uploadedImageUrls: Record<string, string> = {}
-    
+
     for (const item of items) {
       if (!item.personalizationImageUrl) {
         continue
@@ -190,17 +190,17 @@ export async function POST(request: NextRequest) {
           const buffer = Buffer.from(arrayBuffer)
 
           // Gerar nome do arquivo permanente
-          const fileExt = item.personalizationImageFile?.name?.split('.').pop() || 
+          const fileExt = item.personalizationImageFile?.name?.split('.').pop() ||
             item.personalizationImagePath.split('.').pop() || 'png'
           const fileName = `${order.id}_${item.productId}_${Date.now()}.${fileExt}`
           const permanentPath = `personalizations/${fileName}`
 
           // Detectar content type
-          const contentType = item.personalizationImageFile?.type || 
-            (fileExt === 'png' ? 'image/png' : 
-             fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' : 
-             fileExt === 'webp' ? 'image/webp' : 
-             'image/png')
+          const contentType = item.personalizationImageFile?.type ||
+            (fileExt === 'png' ? 'image/png' :
+              fileExt === 'jpg' || fileExt === 'jpeg' ? 'image/jpeg' :
+                fileExt === 'webp' ? 'image/webp' :
+                  'image/png')
 
           // Upload para path permanente
           const { error: uploadError } = await supabaseAdmin.storage
@@ -236,17 +236,17 @@ export async function POST(request: NextRequest) {
           // É base64 (fallback para compatibilidade), fazer upload
           const base64Data = item.personalizationImageUrl.split(',')[1] || item.personalizationImageUrl
           const buffer = Buffer.from(base64Data, 'base64')
-          
+
           const fileExt = item.personalizationImageFile?.name?.split('.').pop() || 'png'
           const fileName = `${order.id}_${item.productId}_${Date.now()}.${fileExt}`
           const filePath = `personalizations/${fileName}`
-          
-          const contentType = item.personalizationImageFile?.type || 
-            (item.personalizationImageUrl.includes('image/png') ? 'image/png' : 
-             item.personalizationImageUrl.includes('image/jpeg') ? 'image/jpeg' : 
-             item.personalizationImageUrl.includes('image/webp') ? 'image/webp' : 
-             'image/png')
-          
+
+          const contentType = item.personalizationImageFile?.type ||
+            (item.personalizationImageUrl.includes('image/png') ? 'image/png' :
+              item.personalizationImageUrl.includes('image/jpeg') ? 'image/jpeg' :
+                item.personalizationImageUrl.includes('image/webp') ? 'image/webp' :
+                  'image/png')
+
           const { error: uploadError } = await supabaseAdmin.storage
             .from('personalizations')
             .upload(filePath, buffer, {
@@ -254,21 +254,21 @@ export async function POST(request: NextRequest) {
               cacheControl: '3600',
               upsert: false,
             })
-          
+
           if (uploadError) {
             console.error('Erro ao fazer upload da imagem:', uploadError)
             continue
           }
-          
+
           const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
             .from('personalizations')
             .createSignedUrl(filePath, 60 * 60 * 24 * 365)
-          
+
           if (signedUrlError || !signedUrlData?.signedUrl) {
             console.error('Erro ao criar signed URL:', signedUrlError)
             continue
           }
-          
+
           uploadedImageUrls[item.productId] = signedUrlData.signedUrl
         } else {
           // Já é uma URL permanente, usar diretamente
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
     // Criar itens do pedido
     const orderItems = items.map((item) => {
       const product = productMap.get(item.productId)!
-      
+
       // Construir objeto de personalização se houver imagem ou descrição
       let personalization: { imageUrl?: string; description?: string } | null = null
       if (uploadedImageUrls[item.productId] || item.personalizationDescription) {
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
           personalization.description = item.personalizationDescription
         }
       }
-      
+
       return {
         order_id: order.id,
         product_id: item.productId,
@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
 
     // Criar sessão do Stripe Checkout
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    
+
     const lineItems = items.map((item) => {
       const product = productMap.get(item.productId)!
       return {
@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
       }
     })
-    
+
     // Adicionar frete como item separado se houver
     if (shippingCost > 0) {
       lineItems.push({

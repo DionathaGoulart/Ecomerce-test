@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'all') {
       query = query.eq('status', status)
+    } else {
+      // Por padrão (visualização "Todos"), ocultar pedidos em checkout (abandonados)
+      query = query.neq('status', 'checkout')
     }
 
     const { data: orders, error } = await query

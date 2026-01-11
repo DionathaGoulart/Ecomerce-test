@@ -48,7 +48,7 @@ export interface Order {
   items?: OrderItem[]
 }
 
-export type OrderStatus = 'pending' | 'paid' | 'production' | 'shipped' | 'cancelled'
+export type OrderStatus = 'checkout' | 'pending' | 'paid' | 'production' | 'shipped' | 'cancelled'
 
 export interface OrderItem {
   id?: string

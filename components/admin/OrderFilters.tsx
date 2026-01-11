@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 
 const statusOptions = [
   { value: 'all', label: 'Todos' },
+  { value: 'checkout', label: 'Em Checkout' },
   { value: 'pending', label: 'Pendentes' },
   { value: 'paid', label: 'Pagos' },
   { value: 'production', label: 'Em Produção' },
@@ -35,11 +36,10 @@ export default function OrderFilters({ currentStatus }: { currentStatus: string 
           variant={currentStatus === option.value ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleStatusChange(option.value)}
-          className={`text-xs sm:text-sm ${
-            currentStatus === option.value
+          className={`text-xs sm:text-sm ${currentStatus === option.value
               ? 'bg-primary-500 text-neutral-950 hover:opacity-90'
               : 'border-header-border text-white hover:bg-white/10'
-          }`}
+            }`}
         >
           {option.label}
         </Button>

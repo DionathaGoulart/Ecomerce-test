@@ -47,7 +47,7 @@ export default function MinhaContaPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  
+
   // Estados para gerenciamento de endereços
   const [addresses, setAddresses] = useState<any[]>([])
   const [loadingAddresses, setLoadingAddresses] = useState(false)
@@ -113,7 +113,7 @@ export default function MinhaContaPage() {
             })
             .select()
             .single()
-          
+
           if (createError) {
             console.error('Erro ao criar perfil:', createError)
           } else if (newProfile) {
@@ -139,6 +139,7 @@ export default function MinhaContaPage() {
         .from('orders')
         .select('*')
         .eq('user_id', authUser.id)
+        .neq('status', 'checkout') // Ocultar pedidos em checkout (abandonados)
         .order('created_at', { ascending: false })
 
       if (ordersError) {
@@ -167,7 +168,7 @@ export default function MinhaContaPage() {
   // Função para buscar CEP na API ViaCEP
   const fetchCEP = useCallback(async (cep: string) => {
     const cleanedCEP = unformatCEP(cep)
-    
+
     // Só busca se tiver 8 dígitos
     if (cleanedCEP.length !== 8) {
       return
@@ -226,11 +227,11 @@ export default function MinhaContaPage() {
 
   const handleSaveAddress = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+
     try {
       const url = editingAddress ? `/api/addresses/${editingAddress}` : '/api/addresses'
       const method = editingAddress ? 'PUT' : 'POST'
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -362,6 +363,7 @@ export default function MinhaContaPage() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
+      checkout: 'Em Checkout',
       pending: 'Pendente',
       paid: 'Pago',
       production: 'Em Produção',
@@ -373,6 +375,7 @@ export default function MinhaContaPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
+      checkout: 'bg-neutral-500/20 text-neutral-500',
       pending: 'bg-warning-500/20 text-warning-500',
       paid: 'bg-success-500/20 text-success-500',
       production: 'bg-info-500/20 text-info-500',
@@ -403,7 +406,7 @@ export default function MinhaContaPage() {
         {/* Botão Admin */}
         {hasAdminAccess && (
           <div className="flex items-center gap-3 pt-6 sm:pt-8">
-            <a 
+            <a
               href="/admin"
               className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-transparent px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-primary-500 transition-opacity hover:opacity-80"
             >
@@ -631,7 +634,7 @@ export default function MinhaContaPage() {
                           const value = e.target.value.replace(/\D/g, '')
                           const formatted = value.length <= 5 ? value : `${value.slice(0, 5)}-${value.slice(5, 8)}`
                           setAddressForm(prev => ({ ...prev, zipcode: formatted }))
-                          
+
                           // Buscar CEP imediatamente quando tiver 8 dígitos
                           if (value.length === 8 && value !== lastFetchedCEP.current) {
                             setTimeout(() => {
@@ -868,7 +871,7 @@ export default function MinhaContaPage() {
                         />
                         Entrar em contato
                       </a>
-                      
+
                       {order.receipt_url && (
                         <a
                           href={order.receipt_url}

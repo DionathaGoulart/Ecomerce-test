@@ -9,6 +9,7 @@ import OrderFilters from '@/components/admin/OrderFilters'
 import { Spinner } from '@/components/atoms/Spinner'
 
 const statusLabels: Record<string, string> = {
+  checkout: 'Em Checkout',
   pending: 'Pendente',
   paid: 'Pago',
   production: 'Em Produção',
@@ -18,6 +19,7 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
+  checkout: 'bg-neutral-500/20 text-neutral-500 border border-neutral-500/30',
   pending: 'bg-warning-500/20 text-warning-500 border border-warning-500/30',
   paid: 'bg-success-500/20 text-success-500 border border-success-500/30',
   production: 'bg-info-500/20 text-info-500 border border-info-500/30',
@@ -42,7 +44,7 @@ interface Order {
 export default function AdminOrdersPage() {
   const searchParams = useSearchParams()
   const statusFilter = searchParams.get('status') || 'all'
-  
+
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -51,13 +53,13 @@ export default function AdminOrdersPage() {
     try {
       setLoading(true)
       setError(null)
-      
+
       const url = statusFilter && statusFilter !== 'all'
         ? `/api/admin/orders?status=${encodeURIComponent(statusFilter)}`
         : '/api/admin/orders'
-      
+
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error('Erro ao carregar pedidos')
       }
@@ -145,9 +147,8 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                          statusColors[order.status] || statusColors.pending
-                        }`}
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusColors[order.status] || statusColors.pending
+                          }`}
                       >
                         {statusLabels[order.status] || order.status}
                       </span>
@@ -183,9 +184,8 @@ export default function AdminOrdersPage() {
                     </div>
                   </div>
                   <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                      statusColors[order.status] || statusColors.pending
-                    }`}
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusColors[order.status] || statusColors.pending
+                      }`}
                   >
                     {statusLabels[order.status] || order.status}
                   </span>
