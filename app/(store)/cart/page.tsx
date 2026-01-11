@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart'
 import { formatCurrency } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { ChevronUp, ChevronDown, Trash2, Image as ImageIcon, ShoppingCart } from 'lucide-react'
+import { ArrowUp, ArrowDown } from '@gravity-ui/icons';
 import { Button } from '@/components/atoms/Button'
 import { Input } from '@/components/atoms/Input'
 import Footer from '@/components/store/Footer'
@@ -218,26 +219,23 @@ export default function CartPage() {
                     <Trash2 className="h-5 w-5" />
                   </button>
 
-                  <div className="grid grid-cols-[100px_1fr] md:grid-cols-[10rem_1fr] gap-x-4 gap-y-4 md:gap-8 items-start">
+                  <div className="grid grid-cols-[100px_1fr] md:flex gap-x-4 gap-y-4 md:gap-8 items-start md:items-stretch">
                     {/* Imagem à esquerda */}
                     {product.image_url && (
-                      <div className="flex-shrink-0 col-start-1 row-start-1 row-span-2 md:row-span-4">
-                        <div className="w-[100px] md:w-40 aspect-square">
-                          <Image
-                            src={product.image_url}
-                            alt={product.title}
-                            width={160}
-                            height={160}
-                            className="w-full h-full rounded-2xl object-cover"
-                          />
-                        </div>
+                      <div className="flex-shrink-0 col-start-1 row-start-1 row-span-2 relative w-[100px] aspect-square md:w-56 md:aspect-square">
+                        <Image
+                          src={product.image_url}
+                          alt={product.title}
+                          fill
+                          className="rounded-2xl object-cover"
+                        />
                       </div>
                     )}
 
-                    {/* Informações à direita - Usando contents para participar do grid pai */}
-                    <div className="contents">
+                    {/* Informações à direita - Usando contents para participar do grid pai no mobile, e flex column no desktop */}
+                    <div className="contents md:flex md:flex-col md:flex-1">
                       {/* Nome do produto */}
-                      <h3 className="text-lg md:text-2xl font-bold text-white mb-0 md:mb-4 col-start-2 md:col-start-2 self-start pr-8 md:pr-0">
+                      <h3 className="text-lg md:text-2xl font-bold text-white mb-0 md:mb-6 col-start-2 md:col-start-2 self-start pr-8 md:pr-0">
                         {product.title}
                       </h3>
 
@@ -249,7 +247,7 @@ export default function CartPage() {
                           size="sm"
                           className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-green-light"
                         >
-                          <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Input
                           type="number"
@@ -275,12 +273,12 @@ export default function CartPage() {
                           size="sm"
                           className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-red-error"
                         >
-                          <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
 
                       {/* Valor */}
-                      <p className="text-xl md:text-2xl font-normal text-white mb-0 md:mb-6 col-start-1 col-span-2 md:col-start-2 md:col-span-1">
+                      <p className="text-xl md:text-2xl font-normal text-white mb-0 md:mb-8 col-start-1 col-span-2 md:col-start-2 md:col-span-1">
                         {formatCurrency(product.price_cents * item.quantity)}
                       </p>
 
@@ -340,32 +338,32 @@ export default function CartPage() {
 
           {/* Card de resumo à direita */}
           <div className="lg:w-[320px]">
-            <div className="bg-[#212121] border border-[#3D3D3D] rounded-2xl p-6 space-y-5 sticky top-24">
+            <div className="bg-[#212121] border border-[#3D3D3D] rounded-2xl p-6 space-y-4 sticky top-24">
               <div className="flex justify-between items-center">
-                <span className="text-white text-lg">Produtos</span>
-                <span className="text-white text-lg font-medium">
+                <span className="text-white/70 text-base">Produtos</span>
+                <span className="text-white/70 text-base font-medium">
                   {formatCurrency(subtotalCents)}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-white text-lg">Frete</span>
-                <span className="text-white text-lg font-medium">
+                <span className="text-white/70 text-base">Frete</span>
+                <span className="text-white/70 text-base font-medium">
                   {formatCurrency(shippingCents)}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-white text-lg">Voucher</span>
-                <span className="text-white text-lg font-medium">
+                <span className="text-white/70 text-base">Voucher</span>
+                <span className="text-white/70 text-base font-medium">
                   {formatCurrency(voucherCents)}
                 </span>
               </div>
 
-              <div className="border-t border-[#3D3D3D] pt-6 mt-6">
+              <div className="pt-8">
                 <div className="flex justify-between items-center">
-                  <span className="text-white text-xl font-bold">Total</span>
-                  <span className="text-white text-xl font-bold">
+                  <span className="text-white text-2xl font-bold">Total</span>
+                  <span className="text-white text-2xl font-bold">
                     {formatCurrency(totalCents)}
                   </span>
                 </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import NextTopLoader from 'nextjs-toploader'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import SEOHead from '@/components/SEOHead'
 
@@ -9,7 +10,7 @@ async function getSEOSettings() {
       .from('seo_settings')
       .select('*')
       .single()
-    
+
     return data || {
       site_title: 'E-commerce Personalizados',
       site_description: 'Produtos personalizados com qualidade',
@@ -31,7 +32,7 @@ async function getSEOSettings() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSEOSettings()
-  
+
   const metadata: Metadata = {
     title: seo.site_title || 'E-commerce Personalizados',
     description: seo.site_description || 'Produtos personalizados com qualidade',
@@ -88,7 +89,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const seo = await getSEOSettings()
-  
+
   return (
     <html lang="pt-BR">
       <body>
@@ -97,6 +98,7 @@ export default async function RootLayout({
           googleTagManagerId={seo.google_tag_manager_id}
           facebookPixelId={seo.facebook_pixel_id}
         />
+        <NextTopLoader color="#E9EF33" height={3} showSpinner={false} />
         {children}
       </body>
     </html>

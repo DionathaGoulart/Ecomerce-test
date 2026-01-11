@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
-import { Search, Plus, Minus, ShoppingCart, ChevronUp, ChevronDown } from 'lucide-react'
+import { Search, Plus, Minus, ShoppingCart } from 'lucide-react'
+import { ArrowUp, ArrowDown } from '@gravity-ui/icons'
 import { useCart } from '@/hooks'
 import { useProducts } from '@/hooks'
 import { formatCurrency } from '@/lib/utils'
@@ -53,7 +54,7 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
   return (
     <Card variant="default" padding="none" className="overflow-hidden group flex flex-col h-full bg-secondary-800 border border-secondary-600">
       {product.image_url && (
-        <div className="overflow-hidden bg-transparent flex-shrink-0 p-4 sm:p-6 pb-0">
+        <div className="overflow-hidden bg-transparent flex-shrink-0 p-4 sm:p-6 pb-0 sm:pb-0">
           <div className="aspect-square w-full relative">
             <Image
               src={product.image_url}
@@ -67,15 +68,15 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
           </div>
         </div>
       )}
-      <div className="flex flex-col flex-grow p-4 sm:p-6 pt-0">
-        <h3 className="font-semibold mb-2 flex-shrink-0 text-base sm:text-lg md:text-product-title text-white/80 mt-4 sm:mt-6">
+      <div className="flex flex-col flex-grow p-4 sm:p-6 pt-0 sm:pt-0">
+        <h3 className="font-semibold mb-2 flex-shrink-0 text-base sm:text-lg md:text-product-title text-white/80 mt-6">
           {truncateText(product.title, 39)}
         </h3>
         <p className="mb-3 sm:mb-4 flex-shrink-0 text-sm sm:text-base md:text-product-price text-white/80">
           A partir de<br />
           <span className="text-white opacity-100">{formatCurrency(product.price_cents)}</span> / 1 unid.
         </p>
-        
+
         <div className="mt-auto min-h-[40px] sm:min-h-[44px]">
           {!isAdding && quantity === 0 ? (
             <Button
@@ -87,36 +88,36 @@ function CatalogCard({ product, onAddToCart, cartQuantity, priority = false }: C
               <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               Adicionar
             </Button>
-        ) : (
-          <div className="flex items-center gap-2 h-[40px] sm:h-[44px]">
-            <Button
-              onClick={handleIncrease}
-              variant="outline"
-              size="sm"
-              className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-green-light"
-            >
-              <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-            <Input
-              type="number"
-              value={quantity}
-              onChange={(e) => {
-                const newQuantity = parseInt(e.target.value) || 0
-                onAddToCart(product.id, newQuantity)
-              }}
-              className="flex-1 text-center text-sm sm:text-base no-spinner bg-transparent border border-secondary-600 text-white h-full"
-              min={1}
-            />
-            <Button
-              onClick={handleDecrease}
-              variant="outline"
-              size="sm"
-              className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-red-error"
-            >
-              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-          </div>
-        )}
+          ) : (
+            <div className="flex items-center gap-2 h-[40px] sm:h-[44px]">
+              <Button
+                onClick={handleIncrease}
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 text-black border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-green-light"
+              >
+                <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+              <Input
+                type="number"
+                value={quantity}
+                onChange={(e) => {
+                  const newQuantity = parseInt(e.target.value) || 0
+                  onAddToCart(product.id, newQuantity)
+                }}
+                className="flex-1 text-center text-sm sm:text-base no-spinner bg-transparent border border-secondary-600 text-white h-full"
+                min={1}
+              />
+              <Button
+                onClick={handleDecrease}
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 text-white border-none rounded-xl sm:rounded-2xl p-2 sm:p-2.5 h-full bg-red-error"
+              >
+                <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Card>
@@ -146,7 +147,7 @@ export default function CatalogSection() {
         asideRef.current.style.marginLeft = ''
       }
     }
-    
+
     updateAsideWidth()
     window.addEventListener('resize', updateAsideWidth)
     return () => window.removeEventListener('resize', updateAsideWidth)
@@ -222,10 +223,10 @@ export default function CatalogSection() {
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     // Filtrar por categoria se uma estiver selecionada
     const matchesCategory = selectedCategory ? product.category_name === selectedCategory : true
-    
+
     return matchesSearch && matchesCategory
   })
 
@@ -270,7 +271,7 @@ export default function CatalogSection() {
     <section id="catalogo" className="relative z-20 w-full py-8 sm:py-12 md:py-16 bg-transparent mt-32 md:pt-24 full-vw">
       <div className="w-full px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32 3xl:px-40 2xl:px-96">
         {/* Título */}
-        <h2 className="font-semibold mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-catalog-title text-white break-words px-4 sm:px-6 md:px-0">
+        <h2 className="font-semibold mb-4 sm:mb-6 md:mb-12 text-4xl sm:text-5xl md:text-[96px] text-white break-words px-4 sm:px-6 md:px-0 leading-tight">
           Catálogo
         </h2>
 
@@ -291,7 +292,7 @@ export default function CatalogSection() {
         {/* Layout: Sidebar + Catálogo */}
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Sidebar de Categorias */}
-          <aside 
+          <aside
             ref={asideRef}
             className="w-full lg:w-64 flex-shrink-0 relative"
           >
@@ -307,22 +308,22 @@ export default function CatalogSection() {
                   {categories.map((category) => {
                     const isSelected = selectedCategory === category.name
                     const isHovered = hoveredCategory === category.name
-                    
+
                     return (
                       <li key={category.id} className="flex-shrink-0">
                         <button
                           onClick={() => setSelectedCategory(category.name)}
                           className={`text-center lg:text-left py-2 px-3 lg:px-0 lg:pr-3 lg:w-full rounded-lg transition-all whitespace-nowrap ${
                             // Mobile: apenas selecionado
-                            isSelected 
-                              ? 'text-primary-500 text-lg sm:text-xl' 
+                            isSelected
+                              ? 'text-primary-500 text-lg sm:text-xl'
                               : 'text-white opacity-80 text-sm sm:text-base'
-                          } ${
+                            } ${
                             // Desktop: hover e selecionado
                             isHovered || isSelected
                               ? 'lg:text-primary-500 lg:text-xl'
                               : 'lg:text-white lg:opacity-80 lg:text-base'
-                          }`}
+                            }`}
                           onMouseEnter={() => {
                             setHoveredCategory(category.name)
                           }}
@@ -375,23 +376,23 @@ export default function CatalogSection() {
             {/* Seção de Orçamento - Alinhada com os produtos */}
             <div className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 mt-64-custom">
               {/* Texto à esquerda */}
-              <p className="text-sm sm:text-base md:text-lg text-white/80 text-left flex-1">
+              <p className="text-base text-white/80 text-left flex-1">
                 Não encontrou o que procurava?<br />Faça um orçamento sob medida
               </p>
-              
+
               {/* Botão à direita */}
               <a
                 href={`https://wa.me/5554999851285?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento para um projeto personalizado.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent pl-[50px] sm:pl-[55px] md:pl-[50px] pr-5 sm:pr-6 md:pr-5 py-3 sm:py-3.5 md:py-[18px] text-[14px] sm:text-base font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] w-auto overflow-hidden flex-shrink-0"
+                className="group relative flex items-center justify-center rounded-xl sm:rounded-[16px] border border-primary-500 bg-transparent pl-[42px] sm:pl-[45px] md:pl-[42px] pr-4 sm:pr-5 md:pr-4 py-2 sm:py-2.5 md:py-3 text-xs font-medium text-primary-500 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] w-auto overflow-hidden flex-shrink-0"
               >
                 <Image
                   src="/icons/project.svg"
                   alt=""
-                  width={20}
-                  height={20}
-                  className="absolute left-[18px] sm:left-[20px] md:left-[18px] top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-100 translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                  width={16}
+                  height={16}
+                  className="absolute left-[14px] sm:left-[16px] md:left-[14px] top-1/2 -translate-y-1/2 h-4 w-4 opacity-100 translate-x-0 transition-all duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
                 />
                 <span className="whitespace-nowrap inline-block">Orçar projeto</span>
               </a>

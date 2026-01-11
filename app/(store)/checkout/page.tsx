@@ -266,12 +266,9 @@ export default function CheckoutPage() {
                             <div className="flex flex-col h-full justify-between">
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
-                                        <h3 className={`text-[24px] font-bold ${selectedMethod === 'delivery' ? 'text-black' : 'text-white'}`}>
+                                        <h3 className={`text-[32px] font-bold ${selectedMethod === 'delivery' ? 'text-black' : 'text-white'}`}>
                                             Receber em casa
                                         </h3>
-                                        <div className={`p-2 rounded-full ${selectedMethod === 'delivery' ? 'bg-black/10' : 'bg-white/10'}`}>
-                                            <MapPin className={`h-6 w-6 ${selectedMethod === 'delivery' ? 'text-black' : 'text-white'}`} />
-                                        </div>
                                     </div>
 
                                     {userAddress ? (
@@ -288,15 +285,15 @@ export default function CheckoutPage() {
 
                                     {userAddress && (
                                         <p className={`text-[18px] font-medium ${selectedMethod === 'delivery' ? 'text-black' : 'text-white'}`}>
-                                            Frete: {formatCurrency(2500)}
+                                            {formatCurrency(2500)}
                                         </p>
                                     )}
                                 </div>
 
                                 <div className="mt-6">
                                     {userAddress ? (
-                                        <button className={`text-sm font-semibold underline ${selectedMethod === 'delivery' ? 'text-black hover:text-black/70' : 'text-white hover:text-white/70'}`}>
-                                            Alterar endereço
+                                        <button className={`text-xs font-medium px-4 py-2 rounded-xl border bg-transparent transition-colors ${selectedMethod === 'delivery' ? 'border-black text-black hover:bg-black/5' : 'border-white text-white hover:bg-white/10'}`}>
+                                            Alterar Endereço
                                         </button>
                                     ) : (
                                         <button className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-colors ${selectedMethod === 'delivery'
@@ -322,12 +319,9 @@ export default function CheckoutPage() {
                             <div className="flex flex-col h-full justify-between">
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
-                                        <h3 className={`text-[24px] font-bold ${selectedMethod === 'pickup' ? 'text-black' : 'text-white'}`}>
+                                        <h3 className={`text-[32px] font-bold ${selectedMethod === 'pickup' ? 'text-black' : 'text-white'}`}>
                                             Retirar no local
                                         </h3>
-                                        <div className={`p-2 rounded-full ${selectedMethod === 'pickup' ? 'bg-black/10' : 'bg-white/10'}`}>
-                                            <Store className={`h-6 w-6 ${selectedMethod === 'pickup' ? 'text-black' : 'text-white'}`} />
-                                        </div>
                                     </div>
 
                                     <p className={`text-[16px] mb-4 max-w-md ${selectedMethod === 'pickup' ? 'text-black/80' : 'text-white/70'}`}>
@@ -345,32 +339,32 @@ export default function CheckoutPage() {
 
                     {/* Resumo da Compra */}
                     <div className="lg:w-[320px]">
-                        <div className="bg-[#212121] border border-[#3D3D3D] rounded-2xl p-6 space-y-5 sticky top-24">
+                        <div className="bg-[#212121] border border-[#3D3D3D] rounded-2xl p-6 space-y-4 sticky top-24">
                             <div className="flex justify-between items-center">
-                                <span className="text-white text-lg">Produtos</span>
-                                <span className="text-white text-lg font-medium">
+                                <span className="text-white/70 text-base">Produtos</span>
+                                <span className="text-white/70 text-base font-medium">
                                     {formatCurrency(subtotalCents)}
                                 </span>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-white text-lg">Frete</span>
-                                <span className="text-white text-lg font-medium">
+                                <span className="text-white/70 text-base">Frete</span>
+                                <span className="text-white/70 text-base font-medium">
                                     {selectedMethod === 'pickup' ? 'Grátis' : formatCurrency(shippingCents)}
                                 </span>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-white text-lg">Voucher</span>
-                                <span className="text-white text-lg font-medium">
+                                <span className="text-white/70 text-base">Voucher</span>
+                                <span className="text-white/70 text-base font-medium">
                                     {formatCurrency(voucherCents)}
                                 </span>
                             </div>
 
-                            <div className="border-t border-[#3D3D3D] pt-6 mt-6">
+                            <div className="pt-8">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-white text-xl font-bold">Total</span>
-                                    <span className="text-white text-xl font-bold">
+                                    <span className="text-white text-2xl font-bold">Total</span>
+                                    <span className="text-white text-2xl font-bold">
                                         {formatCurrency(selectedMethod === 'pickup' ? subtotalCents - voucherCents : totalCents)}
                                     </span>
                                 </div>
