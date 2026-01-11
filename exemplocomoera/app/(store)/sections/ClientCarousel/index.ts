@@ -1,2 +1,0 @@
-export { ClientCarousel } from './ClientCarousel'
-
